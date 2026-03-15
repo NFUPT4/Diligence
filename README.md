@@ -1,37 +1,29 @@
-# Diligence
+# 勤致 - 员工考勤管理系统
 
-#### 介绍
-”勤致“-员工考勤管理系统
+## 项目简介
 
-#### 软件架构
-软件架构说明
+“勤致”是一款轻量级、智能化的 Web 考勤管理系统，旨在解决传统考勤方式中数据分散、统计耗时、防作弊能力弱、难以适应弹性工作制等问题。系统支持基于 GPS 位置验证的打卡、灵活的考勤规则配置、自动化报表生成及请假审批流程，帮助企业实现考勤全流程数字化管理。
 
+## 核心功能
 
-#### 安装教程
+- **员工信息管理**：支持部门、岗位及员工信息的增删改查。
+- **考勤规则配置**：支持固定班次与弹性工时规则设置。
+- **智能打卡**：基于 GPS 地理位置验证，防作弊机制（超出范围无法打卡）。
+- **统计报表**：自动生成多维度考勤报表，支持图表可视化（如 ECharts）。
+- **请假审批**：员工在线提交申请，主管审批，结果自动关联考勤统计。
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+## 技术栈
 
-#### 使用说明
+- **前端**：Vue.js (组合式 API) + Element Plus + ECharts + 高德地图 JS API
+- **后端**：Spring Boot + Spring MVC + JPA / MyBatis
+- **数据库**：MySQL
+- **第三方服务**：高德地图地理编码 API
+- **版本控制**：Git (Gitee / GitHub)
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+## 快速开始
 
-#### 参与贡献
+（项目正在开发中，启动方式后续补充...）
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+## 许可证
 
-
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+本项目为课程实训项目，遵循CC BY-NC-SA，仅供学习交流使用。
