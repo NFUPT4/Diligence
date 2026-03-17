@@ -1,36 +1,30 @@
-# Diligence
+# Diligence - Employee Attendance Management System
 
-#### Description
-”勤致“-员工考勤管理系统
+## Introduction
 
-#### Software Architecture
-Software architecture description
+"Diligence" is a lightweight, intelligent web-based attendance management system designed to address common issues in traditional attendance methods such as data fragmentation, time-consuming statistics, weak anti-cheating mechanisms, and inflexibility to adapt to flexible working hours. The system supports GPS-based location verification for clock-in, flexible attendance rule configuration, automated report generation, and leave approval workflows, enabling enterprises to digitize the entire attendance management process.
 
-#### Installation
+## Key Features
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+- **Employee Information Management**: CRUD operations for departments, positions, and employees.
+- **Attendance Rule Configuration**: Support for fixed shifts and flexible working hours.
+- **Smart Clock-in**: GPS-based location verification with anti-cheating (restricted clock-in outside predefined area).
+- **Statistical Reports**: Automatic generation of multi-dimensional attendance reports with visual charts (e.g., ECharts).
+- **Leave Approval**: Employees submit requests online, supervisors approve, and results automatically affect attendance statistics.
 
-#### Instructions
+## Tech Stack
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### Contribution
-
-1.  Fork the repository
-2.  Create Feat_xxx branch
-3.  Commit your code
-4.  Create Pull Request
+- **Frontend**: Vue.js (Composition API) + Element Plus + ECharts + AMap JS API
+- **Backend**: Spring Boot + Spring MVC + JPA / MyBatis
+- **Database**: MySQL
+- **Third-party Services**: AMap Geocoding API
+- **Version Control**: Git (Gitee / GitHub)
 
 
-#### Gitee Feature
+## Getting Started
 
-1.  You can use Readme\_XXX.md to support different languages, such as Readme\_en.md, Readme\_zh.md
-2.  Gitee blog [blog.gitee.com](https://blog.gitee.com)
-3.  Explore open source project [https://gitee.com/explore](https://gitee.com/explore)
-4.  The most valuable open source project [GVP](https://gitee.com/gvp)
-5.  The manual of Gitee [https://gitee.com/help](https://gitee.com/help)
-6.  The most popular members  [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+(Project is under development – setup instructions will be added later.)
+
+## License
+
+This project is a course training project and is for learning and communication purposes only.
