@@ -11,16 +11,8 @@
             "path": "./tsconfig.vitest.json"
         }
     ],
-    "include": [
-        "./src/components/*.vue",
-        "./src/components/**/*.vue",
-        "./src/*.d.ts",
-        "./src/**/*.ts"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist"
-    ],
+    "include": ["./src/components/*.vue", "./src/components/**/*.vue", "./src/*.d.ts", "./src/**/*.ts"],
+    "exclude": ["node_modules", "dist"],
     "compilerOptions": {
         "module": "ESNext",
         "declaration": true,
@@ -30,9 +22,7 @@
         "moduleResolution": "node",
         "baseUrl": "./",
         "paths": {
-            "@/*": [
-                "./src/*"
-            ]
+            "@/*": ["./src/*"]
         }
     }
 }

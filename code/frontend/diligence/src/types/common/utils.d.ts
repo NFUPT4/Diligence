@@ -8,16 +8,24 @@
  */
 
 /**
- * @file mock.ts
+ * @file utils.d.ts
  * @author edocsitahw
  * @version 1.1
- * @date 2026/04/03 13:24
+ * @date 2026/04/03 13:52
  * @desc
  * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
  * */
-import { createProdMockServer } from "vite-plugin-mock/client";
-import MockMethod from "./api";
 
-export function setupProdMockServer() {
-    createProdMockServer([...MockMethod]);
-}
+/**
+ * @summary 定义一个可空类型
+ * @desc 用于定义一个变量可以为null
+ * */
+export type Nullable<T> = T | null;
+
+
+/**
+ * @summary 定义一个可选类型
+ * @desc 用于定义一个变量可以为undefined
+ * @remarks 与Nullable不同，Optional可以用于定义可选参数，即参数可以不传，但必须声明类型
+ * */
+export type Optional<T> = T | undefined;
