@@ -8,16 +8,20 @@
  */
 
 /**
- * @file mock.ts
+ * @file constant.ts
  * @author edocsitahw
  * @version 1.1
- * @date 2026/04/03 13:24
+ * @date 2026/04/03 13:39
  * @desc
  * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
  * */
-import { createProdMockServer } from "vite-plugin-mock/client";
-import MockMethod from "./api";
+import type { LocalStorageKey } from "@/types/common";
 
-export function setupProdMockServer() {
-    createProdMockServer([...MockMethod]);
-}
+
+/**
+ * @constant DG_TOKEN_KEY
+ *
+ * @summary LocalStorage存储token的key值
+ * @desc 该值用于存储token，在登录成功后，将token存储在localStorage中，以便在其他页面访问时使用。
+ * */
+export const DG_TOKEN_KEY: LocalStorageKey<"token"> = "DG_TOKEN_KEY";

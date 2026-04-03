@@ -12,29 +12,25 @@
  * @file App.vue
  * @author edocsitahw
  * @version 1.1
- * @date {datetime.now():%Y/%m/%d %H:%M:%S}
+ * @date 2026/04/03 12:51
  * @description
  * */
-import {defineComponent} from "vue";
-import router from "@/router/router";
-
+import { defineComponent } from 'vue';
+import router from '@/router/router';
 
 onload = () => {
-    {
-        router.push("/");
-    }
+  {
+    router.push('/')
+  }
 }
 
 export default defineComponent({
-    name: "App"
-});
+  name: 'App',
+})
 </script>
 
 <template>
-
-    <router-view></router-view>
-
+  <router-view></router-view>
 </template>
 
-<style lang="sass">
-</style>
+<style lang="sass"></style>

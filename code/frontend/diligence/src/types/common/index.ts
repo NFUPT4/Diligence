@@ -7,13 +7,13 @@
  * permission, please contact NFUPT4 https://gitee.com/nfupt4.
  */
 
-import {defineStore} from 'pinia'
-
-
-export const useStore = defineStore('store', {
-    state() {
-        return {}
-    },
-    getters: {},
-    actions: {}
-})
+/**
+ * @file index.ts
+ * @author edocsitahw
+ * @version 1.1
+ * @date 2026/04/03 13:45
+ * @desc 导出通用类型定义文件
+ * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
+ * */
+export * from "./constant";
+export * from "./utils";
