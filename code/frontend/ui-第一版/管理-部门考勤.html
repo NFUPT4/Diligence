@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据查看 - 勤致考勤系统</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft Yahei",sans-serif;}
+        body{background:linear-gradient(180deg,#2b65d9,#58a1ff);min-height:100vh;padding:20px;display:flex;justify-content:center;align-items:flex-start;}
+        .container{max-width:800px;width:100%;margin-top:30px;}
+
+        /* 主卡片 */
+        .card{background:#fff;border-radius:16px;padding:36px;box-shadow:0 10px 40px rgba(0,0,0,0.1);margin-bottom:20px;}
+        .card-title{font-size:24px;font-weight:600;margin-bottom:28px;color:#1a1a1a;}
+
+        /* 筛选栏 */
+        .filter-bar{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:28px;align-items:flex-end;}
+        .filter-item{flex:1;min-width:180px;}
+        .filter-label{display:block;font-size:15px;font-weight:500;margin-bottom:10px;color:#222;}
+        .form-select,.form-input{
+            width:100%;height:50px;border:2px solid #e0e0e0;border-radius:10px;
+            padding:0 16px;font-size:16px;background:#f7f9fc;outline:none;transition:0.3s;
+        }
+        .form-select:focus,.form-input:focus{border-color:#2b65d9;}
+        .query-btn{
+            height:50px;padding:0 24px;background:#2b65d9;color:#fff;border:none;
+            border-radius:10px;font-size:16px;font-weight:500;cursor:pointer;transition:0.2s;
+            white-space:nowrap;
+        }
+        .query-btn:hover{background:#1e47b8;}
+
+        /* 导出按钮样式 */
+        .export-btn{
+            height:50px;padding:0 24px;background:#00b42a;color:#fff;border:none;
+            border-radius:10px;font-size:16px;font-weight:500;cursor:pointer;transition:0.2s;
+            white-space:nowrap;
+        }
+        .export-btn:hover{background:#009a20;}
+
+        /* 图表区域 */
+        .chart-box{background:#f7f9fc;border-radius:12px;padding:20px;margin-bottom:28px;height:300px;display:flex;align-items:center;justify-content:center;}
+        .chart-placeholder{text-align:center;color:#666;}
+        .chart-placeholder i{font-size:48px;margin-bottom:16px;opacity:0.5;}
+
+        /* 报表表格 */
+        .table-box{overflow-x:auto;margin-bottom:16px;}
+        .att-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:10px;overflow:hidden;}
+        .att-table th{background:#2b65d9;color:#fff;text-align:left;padding:16px;font-size:15px;font-weight:500;}
+        .att-table td{background:#fff;border-bottom:1px solid #f0f0f0;padding:16px;font-size:15px;color:#333;}
+        .att-table tr:last-child td{border-bottom:none;}
+        .detail-btn{
+            padding:6px 12px;background:#e6f0ff;color:#2b65d9;border:none;
+            border-radius:6px;font-size:14px;cursor:pointer;
+        }
+
+        /* 明细弹窗 */
+        .modal{
+            position:fixed;top:0;left:0;width:100%;height:100%;
+            background:rgba(0,0,0,0.4);display:flex;justify-content:center;align-items:center;
+            z-index:999;display:none;
+        }
+        .modal-card{
+            background:#fff;border-radius:16px;padding:32px;width:90%;
+            max-width:600px;max-height:80vh;overflow-y:auto;
+        }
+        .modal-title{font-size:20px;font-weight:600;margin-bottom:24px;color:#1a1a1a;display:flex;justify-content:space-between;align-items:center;}
+        .close-btn{width:36px;height:36px;border-radius:50%;background:#f5f7fa;border:none;cursor:pointer;font-size:18px;}
+        .detail-item{padding:12px 0;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;}
+        .detail-label{color:#666;}
+        .detail-value{font-weight:500;color:#222;}
+        .status-normal{color:#00b42a;}
+        .status-late{color:#ff9800;}
+        .status-absent{color:#ff4d4f;}
+
+        /* 底部导航 */
+        .nav{display:flex;gap:12px;}
+        .nav-btn{
+            flex:1;background:#fff;border:none;border-radius:12px;padding:16px;
+            font-size:16px;font-weight:500;color:#2b65d9;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.08);
+        }
+        .nav-btn.active{background:#2b65d9;color:#fff;}
+
+        /* 适配小屏 */
+        @media (max-width:768px) {
+            .filter-bar{flex-direction:column;align-items:stretch;}
+            .query-btn{width:100%;}
+            .export-btn{width:100%;}
+            .card{padding:24px;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <div class="card-title">部门考勤数据查看</div>
+
+        <!-- 筛选栏：部门+日期范围+查询 + 导出按钮 -->
+        <div class="filter-bar">
+            <div class="filter-item">
+                <label class="filter-label">选择部门</label>
+                <select class="form-select" id="deptSelect">
+                    <option value="all">全部部门（管理员）</option>
+                    <option value="tech" selected>技术部</option>
+                    <option value="ops">运营部</option>
+                    <option value="sales">销售部</option>
+                    <option value="admin">行政部</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label class="filter-label">开始日期</label>
+                <input type="date" class="form-input" id="startDate" value="2026-04-01">
+            </div>
+            <div class="filter-item">
+                <label class="filter-label">结束日期</label>
+                <input type="date" class="form-input" id="endDate" value="2026-04-30">
+            </div>
+            <button class="query-btn" id="queryBtn">查询报表</button>
+            <!-- 导出按钮 -->
+            <button class="export-btn" id="exportBtn">导出 Excel</button>
+        </div>
+
+        <!-- 图表统计区域 -->
+        <div class="chart-box">
+            <div class="chart-placeholder">
+                <i>📊</i>
+                <h3>技术部4月考勤统计</h3>
+                <p>正常出勤：85% | 迟到：10% | 缺勤：5%</p>
+            </div>
+        </div>
+
+        <!-- 部门考勤报表表格 -->
+        <div class="table-box">
+            <table class="att-table" id="attTable">
+                <thead>
+                    <tr>
+                        <th>员工姓名</th>
+                        <th>工号</th>
+                        <th>正常出勤</th>
+                        <th>迟到次数</th>
+                        <th>缺勤次数</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-id="001" data-name="张三" data-dept="技术部">
+                        <td>张三</td>
+                        <td>JS001</td>
+                        <td>28天</td>
+                        <td>1次</td>
+                        <td>0次</td>
+                        <td><button class="detail-btn">查看明细</button></td>
+                    </tr>
+                    <tr data-id="002" data-name="李四" data-dept="技术部">
+                        <td>李四</td>
+                        <td>JS002</td>
+                        <td>27天</td>
+                        <td>2次</td>
+                        <td>0次</td>
+                        <td><button class="detail-btn">查看明细</button></td>
+                    </tr>
+                    <tr data-id="003" data-name="王五" data-dept="技术部">
+                        <td>王五</td>
+                        <td>JS003</td>
+                        <td>25天</td>
+                        <td>1次</td>
+                        <td>1次</td>
+                        <td><button class="detail-btn">查看明细</button></td>
+                    </tr>
+                    <tr data-id="004" data-name="赵六" data-dept="技术部">
+                        <td>赵六</td>
+                        <td>JS004</td>
+                        <td>29天</td>
+                        <td>0次</td>
+                        <td>0次</td>
+                        <td><button class="detail-btn">查看明细</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="nav">
+        <button class="nav-btn">首页</button>
+        <button class="nav-btn">我的考勤</button>
+        <button class="nav-btn">申请</button>
+        <button class="nav-btn active">数据查看</button>
+        <button class="nav-btn">我的</button>
+    </div>
+</div>
+
+<!-- 员工考勤明细弹窗 -->
+<div class="modal" id="detailModal">
+    <div class="modal-card">
+        <div class="modal-title">
+            <span id="modalName">张三（JS001）- 考勤明细</span>
+            <button class="close-btn" id="closeModal">×</button>
+        </div>
+        <div id="detailContent">
+        </div>
+    </div>
+</div>
+
+<!-- 引入 Excel 导出库 -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+    // 查询
+    const queryBtn = document.getElementById('queryBtn');
+    queryBtn.addEventListener('click', () => {
+        const dept = document.getElementById('deptSelect').options[document.getElementById('deptSelect').selectedIndex].text;
+        const start = document.getElementById('startDate').value;
+        const end = document.getElementById('endDate').value;
+        alert(`已查询【${dept}】${start} 至 ${end} 的考勤数据`);
+    });
+
+    // ====================== 导出 Excel 功能 ======================
+    document.getElementById('exportBtn').addEventListener('click', function() {
+        const wb = XLSX.utils.table_to_book(document.getElementById('attTable'), { sheet: "考勤报表" });
+        XLSX.writeFile(wb, "部门考勤数据报表.xlsx");
+        alert("Excel 导出成功！浏览器已自动下载");
+    });
+
+    // 明细弹窗逻辑（保持不变）
+    const modal = document.getElementById('detailModal');
+    const closeModal = document.getElementById('closeModal');
+    const detailContent = document.getElementById('detailContent');
+    const modalName = document.getElementById('modalName');
+
+    const empDetailData = {
+        "001": [
+            {date: "2026-04-05", in: "09:15", out: "18:00", status: "迟到"},
+            {date: "2026-04-10", in: "08:50", out: "18:10", status: "正常"},
+            {date: "2026-04-15", in: "08:45", out: "18:05", status: "正常"},
+            {date: "2026-04-20", in: "08:55", out: "18:20", status: "正常"},
+            {date: "2026-04-25", in: "09:00", out: "18:00", status: "正常"}
+        ],
+        "002": [
+            {date: "2026-04-03", in: "09:20", out: "18:00", status: "迟到"},
+            {date: "2026-04-08", in: "09:10", out: "18:10", status: "迟到"},
+            {date: "2026-04-12", in: "08:55", out: "18:05", status: "正常"}
+        ],
+        "003": [
+            {date: "2026-04-06", in: "09:18", out: "18:00", status: "迟到"},
+            {date: "2026-04-18", in: "—", out: "—", status: "缺勤"},
+            {date: "2026-04-22", in: "08:48", out: "18:15", status: "正常"}
+        ],
+        "004": [
+            {date: "2026-04-02", in: "08:50", out: "18:00", status: "正常"},
+            {date: "2026-04-09", in: "08:45", out: "18:10", status: "正常"},
+            {date: "2026-04-16", in: "08:55", out: "18:05", status: "正常"}
+        ]
+    };
+
+    document.querySelectorAll('.detail-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tr = btn.closest('tr');
+            const empId = tr.dataset.id;
+            const empName = tr.dataset.name;
+            const empNo = tr.children[1].innerText;
+            const dept = tr.dataset.dept;
+            
+            modalName.innerText = `${empName}（${empNo}）- ${dept}考勤明细`;
+            let html = '';
+            empDetailData[empId].forEach(item => {
+                let statusClass = '';
+                if(item.status === '正常') statusClass = 'status-normal';
+                else if(item.status === '迟到') statusClass = 'status-late';
+                else if(item.status === '缺勤') statusClass = 'status-absent';
+                
+                html += `
+                <div class="detail-item">
+                    <div class="detail-label">${item.date}</div>
+                    <div class="detail-value">上班：${item.in} | 下班：${item.out} | <span class="${statusClass}">${item.status}</span></div>
+                </div>
+                `;
+            });
+            detailContent.innerHTML = html;
+            modal.style.display = 'flex';
+        });
+    });
+
+    closeModal.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+    modal.addEventListener('click', (e) => {
+        if(e.target === modal) modal.style.display = 'none';
+    });
+</script>
+</body>
+</html>
