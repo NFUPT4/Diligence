@@ -11,13 +11,12 @@
  * @file mock.ts
  * @author edocsitahw
  * @version 1.1
- * @date 2026/03/15 21:57
+ * @date 2026/04/03 13:24
  * @desc
  * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
  * */
-import {createProdMockServer} from "vite-plugin-mock/client";
+import { createProdMockServer } from "vite-plugin-mock/client";
 import MockMethod from "./api";
-
 
 export function setupProdMockServer() {
     createProdMockServer([...MockMethod]);

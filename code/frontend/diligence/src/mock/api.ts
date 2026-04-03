@@ -11,18 +11,18 @@
  * @file api.ts
  * @author edocsitahw
  * @version 1.1
- * @date 2026/03/15 21:56
+ * @date 2026/04/03 13:25
  * @desc
  * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
  * */
 export default [
     {
-        url: '/api',
-        method: 'POST',
+        url: "/api",
+        method: "POST",
         response: {
             code: 200,
-            msg: 'ok',
-            data: 'Hello, World!'
+            msg: "ok",
+            data: "Hello, World!"
         }
     }
-]
+];

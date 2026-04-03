@@ -9,22 +9,21 @@
 
 <template>
 
+
+
 </template>
 
-<script lang='ts' setup>
+<script lang="ts" setup>
 /**
  * @file Home.vue
  * @author edocsitahw
  * @version 1.1
- * @date 2026/03/15 22:00
+ * @date 2026/04/03 12:51
  * @desc
  * @copyright CC BY-NC-SA
  * */
-import {ref, reactive, computed, watch} from "vue";
-import type {Ref, Reactive, PropType} from "vue";
-
+import { ref, reactive, computed, watch } from 'vue'
+import type { Ref, Reactive, PropType } from 'vue'
 </script>
 
-<style lang='sass' scoped>
-
-</style>
+<style lang="sass" scoped></style>

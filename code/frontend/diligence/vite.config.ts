@@ -7,15 +7,18 @@
  * permission, please contact NFUPT4 https://gitee.com/nfupt4.
  */
 
-import {fileURLToPath, URL} from 'node:url';
+import { fileURLToPath, URL } from "node:url";
 
-import {defineConfig} from 'vite';
-import {viteMockServe} from "vite-plugin-mock";
-import vue from '@vitejs/plugin-vue';
-import vueDevTools from 'vite-plugin-vue-devtools';
+import { defineConfig } from "vite";
+import { viteMockServe } from "vite-plugin-mock";
+import vue from "@vitejs/plugin-vue";
+import vueDevTools from "vite-plugin-vue-devtools";
 
-// https://vite.dev/config/
+// https://vitejs.dev/config/
 export default defineConfig({
+    esbuild: {
+        target: "es2020"
+    },
     css: {
         preprocessorOptions: {
             sass: {
@@ -36,13 +39,13 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            '@': fileURLToPath(new URL('./src', import.meta.url))
+            "@": fileURLToPath(new URL("./src", import.meta.url))
         }
     },
     assetsInclude: ["**/*.svg"],
     server: {
         host: "0.0.0.0",
-        port: 8080,
+        port: 7265,
         open: true
     }
-})
+});

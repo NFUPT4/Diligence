@@ -1,0 +1,1463 @@
+openapi: 3.0.3
+info:
+    title: “勤致”-员工考勤管理系统 API
+    description: "基于前后端分离架构的考勤管理RESTful API，支持GPS打卡、审批流程、报表导出等功能。"
+    version: 1.0.0
+    contact:
+        name: 项目组
+servers:
+    -   url: http://localhost:8080/api/v1
+        description: 本地开发服务器
+    -   url: https://your-domain.com/api
+        description: 生产环境服务器
+
+tags:
+    -   name: 认证授权
+        description: 用户登录、Token刷新
+    -   name: 打卡管理
+        description: 员工上下班打卡、打卡记录查询
+    -   name: 申请审批
+        description: 考勤申请提交、审批、记录查询
+    -   name: 报表数据
+        description: 个人/部门考勤报表、数据导出
+    -   name: 员工账号管理
+        description: 管理员对员工账号的增删改查、状态管理
+    -   name: 考勤规则配置
+        description: 打卡地点、考勤组、考勤规则管理
+    -   name: 组织架构维护
+        description: 部门、岗位的管理
+
+components:
+    securitySchemes:
+        BearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+            description:
+                "登录成功后返回的JWT Token，请在请求头中携带 `Authorization: Bearer <token>`"
+
+    schemas:
+        # 通用响应封装
+        Response:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    example: 200
+                message:
+                    type: string
+                    example: success
+                data:
+                    type: object
+
+        PageResult:
+            type: object
+            properties:
+                total:
+                    type: integer
+                    example: 100
+                pageNum:
+                    type: integer
+                    example: 1
+                pageSize:
+                    type: integer
+                    example: 10
+                list:
+                    type: array
+
+        # 登录
+        LoginRequest:
+            type: object
+            required:
+                - empNo
+                - password
+            properties:
+                empNo:
+                    type: string
+                    description: 员工工号
+                    example: "EMP001"
+                password:
+                    type: string
+                    description: 密码
+                    example: "123456"
+        LoginResponse:
+            type: object
+            properties:
+                token:
+                    type: string
+                    description: JWT Token
+                userInfo:
+                    $ref: '#/components/schemas/UserInfo'
+        UserInfo:
+            type: object
+            properties:
+                employeeId:
+                    type: integer
+                empNo:
+                    type: string
+                name:
+                    type: string
+                role:
+                    type: integer
+                    description: 0-普通员工，1-部门主管，2-管理员
+                deptId:
+                    type: integer
+                deptName:
+                    type: string
+
+        # 打卡
+        ClockRequest:
+            type: object
+            required:
+                - longitude
+                - latitude
+                - clockTime
+            properties:
+                longitude:
+                    type: number
+                    format: double
+                    description: GPS经度
+                latitude:
+                    type: number
+                    format: double
+                    description: GPS纬度
+                location:
+                    type: string
+                    description: 逆地理编码地址
+                clockTime:
+                    type: string
+                    format: date-time
+                    description: 打卡时间
+        ClockRecordVO:
+            type: object
+            properties:
+                recordId:
+                    type: integer
+                employeeId:
+                    type: integer
+                employeeName:
+                    type: string
+                clockDate:
+                    type: string
+                    format: date
+                clockTime:
+                    type: string
+                    format: date-time
+                clockType:
+                    type: integer
+                    description: 0-上班，1-下班
+                longitude:
+                    type: number
+                latitude:
+                    type: number
+                location:
+                    type: string
+                isValid:
+                    type: boolean
+                status:
+                    type: integer
+                    description: 0-正常，1-异常（迟到/早退）
+
+        # 考勤申请
+        ApplicationSubmitRequest:
+            type: object
+            required:
+                - appType
+                - startTime
+                - endTime
+                - reason
+            properties:
+                appType:
+                    type: integer
+                    description: 0-请假，1-加班，2-外勤，3-补卡
+                startTime:
+                    type: string
+                    format: date-time
+                endTime:
+                    type: string
+                    format: date-time
+                reason:
+                    type: string
+                    maxLength: 255
+                attachmentUrl:
+                    type: string
+                    description: 附件URL（先上传获得）
+        ApplicationVO:
+            type: object
+            properties:
+                appId:
+                    type: integer
+                employeeId:
+                    type: integer
+                employeeName:
+                    type: string
+                appType:
+                    type: integer
+                appTypeName:
+                    type: string
+                startTime:
+                    type: string
+                    format: date-time
+                endTime:
+                    type: string
+                    format: date-time
+                duration:
+                    type: number
+                reason:
+                    type: string
+                attachmentUrl:
+                    type: string
+                status:
+                    type: integer
+                statusName:
+                    type: string
+                currentApprover:
+                    type: integer
+                createTime:
+                    type: string
+                    format: date-time
+        ApprovalRequest:
+            type: object
+            required:
+                - result
+            properties:
+                result:
+                    type: integer
+                    description: 0-通过，1-驳回
+                comment:
+                    type: string
+                    description: 驳回时必填
+
+        # 报表
+        DepartmentReportQuery:
+            type: object
+            properties:
+                deptId:
+                    type: integer
+                    description: 部门ID，管理员可传null查全公司
+                startDate:
+                    type: string
+                    format: date
+                endDate:
+                    type: string
+                    format: date
+                employeeName:
+                    type: string
+                status:
+                    type: integer
+                    description: 考勤状态筛选
+        EmployeeReportVO:
+            type: object
+            properties:
+                employeeId:
+                    type: integer
+                empNo:
+                    type: string
+                name:
+                    type: string
+                deptName:
+                    type: string
+                totalDays:
+                    type: integer
+                normalDays:
+                    type: integer
+                lateTimes:
+                    type: integer
+                earlyTimes:
+                    type: integer
+                absentDays:
+                    type: integer
+                leaveDays:
+                    type: number
+                overtimeHours:
+                    type: number
+
+        # 员工管理
+        EmployeeCreateRequest:
+            type: object
+            required:
+                - empNo
+                - name
+                - deptId
+                - positionId
+            properties:
+                empNo:
+                    type: string
+                    minLength: 6
+                    maxLength: 20
+                name:
+                    type: string
+                gender:
+                    type: integer
+                phone:
+                    type: string
+                email:
+                    type: string
+                deptId:
+                    type: integer
+                positionId:
+                    type: integer
+                role:
+                    type: integer
+                    description: 0-员工，1-主管，2-管理员
+        EmployeeUpdateRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                gender:
+                    type: integer
+                phone:
+                    type: string
+                email:
+                    type: string
+                deptId:
+                    type: integer
+                positionId:
+                    type: integer
+                role:
+                    type: integer
+        EmployeeVO:
+            type: object
+            properties:
+                employeeId:
+                    type: integer
+                empNo:
+                    type: string
+                name:
+                    type: string
+                gender:
+                    type: integer
+                phone:
+                    type: string
+                email:
+                    type: string
+                deptId:
+                    type: integer
+                deptName:
+                    type: string
+                positionId:
+                    type: integer
+                positionName:
+                    type: string
+                role:
+                    type: integer
+                groupId:
+                    type: integer
+                groupName:
+                    type: string
+                status:
+                    type: integer
+                createTime:
+                    type: string
+                    format: date-time
+
+        # 考勤规则
+        LocationRequest:
+            type: object
+            required:
+                - locName
+                - address
+                - longitude
+                - latitude
+            properties:
+                locName:
+                    type: string
+                address:
+                    type: string
+                longitude:
+                    type: number
+                latitude:
+                    type: number
+                radius:
+                    type: integer
+                    description: 有效半径，米，默认100
+        LocationVO:
+            type: object
+            properties:
+                locId:
+                    type: integer
+                locName:
+                    type: string
+                address:
+                    type: string
+                longitude:
+                    type: number
+                latitude:
+                    type: number
+                radius:
+                    type: integer
+                status:
+                    type: integer
+
+        AttendanceRuleRequest:
+            type: object
+            required:
+                - ruleName
+                - ruleType
+            properties:
+                ruleName:
+                    type: string
+                ruleType:
+                    type: integer
+                    description: 0-固定班次，1-弹性工作制
+                morningStart:
+                    type: string
+                    format: time
+                morningEnd:
+                    type: string
+                    format: time
+                afternoonStart:
+                    type: string
+                    format: time
+                afternoonEnd:
+                    type: string
+                    format: time
+                lateMinutes:
+                    type: integer
+                earlyMinutes:
+                    type: integer
+                workHoursPerDay:
+                    type: number
+        AttendanceRuleVO:
+            type: object
+            properties:
+                ruleId:
+                    type: integer
+                ruleName:
+                    type: string
+                ruleType:
+                    type: integer
+                morningStart:
+                    type: string
+                morningEnd:
+                    type: string
+                afternoonStart:
+                    type: string
+                afternoonEnd:
+                    type: string
+                lateMinutes:
+                    type: integer
+                earlyMinutes:
+                    type: integer
+                workHoursPerDay:
+                    type: number
+                status:
+                    type: integer
+
+        AttendanceGroupRequest:
+            type: object
+            required:
+                - groupName
+                - ruleId
+                - locationIds
+            properties:
+                groupName:
+                    type: string
+                ruleId:
+                    type: integer
+                deptId:
+                    type: integer
+                    description: 关联部门ID，可选
+                locationIds:
+                    type: array
+                    items:
+                        type: integer
+                employeeIds:
+                    type: array
+                    items:
+                        type: integer
+        AttendanceGroupVO:
+            type: object
+            properties:
+                groupId:
+                    type: integer
+                groupName:
+                    type: string
+                ruleId:
+                    type: integer
+                ruleName:
+                    type: string
+                deptId:
+                    type: integer
+                deptName:
+                    type: string
+                locationList:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/LocationVO'
+                employeeCount:
+                    type: integer
+                status:
+                    type: integer
+
+        # 组织架构
+        DepartmentRequest:
+            type: object
+            required:
+                - deptName
+            properties:
+                deptName:
+                    type: string
+                parentId:
+                    type: integer
+                deptLeaderId:
+                    type: integer
+        DepartmentVO:
+            type: object
+            properties:
+                deptId:
+                    type: integer
+                deptName:
+                    type: string
+                parentId:
+                    type: integer
+                parentName:
+                    type: string
+                deptLeaderId:
+                    type: integer
+                deptLeaderName:
+                    type: string
+                status:
+                    type: integer
+                employeeCount:
+                    type: integer
+                children:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/DepartmentVO'
+
+        PositionRequest:
+            type: object
+            required:
+                - positionName
+                - deptId
+            properties:
+                positionName:
+                    type: string
+                deptId:
+                    type: integer
+        PositionVO:
+            type: object
+            properties:
+                positionId:
+                    type: integer
+                positionName:
+                    type: string
+                deptId:
+                    type: integer
+                deptName:
+                    type: string
+                status:
+                    type: integer
+
+        # 导出
+        ExportRequest:
+            type: object
+            properties:
+                deptId:
+                    type: integer
+                startDate:
+                    type: string
+                    format: date
+                endDate:
+                    type: string
+                    format: date
+                fields:
+                    type: array
+                    items:
+                        type: string
+                    description: 需要导出的字段列表
+
+paths:
+    # ==================== 认证授权 ====================
+    /auth/login:
+        post:
+            tags:
+                - 认证授权
+            summary: 用户登录
+            operationId: login
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LoginRequest'
+            responses:
+                '200':
+                    description: 登录成功
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    -   $ref: '#/components/schemas/Response'
+                                    -   type: object
+                                        properties:
+                                            data:
+                                                $ref: '#/components/schemas/LoginResponse'
+                '401':
+                    description: 工号或密码错误
+                '403':
+                    description: 账号已禁用
+
+    /auth/logout:
+        post:
+            tags:
+                - 认证授权
+            summary: 用户登出
+            security:
+                -   BearerAuth: [ ]
+            responses:
+                '200':
+                    description: 登出成功
+
+    # ==================== 打卡管理 ====================
+    /clock/record:
+        post:
+            tags:
+                - 打卡管理
+            summary: 执行打卡
+            operationId: clockIn
+            security:
+                -   BearerAuth: [ ]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ClockRequest'
+            responses:
+                '200':
+                    description: 打卡成功
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    -   $ref: '#/components/schemas/Response'
+                                    -   type: object
+                                        properties:
+                                            data:
+                                                $ref: '#/components/schemas/ClockRecordVO'
+                '400':
+                    description: 打卡失败（不在范围、重复打卡等）
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Response'
+
+    /clock/today-status:
+        get:
+            tags:
+                - 打卡管理
+            summary: 获取今日打卡状态
+            security:
+                -   BearerAuth: [ ]
+            responses:
+                '200':
+                    description: 成功
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    -   $ref: '#/components/schemas/Response'
+                                    -   type: object
+                                        properties:
+                                            data:
+                                                type: object
+                                                properties:
+                                                    hasClockIn:
+                                                        type: boolean
+                                                    clockInTime:
+                                                        type: string
+                                                    hasClockOut:
+                                                        type: boolean
+                                                    clockOutTime:
+                                                        type: string
+
+    /clock/my-records:
+        get:
+            tags:
+                - 打卡管理
+            summary: 查询个人打卡记录（日历/列表）
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: yearMonth
+                    in: query
+                    description: 格式 YYYY-MM
+                    schema:
+                        type: string
+                        example: "2026-03"
+            responses:
+                '200':
+                    description: 成功
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    -   $ref: '#/components/schemas/Response'
+                                    -   type: object
+                                        properties:
+                                            data:
+                                                type: array
+                                                items:
+                                                    $ref: '#/components/schemas/ClockRecordVO'
+
+    # ==================== 申请审批 ====================
+    /application/submit:
+        post:
+            tags:
+                - 申请审批
+            summary: 提交考勤申请
+            security:
+                -   BearerAuth: [ ]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ApplicationSubmitRequest'
+            responses:
+                '200':
+                    description: 提交成功
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    -   $ref: '#/components/schemas/Response'
+                                    -   type: object
+                                        properties:
+                                            data:
+                                                $ref: '#/components/schemas/ApplicationVO'
+
+    /application/{appId}/cancel:
+        put:
+            tags:
+                - 申请审批
+            summary: 撤销申请（仅待审批状态）
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: appId
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: 撤销成功
+
+    /application/my-applications:
+        get:
+            tags:
+                - 申请审批
+            summary: 查询我的申请记录
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: pageNum
+                    in: query
+                    schema:
+                        type: integer
+                        default: 1
+                -   name: pageSize
+                    in: query
+                    schema:
+                        type: integer
+                        default: 10
+                -   name: status
+                    in: query
+                    description: 审批状态筛选
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: 成功
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    -   $ref: '#/components/schemas/Response'
+                                    -   type: object
+                                        properties:
+                                            data:
+                                                $ref: '#/components/schemas/PageResult'
+
+    /application/pending-approvals:
+        get:
+            tags:
+                - 申请审批
+            summary: 查询待审批申请（部门主管/管理员）
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: pageNum
+                    in: query
+                    schema:
+                        type: integer
+                -   name: pageSize
+                    in: query
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: 成功
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    -   $ref: '#/components/schemas/Response'
+                                    -   type: object
+                                        properties:
+                                            data:
+                                                $ref: '#/components/schemas/PageResult'
+
+    /application/{appId}/approve:
+        put:
+            tags:
+                - 申请审批
+            summary: 审批申请
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: appId
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ApprovalRequest'
+            responses:
+                '200':
+                    description: 审批成功
+
+    # ==================== 报表数据 ====================
+    /report/personal:
+        get:
+            tags:
+                - 报表数据
+            summary: 个人考勤报表（员工）
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: startDate
+                    in: query
+                    required: true
+                    schema:
+                        type: string
+                        format: date
+                -   name: endDate
+                    in: query
+                    required: true
+                    schema:
+                        type: string
+                        format: date
+            responses:
+                '200':
+                    description: 成功
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    -   $ref: '#/components/schemas/Response'
+                                    -   type: object
+                                        properties:
+                                            data:
+                                                $ref: '#/components/schemas/EmployeeReportVO'
+
+    /report/department:
+        get:
+            tags:
+                - 报表数据
+            summary: 部门/公司考勤报表（主管/管理员）
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: deptId
+                    in: query
+                    description: 部门ID，管理员可空查全公司
+                    schema:
+                        type: integer
+                -   name: startDate
+                    in: query
+                    required: true
+                    schema:
+                        type: string
+                        format: date
+                -   name: endDate
+                    in: query
+                    required: true
+                    schema:
+                        type: string
+                        format: date
+                -   name: employeeName
+                    in: query
+                    schema:
+                        type: string
+                -   name: pageNum
+                    in: query
+                    schema:
+                        type: integer
+                        default: 1
+                -   name: pageSize
+                    in: query
+                    schema:
+                        type: integer
+                        default: 10
+            responses:
+                '200':
+                    description: 成功
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    -   $ref: '#/components/schemas/Response'
+                                    -   type: object
+                                        properties:
+                                            data:
+                                                $ref: '#/components/schemas/PageResult'
+
+    /report/export:
+        post:
+            tags:
+                - 报表数据
+            summary: 导出考勤数据Excel
+            security:
+                -   BearerAuth: [ ]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ExportRequest'
+            responses:
+                '200':
+                    description: 导出成功，返回文件流
+                    content:
+                        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+                            schema:
+                                type: string
+                                format: binary
+
+    # ==================== 员工账号管理 ====================
+    /admin/employees:
+        get:
+            tags:
+                - 员工账号管理
+            summary: 分页查询员工列表
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: pageNum
+                    in: query
+                    schema:
+                        type: integer
+                -   name: pageSize
+                    in: query
+                    schema:
+                        type: integer
+                -   name: empNo
+                    in: query
+                    schema:
+                        type: string
+                -   name: name
+                    in: query
+                    schema:
+                        type: string
+                -   name: deptId
+                    in: query
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: 成功
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    -   $ref: '#/components/schemas/Response'
+                                    -   type: object
+                                        properties:
+                                            data:
+                                                $ref: '#/components/schemas/PageResult'
+
+        post:
+            tags:
+                - 员工账号管理
+            summary: 新增员工
+            security:
+                -   BearerAuth: [ ]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/EmployeeCreateRequest'
+            responses:
+                '200':
+                    description: 新增成功
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    -   $ref: '#/components/schemas/Response'
+                                    -   type: object
+                                        properties:
+                                            data:
+                                                $ref: '#/components/schemas/EmployeeVO'
+
+    /admin/employees/{employeeId}:
+        get:
+            tags:
+                - 员工账号管理
+            summary: 获取员工详情
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: employeeId
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: 成功
+        put:
+            tags:
+                - 员工账号管理
+            summary: 编辑员工信息
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: employeeId
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/EmployeeUpdateRequest'
+            responses:
+                '200':
+                    description: 修改成功
+        delete:
+            tags:
+                - 员工账号管理
+            summary: 删除员工
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: employeeId
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: 删除成功
+
+    /admin/employees/{employeeId}/status:
+        put:
+            tags:
+                - 员工账号管理
+            summary: 启用/禁用员工账号
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: employeeId
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                status:
+                                    type: integer
+                                    description: 0-禁用，1-启用
+            responses:
+                '200':
+                    description: 操作成功
+
+    /admin/employees/{employeeId}/reset-password:
+        put:
+            tags:
+                - 员工账号管理
+            summary: 重置密码（默认密码）
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: employeeId
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: 重置成功
+
+    # ==================== 考勤规则配置 ====================
+    /admin/locations:
+        get:
+            tags:
+                - 考勤规则配置
+            summary: 查询所有打卡地点
+            security:
+                -   BearerAuth: [ ]
+            responses:
+                '200':
+                    description: 成功
+        post:
+            tags:
+                - 考勤规则配置
+            summary: 新增打卡地点
+            security:
+                -   BearerAuth: [ ]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LocationRequest'
+            responses:
+                '200':
+                    description: 成功
+
+    /admin/locations/{locId}:
+        put:
+            tags:
+                - 考勤规则配置
+            summary: 编辑打卡地点
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: locId
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LocationRequest'
+        delete:
+            tags:
+                - 考勤规则配置
+            summary: 删除打卡地点
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: locId
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+
+    /admin/rules:
+        get:
+            tags:
+                - 考勤规则配置
+            summary: 查询所有考勤规则
+            security:
+                -   BearerAuth: [ ]
+            responses:
+                '200':
+                    description: 成功
+        post:
+            tags:
+                - 考勤规则配置
+            summary: 新增考勤规则
+            security:
+                -   BearerAuth: [ ]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/AttendanceRuleRequest'
+
+    /admin/rules/{ruleId}:
+        put:
+            tags:
+                - 考勤规则配置
+            summary: 编辑考勤规则
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: ruleId
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/AttendanceRuleRequest'
+        delete:
+            tags:
+                - 考勤规则配置
+            summary: 删除考勤规则
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: ruleId
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+
+    /admin/groups:
+        get:
+            tags:
+                - 考勤规则配置
+            summary: 查询所有考勤组
+            security:
+                -   BearerAuth: [ ]
+            responses:
+                '200':
+                    description: 成功
+        post:
+            tags:
+                - 考勤规则配置
+            summary: 新增考勤组
+            security:
+                -   BearerAuth: [ ]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/AttendanceGroupRequest'
+
+    /admin/groups/{groupId}:
+        put:
+            tags:
+                - 考勤规则配置
+            summary: 编辑考勤组
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: groupId
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/AttendanceGroupRequest'
+        delete:
+            tags:
+                - 考勤规则配置
+            summary: 删除考勤组
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: groupId
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+
+    /admin/groups/{groupId}/employees:
+        post:
+            tags:
+                - 考勤规则配置
+            summary: 为考勤组分配员工
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: groupId
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                employeeIds:
+                                    type: array
+                                    items:
+                                        type: integer
+
+    # ==================== 组织架构维护 ====================
+    /admin/departments/tree:
+        get:
+            tags:
+                - 组织架构维护
+            summary: 获取部门树形结构
+            security:
+                -   BearerAuth: [ ]
+            responses:
+                '200':
+                    description: 成功
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    -   $ref: '#/components/schemas/Response'
+                                    -   type: object
+                                        properties:
+                                            data:
+                                                type: array
+                                                items:
+                                                    $ref: '#/components/schemas/DepartmentVO'
+
+    /admin/departments:
+        post:
+            tags:
+                - 组织架构维护
+            summary: 新增部门
+            security:
+                -   BearerAuth: [ ]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/DepartmentRequest'
+
+    /admin/departments/{deptId}:
+        put:
+            tags:
+                - 组织架构维护
+            summary: 编辑部门
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: deptId
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/DepartmentRequest'
+        delete:
+            tags:
+                - 组织架构维护
+            summary: 删除部门（需无子部门无员工）
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: deptId
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+
+    /admin/positions:
+        get:
+            tags:
+                - 组织架构维护
+            summary: 获取岗位列表
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: deptId
+                    in: query
+                    schema:
+                        type: integer
+            responses:
+                '200':
+                    description: 成功
+        post:
+            tags:
+                - 组织架构维护
+            summary: 新增岗位
+            security:
+                -   BearerAuth: [ ]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PositionRequest'
+
+    /admin/positions/{positionId}:
+        put:
+            tags:
+                - 组织架构维护
+            summary: 编辑岗位
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: positionId
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PositionRequest'
+        delete:
+            tags:
+                - 组织架构维护
+            summary: 删除岗位（需无员工）
+            security:
+                -   BearerAuth: [ ]
+            parameters:
+                -   name: positionId
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+
+    # ==================== 文件上传 ====================
+    /upload:
+        post:
+            tags:
+                - 通用
+            summary: 上传附件（图片、PDF）
+            security:
+                -   BearerAuth: [ ]
+            requestBody:
+                required: true
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: object
+                            properties:
+                                file:
+                                    type: string
+                                    format: binary
+            responses:
+                '200':
+                    description: 成功返回文件URL
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    -   $ref: '#/components/schemas/Response'
+                                    -   type: object
+                                        properties:
+                                            data:
+                                                type: string
+                                                description: 可访问的附件URL
