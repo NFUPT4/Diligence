@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>考勤申请 - 勤致考勤系统</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft Yahei",sans-serif;}
+        body{background:linear-gradient(180deg,#2b65d9,#58a1ff);min-height:100vh;padding:20px;display:flex;justify-content:center;align-items:center;}
+        .container{max-width:500px;width:100%;}
+
+        .card{background:#fff;border-radius:16px;padding:36px;box-shadow:0 10px 40px rgba(0,0,0,0.1);margin-bottom:20px;}
+        .card-title{font-size:24px;font-weight:600;margin-bottom:28px;color:#1a1a1a;}
+
+        .form-group{margin-bottom:24px;}
+        .form-label{display:block;font-size:17px;font-weight:500;margin-bottom:10px;color:#222;}
+        
+        .form-input,
+        .form-select,
+        .form-textarea{
+            width:100%;height:54px;border:2px solid #e0e0e0;border-radius:10px;
+            padding:0 16px;font-size:16px;background:#f7f9fc;outline:none;transition:0.3s;
+        }
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus{ border-color:#2b65d9; }
+        .form-textarea{height:120px;resize:none;padding:16px;line-height:1.5;}
+
+        /* 补卡专用区域 */
+        .repair-fields{ display:none; margin-bottom:24px; }
+        .repair-row{ display:flex; gap:12px; }
+        .repair-row .form-group{ flex:1; margin-bottom:0; }
+
+        /* ========== 完全修复：附件上传UI ========== */
+        .upload-container {
+            width: 100%;
+        }
+        .upload-btn {
+            display: block;
+            width: 100%;
+            height: 54px;
+            border: 2px dashed #e0e0e0;
+            border-radius: 10px;
+            background: #f7f9fc;
+            text-align: center;
+            line-height: 54px;
+            font-size: 16px;
+            color: #666;
+            cursor: pointer;
+        }
+        #attachment {
+            display: none;
+        }
+        .file-name {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #2b65d9;
+            padding-left: 4px;
+        }
+        /* ======================================== */
+
+        .submit-btn{
+            width:100%;height:56px;background:#1e47b8;color:#fff;border:none;
+            border-radius:10px;font-size:18px;font-weight:600;cursor:pointer;transition:0.3s;margin-top:8px;
+        }
+        .submit-btn:hover{background:#163a99;}
+        .submit-btn:disabled{background:#999;cursor:not-allowed;}
+
+        /* 导航 */
+        .nav{display:flex;gap:12px;}
+        .nav-btn{
+            flex:1;background:#fff;border:none;border-radius:12px;padding:16px;
+            font-size:16px;font-weight:500;color:#2b65d9;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.08);
+            white-space: nowrap;
+        }
+        .nav-btn.active{background:#2b65d9;color:#fff;}
+
+        .toast{
+            position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+            background:rgba(0,0,0,0.7);color:#fff;padding:16px 24px;
+            border-radius:8px;display:none;z-index:999;
+        }
+        .error-msg{
+            color:#ff4d4f;
+            font-size:14px;
+            margin-top:6px;
+            display:none;
+        }
+
+        /* 移动端适配 */
+        @media (max-width:768px) {
+            .nav{gap:8px;}
+            .nav-btn{padding:12px 6px;font-size:14px;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <div class="card-title">考勤申请</div>
+
+        <!-- 申请类型 -->
+        <div class="form-group">
+            <label class="form-label">申请类型</label>
+            <select class="form-select" id="applyType">
+                <option value="leave">请假</option>
+                <option value="overtime">加班</option>
+                <option value="outwork">外勤</option>
+                <option value="repair">补卡</option>
+            </select>
+        </div>
+
+        <!-- 补卡专用 -->
+        <div class="repair-fields" id="repairFields">
+            <div class="repair-row">
+                <div class="form-group">
+                    <label class="form-label">补卡日期</label>
+                    <input type="date" class="form-input" id="repairDate">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">打卡时段</label>
+                    <select class="form-select" id="repairSlot">
+                        <option>上班打卡</option>
+                        <option>下班打卡</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 开始时间 -->
+        <div class="form-group">
+            <label class="form-label">开始时间</label>
+            <input type="datetime-local" class="form-input" id="startTime">
+            <div class="error-msg" id="startError">请选择开始时间</div>
+        </div>
+
+        <!-- 结束时间 -->
+        <div class="form-group">
+            <label class="form-label">结束时间</label>
+            <input type="datetime-local" class="form-input" id="endTime">
+            <div class="error-msg" id="endError">请选择结束时间</div>
+        </div>
+
+        <!-- 申请原因 -->
+        <div class="form-group">
+            <label class="form-label">申请原因</label>
+            <textarea class="form-textarea" id="reason" placeholder="请详细说明申请原因"></textarea>
+            <div class="error-msg" id="reasonError">请填写申请原因</div>
+        </div>
+
+        <!-- ========== 完美修复：上传附件 ========== -->
+        <div class="form-group">
+            <label class="form-label">上传附件（可选）</label>
+            <div class="upload-container">
+                <label for="attachment" class="upload-btn">📎 点击上传证明材料</label>
+                <input type="file" id="attachment">
+                <div class="file-name" id="fileName"></div>
+            </div>
+        </div>
+        <!-- ======================================= -->
+
+        <!-- 提交按钮 -->
+        <button class="submit-btn" id="submitBtn">提交申请</button>
+    </div>
+
+    <!-- ====================== 底部导航（完整5个按钮） ====================== -->
+    <div class="nav">
+        <button class="nav-btn">首页</button>
+        <button class="nav-btn">我的考勤</button>
+        <button class="nav-btn active">申请</button>
+        <button class="nav-btn">数据查看</button>
+        <button class="nav-btn">我的</button>
+    </div>
+</div>
+
+<!-- 成功提示 -->
+<div class="toast" id="toast">
+    申请提交成功<br>已通知上级审批
+</div>
+
+<script>
+// 补卡显示/隐藏
+const applyType = document.getElementById('applyType');
+const repairFields = document.getElementById('repairFields');
+const startTimeGroup = document.getElementById('startTime').parentElement;
+const endTimeGroup = document.getElementById('endTime').parentElement;
+
+applyType.addEventListener('change', function(){
+    if(this.value === 'repair'){
+        repairFields.style.display = 'block';
+        startTimeGroup.style.display = 'none';
+        endTimeGroup.style.display = 'none';
+    }else{
+        repairFields.style.display = 'none';
+        startTimeGroup.style.display = 'block';
+        endTimeGroup.style.display = 'block';
+    }
+});
+
+// 附件上传
+const attachment = document.getElementById('attachment');
+const fileName = document.getElementById('fileName');
+attachment.addEventListener('change', function(){
+    if(this.files.length > 0){
+        fileName.innerText = '已选择：' + this.files[0].name;
+    }else{
+        fileName.innerText = '';
+    }
+});
+
+// 提交校验
+const submitBtn = document.getElementById('submitBtn');
+const toast = document.getElementById('toast');
+
+submitBtn.addEventListener('click', function(){
+    const type = applyType.value;
+    const start = document.getElementById('startTime').value;
+    const end = document.getElementById('endTime').value;
+    const reason = document.getElementById('reason').value.trim();
+    const repairDate = document.getElementById('repairDate').value;
+    
+    document.getElementById('startError').style.display = 'none';
+    document.getElementById('endError').style.display = 'none';
+    document.getElementById('reasonError').style.display = 'none';
+    
+    let valid = true;
+
+    if(type === 'repair'){
+        if(!repairDate){ alert('请选择补卡日期'); valid = false; return; }
+    }else{
+        if(!start){ document.getElementById('startError').style.display = 'block'; valid = false; }
+        if(!end){ document.getElementById('endError').style.display = 'block'; valid = false; }
+    }
+
+    if(!reason){ document.getElementById('reasonError').style.display = 'block'; valid = false; }
+    if(!valid) return;
+
+    submitBtn.disabled = true;
+    submitBtn.innerText = "提交中...";
+
+    setTimeout(()=>{
+        toast.style.display = 'block';
+        setTimeout(()=>{
+            toast.style.display = 'none';
+            submitBtn.innerText = "提交成功";
+        }, 2000);
+    }, 1000);
+});
+</script>
+
+</body>
+</html>

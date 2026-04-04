@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人考勤 - 勤致考勤系统</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft Yahei",sans-serif;}
+        body{background:linear-gradient(180deg,#2b65d9,#58a1ff);min-height:100vh;padding:20px;display:flex;justify-content:center;align-items:center;}
+        .container{max-width:500px;width:100%;}
+
+        .card{background:#fff;border-radius:16px;padding:28px 32px;box-shadow:0 10px 40px rgba(0,0,0,0.1);margin-bottom:20px;}
+        .card-title{font-size:22px;font-weight:600;margin-bottom:20px;color:#1a1a1a;}
+
+        /* 月份切换 */
+        .month-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+        .month-title{font-size:18px;font-weight:500;color:#222;}
+        .month-btn{background:#f5f7fa;border:none;width:40px;height:40px;border-radius:10px;font-size:16px;cursor:pointer;}
+        .month-btn:hover{background:#e8ebf1;}
+
+        /* 日历头部（星期） */
+        .calendar-header{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:12px;}
+        .week-text{font-size:14px;color:#666;font-weight:500;}
+
+        /* 日历主体（日期） */
+        .calendar-body{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;}
+        .day-item{
+            width:100%;aspect-ratio:1/1;display:flex;flex-direction:column;
+            align-items:center;justify-content:center;border-radius:10px;
+            font-size:15px;cursor:pointer;position:relative;
+        }
+        .day-text{margin-bottom:2px;}
+        .day-empty{background:transparent;cursor:default;}
+
+        /* 打卡状态圆点 */
+        .status-dot{width:8px;height:8px;border-radius:50%;}
+        .normal{background:#00b42a;} /* 正常 */
+        .late{background:#ff9800;}    /* 迟到 */
+        .absent{background:#ff4d4f;} /* 缺勤 */
+        .rest{background:#909399;}    /* 休息 */
+
+        /* 今日高亮 */
+        .day-today{background:#e6f0ff;color:#2b65d9;font-weight:500;}
+
+        /* 打卡详情弹窗 */
+        .modal{
+            position:fixed;top:0;left:0;width:100%;height:100%;
+            background:rgba(0,0,0,0.4);display:flex;
+            justify-content:center;align-items:center;z-index:999;
+            display:none;
+        }
+        .modal-card{
+            background:#fff;border-radius:16px;padding:32px;width:90%;
+            max-width:460px;
+        }
+        .modal-title{font-size:20px;font-weight:600;margin-bottom:20px;color:#1a1a1a;}
+        .detail-item{
+            padding:14px 0;border-bottom:1px solid #f0f0f0;
+            display:flex;justify-content:space-between;
+        }
+        .detail-label{font-size:15px;color:#666;}
+        .detail-value{font-size:15px;font-weight:500;color:#222;}
+        .btn-close{
+            width:100%;background:#2b65d9;color:#fff;
+            border:none;height:52px;border-radius:10px;font-size:16px;margin-top:20px;cursor:pointer;
+        }
+
+        /* 导航 —— 已按你的图片完整添加 5 个按钮 */
+        .nav{display:flex;gap:12px;}
+        .nav-btn{
+            flex:1;background:#fff;border:none;border-radius:12px;padding:16px;
+            font-size:16px;font-weight:500;color:#2b65d9;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.08);
+            white-space: nowrap;
+        }
+        .nav-btn.active{background:#2b65d9;color:#fff;}
+
+        /* 移动端适配 */
+        @media (max-width:768px) {
+            .nav{gap:8px;}
+            .nav-btn{padding:12px 6px;font-size:14px;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <div class="card-title">个人考勤</div>
+
+        <!-- 月份切换 -->
+        <div class="month-bar">
+            <button class="month-btn" id="prevMonth">&lt;</button>
+            <div class="month-title" id="monthTitle">2026年04月</div>
+            <button class="month-btn" id="nextMonth">&gt;</button>
+        </div>
+
+        <!-- 星期 -->
+        <div class="calendar-header">
+            <div class="week-text">日</div>
+            <div class="week-text">一</div>
+            <div class="week-text">二</div>
+            <div class="week-text">三</div>
+            <div class="week-text">四</div>
+            <div class="week-text">五</div>
+            <div class="week-text">六</div>
+        </div>
+
+        <!-- 日历 -->
+        <div class="calendar-body" id="calendarBody">
+            <!-- 日历由JS自动生成 -->
+        </div>
+    </div>
+
+    <!-- ====================== 底部导航（完整5个按钮） ====================== -->
+    <div class="nav">
+        <button class="nav-btn">首页</button>
+        <button class="nav-btn active">我的考勤</button>
+        <button class="nav-btn">申请</button>
+        <button class="nav-btn">数据查看</button>
+        <button class="nav-btn">我的</button>
+    </div>
+</div>
+
+<!-- 打卡详情弹窗 -->
+<div class="modal" id="detailModal">
+    <div class="modal-card">
+        <div class="modal-title" id="detailTitle">4月3日 打卡详情</div>
+        
+        <div class="detail-item">
+            <div class="detail-label">上班打卡</div>
+            <div class="detail-value" id="detailIn">08:55 ✅ 正常</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">下班打卡</div>
+            <div class="detail-value" id="detailOut">18:05 ✅ 正常</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">打卡状态</div>
+            <div class="detail-value" id="detailStatus" style="color:#00b42a;">正常出勤</div>
+        </div>
+
+        <button class="btn-close" id="closeDetail">关闭</button>
+    </div>
+</div>
+
+<script>
+// ==================== 考勤日历核心逻辑 ====================
+let currentDate = new Date();
+let currentYear = currentDate.getFullYear();
+let currentMonth = currentDate.getMonth();
+
+// 模拟打卡数据
+const checkData = {
+    "2026-04-01":"rest",    // 休息
+    "2026-04-02":"normal",  // 正常
+    "2026-04-03":"normal",  // 正常
+    "2026-04-04":"late",    // 迟到
+    "2026-04-05":"absent",  // 缺勤
+    "2026-04-06":"normal",
+    "2026-04-07":"normal",
+    "2026-04-08":"rest"
+};
+
+// 初始化日历
+renderCalendar();
+
+// 切换月份
+document.getElementById('prevMonth').onclick = ()=>{
+    currentMonth--;
+    if(currentMonth <0){currentMonth=11;currentYear--;}
+    renderCalendar();
+};
+document.getElementById('nextMonth').onclick = ()=>{
+    currentMonth++;
+    if(currentMonth >11){currentMonth=0;currentYear++;}
+    renderCalendar();
+};
+
+// 渲染日历
+function renderCalendar(){
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth+1, 0).getDate();
+    const body = document.getElementById('calendarBody');
+    body.innerHTML = '';
+
+    // 标题
+    document.getElementById('monthTitle').innerText = `${currentYear}年${(currentMonth+1).toString().padStart(2,'0')}月`;
+
+    // 空白填充
+    for(let i=0;i<firstDay;i++){
+        const empty = document.createElement('div');
+        empty.className = 'day-item day-empty';
+        body.appendChild(empty);
+    }
+
+    // 日期
+    for(let day=1;day<=daysInMonth;day++){
+        const item = document.createElement('div');
+        item.className = 'day-item';
+        
+        // 今日高亮
+        const isToday = currentYear===new Date().getFullYear() && currentMonth===new Date().getMonth() && day===new Date().getDate();
+        if(isToday) item.classList.add('day-today');
+
+        // 日期
+        const dayText = document.createElement('div');
+        dayText.className = 'day-text';
+        dayText.innerText = day;
+
+        // 状态点
+        const dot = document.createElement('div');
+        dot.className = 'status-dot';
+        const key = `${currentYear}-${(currentMonth+1).toString().padStart(2,'0')}-${day.toString().padStart(2,'0')}`;
+        const status = checkData[key] || 'normal';
+        dot.classList.add(status);
+
+        item.appendChild(dayText);
+        item.appendChild(dot);
+        body.appendChild(item);
+
+        // 点击查看详情
+        item.onclick = ()=>openDetail(key, status, day);
+    }
+}
+
+// 打开详情
+const modal = document.getElementById('detailModal');
+function openDetail(date, status, day){
+    document.getElementById('detailTitle').innerText = `${currentMonth+1}月${day}日 打卡详情`;
+    
+    if(status==='normal'){
+        document.getElementById('detailIn').innerText = '08:55 ✅ 正常';
+        document.getElementById('detailOut').innerText = '18:05 ✅ 正常';
+        document.getElementById('detailStatus').innerText = '正常出勤';
+        document.getElementById('detailStatus').style.color = '#00b42a';
+    }else if(status==='late'){
+        document.getElementById('detailIn').innerText = '09:12 ⚠️ 迟到';
+        document.getElementById('detailOut').innerText = '18:10 ✅ 正常';
+        document.getElementById('detailStatus').innerText = '迟到';
+        document.getElementById('detailStatus').style.color = '#ff9800';
+    }else if(status==='absent'){
+        document.getElementById('detailIn').innerText = '— ❌ 未打卡';
+        document.getElementById('detailOut').innerText = '— ❌ 未打卡';
+        document.getElementById('detailStatus').innerText = '缺勤';
+        document.getElementById('detailStatus').style.color = '#ff4d4f';
+    }else if(status==='rest'){
+        document.getElementById('detailIn').innerText = '— 休息日';
+        document.getElementById('detailOut').innerText = '— 休息日';
+        document.getElementById('detailStatus').innerText = '休息日';
+        document.getElementById('detailStatus').style.color = '#909399';
+    }
+    
+    modal.style.display = 'flex';
+}
+
+// 关闭弹窗
+document.getElementById('closeDetail').onclick = ()=>{
+    modal.style.display = 'none';
+};
+</script>
+</body>
+</html>

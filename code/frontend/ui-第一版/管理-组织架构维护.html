@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>组织架构维护 - 勤致考勤系统</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft Yahei",sans-serif;}
+        body{background:linear-gradient(180deg,#2b65d9,#58a1ff);min-height:100vh;padding:20px;display:flex;justify-content:center;align-items:flex-start;}
+        .container{max-width:900px;width:100%;margin-top:20px;}
+
+        .card{background:#fff;border-radius:16px;padding:32px;box-shadow:0 10px 40px rgba(0,0,0,0.1);margin-bottom:20px;}
+        .card-title{font-size:24px;font-weight:600;margin-bottom:24px;color:#1a1a1a;}
+
+        /* 标签页 */
+        .tabs{display:flex;gap:8px;margin-bottom:24px;border-bottom:1px solid #eee;padding-bottom:12px;}
+        .tab{padding:10px 20px;border-radius:8px;background:#f5f7fa;cursor:pointer;font-weight:500;}
+        .tab.active{background:#2b65d9;color:#fff;}
+        .tab-panel{display:none;}
+        .tab-panel.active{display:block;}
+
+        /* 工具栏 */
+        .tool-bar{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px;align-items:center;}
+        .search-input{flex:1;min-width:220px;height:50px;border:2px solid #e0e0e0;border-radius:10px;padding:0 16px;font-size:16px;background:#f7f9fc;outline:none;}
+        .search-input:focus{border-color:#2b65d9;}
+        .btn{height:50px;padding:0 20px;border:none;border-radius:10px;font-size:16px;font-weight:500;cursor:pointer;}
+        .btn-primary{background:#2b65d9;color:#fff;}
+        .btn-default{background:#f0f2f5;color:#333;}
+        .btn-danger{background:#ff4d4f;color:#fff;}
+
+        /* 表格 */
+        .table-box{overflow-x:auto;}
+        .data-table{width:100%;border-collapse:collapse;border-radius:10px;overflow:hidden;}
+        .data-table th{background:#2b65d9;color:#fff;padding:16px;text-align:left;font-size:15px;}
+        .data-table td{padding:16px;border-bottom:1px solid #f0f0f0;font-size:15px;}
+
+        /* 弹窗 */
+        .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;z-index:999;display:none;}
+        .modal-card{background:#fff;border-radius:16px;padding:32px;width:90%;max-width:520px;}
+        .modal-title{font-size:20px;font-weight:600;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;}
+        .close-modal{width:36px;height:36px;border-radius:50%;background:#f5f7fa;border:none;font-size:18px;cursor:pointer;}
+        .form-group{margin-bottom:20px;}
+        .form-label{display:block;font-size:15px;font-weight:500;margin-bottom:8px;color:#222;}
+        .form-input,.form-select{width:100%;height:50px;border:2px solid #e0e0e0;border-radius:10px;padding:0 16px;font-size:16px;background:#f7f9fc;outline:none;}
+        .btn-row{display:flex;gap:12px;margin-top:12px;}
+        .btn-row .btn{flex:1;}
+
+        /* 导航 */
+        .nav{display:flex;gap:12px;}
+        .nav-btn{flex:1;background:#fff;border:none;border-radius:12px;padding:16px;font-size:16px;font-weight:500;color:#2b65d9;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.08);}
+        .nav-btn.active{background:#2b65d9;color:#fff;}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <div class="card-title">组织架构维护</div>
+
+        <div class="tabs">
+            <div class="tab active" data-target="dept">部门管理</div>
+            <div class="tab" data-target="post">岗位管理</div>
+        </div>
+
+        <!-- 部门管理 - 新增销售部、行政部 -->
+        <div class="tab-panel active" id="dept">
+            <div class="tool-bar">
+                <input type="text" class="search-input" placeholder="搜索部门">
+                <button class="btn btn-primary" onclick="openDeptModal()">新增部门</button>
+            </div>
+            <div class="table-box">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>部门ID</th>
+                            <th>部门名称</th>
+                            <th>上级部门</th>
+                            <th>员工数</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-id="1" data-emp="0" data-child="4">
+                            <td>1</td>
+                            <td>总公司</td>
+                            <td>无</td>
+                            <td>0</td>
+                            <td>
+                                <button class="btn btn-default" onclick="editDept(1)">编辑</button>
+                                <button class="btn btn-danger" onclick="deleteDept(1)">删除</button>
+                            </td>
+                        </tr>
+                        <tr data-id="2" data-emp="5" data-child="0">
+                            <td>2</td>
+                            <td>技术部</td>
+                            <td>总公司</td>
+                            <td>5</td>
+                            <td>
+                                <button class="btn btn-default" onclick="editDept(2)">编辑</button>
+                                <button class="btn btn-danger" onclick="deleteDept(2)">删除</button>
+                            </td>
+                        </tr>
+                        <tr data-id="3" data-emp="3" data-child="0">
+                            <td>3</td>
+                            <td>运营部</td>
+                            <td>总公司</td>
+                            <td>3</td>
+                            <td>
+                                <button class="btn btn-default" onclick="editDept(3)">编辑</button>
+                                <button class="btn btn-danger" onclick="deleteDept(3)">删除</button>
+                            </td>
+                        </tr>
+                        <tr data-id="4" data-emp="8" data-child="0">
+                            <td>4</td>
+                            <td>销售部</td>
+                            <td>总公司</td>
+                            <td>8</td>
+                            <td>
+                                <button class="btn btn-default" onclick="editDept(4)">编辑</button>
+                                <button class="btn btn-danger" onclick="deleteDept(4)">删除</button>
+                            </td>
+                        </tr>
+                        <tr data-id="5" data-emp="2" data-child="0">
+                            <td>5</td>
+                            <td>行政部</td>
+                            <td>总公司</td>
+                            <td>2</td>
+                            <td>
+                                <button class="btn btn-default" onclick="editDept(5)">编辑</button>
+                                <button class="btn btn-danger" onclick="deleteDept(5)">删除</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 岗位管理 - 新增对应部门岗位+下拉选项添加销售部、行政部 -->
+        <div class="tab-panel" id="post">
+            <div class="tool-bar">
+                <input type="text" class="search-input" placeholder="搜索岗位">
+                <button class="btn btn-primary" onclick="openPostModal()">新增岗位</button>
+            </div>
+            <div class="table-box">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>岗位ID</th>
+                            <th>岗位名称</th>
+                            <th>所属部门</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-id="1">
+                            <td>1</td>
+                            <td>前端开发</td>
+                            <td>技术部</td>
+                            <td>
+                                <button class="btn btn-default" onclick="editPost(1)">编辑</button>
+                                <button class="btn btn-danger" onclick="deletePost(1)">删除</button>
+                            </td>
+                        </tr>
+                        <tr data-id="2">
+                            <td>2</td>
+                            <td>产品经理</td>
+                            <td>运营部</td>
+                            <td>
+                                <button class="btn btn-default" onclick="editPost(2)">编辑</button>
+                                <button class="btn btn-danger" onclick="deletePost(2)">删除</button>
+                            </td>
+                        </tr>
+                        <tr data-id="3">
+                            <td>3</td>
+                            <td>销售代表</td>
+                            <td>销售部</td>
+                            <td>
+                                <button class="btn btn-default" onclick="editPost(3)">编辑</button>
+                                <button class="btn btn-danger" onclick="deletePost(3)">删除</button>
+                            </td>
+                        </tr>
+                        <tr data-id="4">
+                            <td>4</td>
+                            <td>行政专员</td>
+                            <td>行政部</td>
+                            <td>
+                                <button class="btn btn-default" onclick="editPost(4)">编辑</button>
+                                <button class="btn btn-danger" onclick="deletePost(4)">删除</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="nav">
+        <button class="nav-btn">首页</button>
+        <button class="nav-btn">我的考勤</button>
+        <button class="nav-btn">申请</button>
+        <button class="nav-btn">数据查看</button>
+        <button class="nav-btn">员工管理</button>
+        <button class="nav-btn">规则配置</button>
+        <button class="nav-btn active">组织架构</button>
+        <button class="nav-btn">我的</button>
+    </div>
+</div>
+
+<!-- 部门弹窗 - 下拉选项添加销售部、行政部 -->
+<div class="modal" id="deptModal">
+    <div class="modal-card">
+        <div class="modal-title">
+            <span id="deptTitle">新增部门</span>
+            <button class="close-modal" onclick="closeDeptModal()">×</button>
+        </div>
+        <div class="form-group">
+            <label class="form-label">部门名称</label>
+            <input class="form-input" id="deptName" placeholder="请输入部门名称">
+        </div>
+        <div class="form-group">
+            <label class="form-label">上级部门</label>
+            <select class="form-select" id="parentDept">
+                <option value="0">无（顶级部门）</option>
+                <option value="1">总公司</option>
+                <option value="2">技术部</option>
+                <option value="3">运营部</option>
+                <option value="4">销售部</option>
+                <option value="5">行政部</option>
+            </select>
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-default" onclick="closeDeptModal()">取消</button>
+            <button class="btn btn-primary" onclick="saveDept()">保存</button>
+        </div>
+    </div>
+</div>
+
+<!-- 岗位弹窗 - 下拉选项添加销售部、行政部 -->
+<div class="modal" id="postModal">
+    <div class="modal-card">
+        <div class="modal-title">
+            <span id="postTitle">新增岗位</span>
+            <button class="close-modal" onclick="closePostModal()">×</button>
+        </div>
+        <div class="form-group">
+            <label class="form-label">岗位名称</label>
+            <input class="form-input" id="postName" placeholder="请输入岗位名称">
+        </div>
+        <div class="form-group">
+            <label class="form-label">所属部门</label>
+            <select class="form-select" id="postDept">
+                <option>技术部</option>
+                <option>运营部</option>
+                <option>销售部</option>
+                <option>行政部</option>
+                <option>总公司</option>
+            </select>
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-default" onclick="closePostModal()">取消</button>
+            <button class="btn btn-primary" onclick="savePost()">保存</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// 标签切换
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.target).classList.add('active');
+    })
+})
+
+// 部门模态框
+function openDeptModal(){
+    document.getElementById('deptTitle').innerText = "新增部门";
+    document.getElementById('deptName').value = "";
+    document.getElementById('deptModal').style.display = "flex";
+}
+function editDept(id){
+    document.getElementById('deptTitle').innerText = "编辑部门";
+    // 模拟回显对应部门名称
+    const deptNames = {1:'总公司',2:'技术部',3:'运营部',4:'销售部',5:'行政部'};
+    document.getElementById('deptName').value = deptNames[id];
+    document.getElementById('deptModal').style.display = "flex";
+}
+function closeDeptModal(){
+    document.getElementById('deptModal').style.display = "none";
+}
+function saveDept(){
+    alert("保存成功");
+    closeDeptModal();
+}
+
+// 删除部门校验（核心功能）- 总公司子部门数更新为4
+function deleteDept(id){
+    const tr = document.querySelector(`tr[data-id="${id}"]`);
+    const empCount = parseInt(tr.dataset.emp);
+    const childCount = parseInt(tr.dataset.child);
+    
+    if(empCount > 0){
+        alert("无法删除：该部门下存在员工！");
+        return;
+    }
+    if(childCount > 0){
+        alert("无法删除：该部门下存在子部门！");
+        return;
+    }
+    if(confirm("确认删除该部门？")){
+        alert("删除成功");
+    }
+}
+
+// 岗位模态框
+function openPostModal(){
+    document.getElementById('postTitle').innerText = "新增岗位";
+    document.getElementById('postName').value = "";
+    document.getElementById('postModal').style.display = "flex";
+}
+function editPost(id){
+    document.getElementById('postTitle').innerText = "编辑岗位";
+    // 模拟回显对应岗位名称
+    const postNames = {1:'前端开发',2:'产品经理',3:'销售代表',4:'行政专员'};
+    document.getElementById('postName').value = postNames[id];
+    document.getElementById('postModal').style.display = "flex";
+}
+function closePostModal(){
+    document.getElementById('postModal').style.display = "none";
+}
+function savePost(){
+    alert("保存成功");
+    closePostModal();
+}
+function deletePost(id){
+    if(confirm("确认删除该岗位？")){
+        alert("删除成功");
+    }
+}
+</script>
+</body>
+</html>
