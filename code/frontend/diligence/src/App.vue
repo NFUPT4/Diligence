@@ -8,29 +8,35 @@
   -->
 
 <script lang="ts">
-/**
- * @file App.vue
- * @author edocsitahw
- * @version 1.1
- * @date 2026/04/03 12:51
- * @description
- * */
-import { defineComponent } from 'vue';
-import router from '@/router/router';
+    /**
+     * @file App.vue
+     * @author edocsitahw
+     * @version 1.1
+     * @date 2026/04/03 12:51
+     * @description
+     * */
+    import { defineComponent } from "vue";
+    import router from "@/router/router";
 
-onload = () => {
-  {
-    router.push('/')
-  }
-}
+    onload = () => {
+        {
+            router.push("/");
+        }
+    };
 
-export default defineComponent({
-  name: 'App',
-})
+    export default defineComponent({
+        name: "App"
+    });
 </script>
 
 <template>
-  <router-view></router-view>
+    <router-view></router-view>
 </template>
 
-<style lang="sass"></style>
+<style lang="sass">
+    html, body, #app
+        padding: 0
+        margin: 0
+        width: 100%
+        height: 100%
+</style>

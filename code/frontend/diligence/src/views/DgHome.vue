@@ -8,22 +8,19 @@
   -->
 
 <template>
-
-
-
+    <div class="dg-home"></div>
 </template>
 
 <script lang="ts" setup>
-/**
- * @file Home.vue
- * @author edocsitahw
- * @version 1.1
- * @date 2026/04/03 12:51
- * @desc
- * @copyright CC BY-NC-SA
- * */
-import { ref, reactive, computed, watch } from 'vue'
-import type { Ref, Reactive, PropType } from 'vue'
+    /**
+     * @file Home.vue
+     * @author edocsitahw
+     * @version 1.1
+     * @date 2026/04/03 12:51
+     * @desc
+     * @copyright CC BY-NC-SA
+     * */
 </script>
 
-<style lang="sass" scoped></style>
+<style lang="sass" scoped>
+</style>
