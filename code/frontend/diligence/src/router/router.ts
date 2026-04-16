@@ -8,17 +8,48 @@
  */
 
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "@/views/Home.vue";
+import Home from "@/views/home/DgHome.vue";
+import { useAuthStore } from "@/stores/auth.store";
+import { useUserStore } from "@/stores/user.store";
+
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
             path: "/",
-            name: "Home",
-            component: Home
+            name: "home",
+            component: Home,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: "/auth",
+            name: "auth",
+            component: () => import("@/views/authentication/DgAuth.vue"),
+            meta: { requiresAuth: false }
         }
     ]
 });
+
+
+router.beforeEach((to, from) => {
+    const authStore = useAuthStore();
+    const userStore = useUserStore();
+
+    // 需要认证的路由
+    if (to.meta.requiresAuth) {
+        // 已登录
+        if (authStore.authenticated && userStore._info)
+            return true;
+
+        else
+            return "/auth";
+    }
+
+    // 游客访问路由
+    else
+        return true;
+});
+
 
 export default router;

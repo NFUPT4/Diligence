@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../../../../../SPA/code/client/SPA/.idea/SPA.iml" filepath="$PROJECT_DIR$/../../../../../SPA/code/client/SPA/.idea/SPA.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../../../../WaypointCompass/frontend/app/.idea/app.iml" filepath="$PROJECT_DIR$/../../../../../WaypointCompass/frontend/app/.idea/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/diligence.iml" filepath="$PROJECT_DIR$/.idea/diligence.iml" />
     </modules>

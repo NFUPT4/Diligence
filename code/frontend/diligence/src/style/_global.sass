@@ -1,0 +1,149 @@
+/*!
+ / Copyright (c) 2026 NFUPT4. All rights reserved.
+ / This source code is licensed under the CC BY-NC-SA
+ / (Creative Commons Attribution-NonCommercial-NoDerivatives) License.
+ / This software is protected by copyright law. Reproduction, distribution, or use for commercial
+ / purposes is prohibited without the organization's permission. If you have any questions or require
+ / permission, please contact NFUPT4 https://gitee.com/nfupt4.
+ /
+/*!
+ * 全局Sass样式文件
+ * @file _global.sass
+ * @description 定义全局的Sass变量、混合宏和动画效果
+ * @author Xiao Songtao
+ * @copyright CC BY-NC-SA
+ */
+@use 'sass:map'
+@use 'sass:meta'
+@use 'sass:math'
+
+/* variables */
+/// 响应式设计断点映射
+/// @type Map
+$breakpoints: ('phone': 320px, 'tablet': 768px, 'desktop': 1024px, 'wide': 1280px) !default
+
+/* mixin */
+
+/// 响应式媒体查询混合宏
+/// @mixin media-query
+/// @param {string|number} $from - 起始断点（名称或像素值）
+/// @param {string|number} $until - 结束断点（名称或像素值）
+/// @param {string} $and - 额外的媒体查询条件
+/// @example
+/// .element {
+///   @include media-query(phone, desktop) {
+///     // 在手机和平板设备上的样式
+///   }
+/// }
+@mixin media-query($from: false, $until: false, $and: false)
+    $min-width: 0
+    $max-width: 0
+    $query: ''
+
+    @if $from
+        @if meta.type-of($from) == 'string'
+            $min-width: map.get($breakpoints, $from)
+
+        @else
+            $min-width: $from
+
+    @if $until
+        @if meta.type-of($until) == 'string'
+            $max-width: map.get($breakpoints, $until) - 1px
+        @else
+            $max-width: $until - 1px
+
+    @if $min-width != 0
+        $query: "#{$query} (min-width: #{$min-width})"
+
+    @if $max-width != 0
+        @if $query != ''
+            $query: "#{$query} and (max-width: #{$max-width})"
+        @else
+            $query: "#{$query} (max-width: #{$max-width})"
+
+    @if $and
+        @if $query != ''
+            $query: "#{$query} and #{$and}"
+        @else
+            $query: "#{$query} #{$and}"
+
+    @if $query != ''
+        @media #{$query}
+            @content
+
+
+@mixin mobile()
+    @include media-query($from: phone, $until: tablet)
+        @content
+
+
+@mixin pc()
+    @include media-query($from: tablet)
+        @content
+
+
+/// 生成指定范围内的随机数
+/// @function random-num
+/// @param {number} $min - 最小值
+/// @param {number} $max - 最大值
+/// @returns {number} 随机数值
+@function random-num($min, $max)
+    @return $min + math.random($max - $min)
+
+
+/// 生成随机百分比
+/// @function random-percent
+/// @returns {string} 随机百分比字符串（如 "50%"）
+@function random-percent()
+    @return math.random(100) * 1%
+
+
+/// 生成随机HSL颜色
+/// @function random-color
+/// @returns {string} 随机HSL颜色字符串
+@function random-color()
+    @return hsl(math.random(360), math.random(70) + 30%, math.random(70) + 58%)
+
+
+/// 浮动动画关键帧
+/// @keyframes float
+/// @description 创建元素浮动效果的动画关键帧
+@keyframes float
+    0%, 100%
+        transform: translate(0, 0) rotate(0)
+
+    25%
+        transform: translate(random-num(10, 30) + px, random-num(10, 30) + px) rotate(5deg)
+
+    50%
+        transform: translate(random-num(-30, -10) + px, random-num(10, 30) + px) rotate(-5deg)
+
+    75%
+        transform: translate(random-num(-30, -10) + px, random-num(-30, -10) + px) rotate(5deg)
+
+
+/// 预设圆形背景混合宏
+/// @mixin perset-circle
+/// @description 创建随机位置和大小的圆形背景元素，用于装饰性背景
+/// @param {string} $center-color - 中心颜色
+/// @param {string} $border-color - 边框颜色
+@mixin perset-circle($center-color, $border-color)
+    $size: random-num(100, 400) + px
+
+    position: fixed
+
+    width: $size
+    height: $size
+
+    background: radial-gradient(circle at center, $center-color 0%, $border-color 50%, transparent 70%)
+
+    top: random-percent()
+    left: random-percent()
+
+    animation: float random-num(20, 40) + s ease-in-out infinite
+    animation-delay: random-num(0, 20) + s
+
+    opacity: 1
+    z-index: -1
+    pointer-events: none
