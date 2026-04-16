@@ -20,6 +20,15 @@
         <template #badge>
             <span class="dhr-badge"><i class="fas fa-shield-alt" />{{ $t("home.reviews.template.badge") }}</span>
         </template>
+
+        <template #default>
+            <div class="dhr-clock">
+                <!-- TODO: 带实现 -->
+                <div class="dhr-clock-location"> </div>
+            </div>
+
+            <div class="dhr-tip"> <i class="fas fa-info-circle dhr-tip-icon" /> {{}} </div>
+        </template>
     </dg-panel>
 </template>
 
@@ -54,4 +63,15 @@
             border-radius: 40px
             font-size: 0.7rem
             font-weight: 600
+
+        &-tip
+            margin-top: 18px
+            background: #f1f5f9
+            border-radius: 20px
+            padding: 12px
+            font-size: 0.8rem
+
+            &-icon
+                color: var(--primary-color)
+                margin-right: 6px
 </style>

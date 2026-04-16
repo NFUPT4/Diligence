@@ -12,24 +12,34 @@
         <div class="da-main">
             <!-- 表单 -->
             <div class="da-main-left">
+
+                <div class="da-main-left-container">
+
+                    <h2 class="da-main-left-title">{{ $t("auth.template.user-login") }}</h2>
+
+                </div>
+
                 <el-form
                     :model="formRawInfo"
                     label-width="auto"
                     class="da-main-left-form"
                     :rules="rules"
                     ref="formRef"
+                    label-position="left"
                     @submit.prevent="handleSubmit">
-                    <h2>{{ $t("auth.template.user-login") }}</h2>
-
                     <!-- 工号 -->
-                    <el-form-item prop="empNo">
+                    <el-form-item
+                        prop="empNo"
+                        label="工号">
                         <el-input
                             :placeholder="$t('auth.template.input-emp')"
                             v-model="formRawInfo.empNo" />
                     </el-form-item>
 
                     <!-- 密码 -->
-                    <el-form-item prop="password">
+                    <el-form-item
+                        prop="password"
+                        label="密码">
                         <el-input
                             type="password"
                             :placeholder="$t('auth.template.input-pwd')"
@@ -38,29 +48,34 @@
                     </el-form-item>
 
                     <!-- 附加选项 -->
-                    <el-form-item>
-                        <!-- 记住登录 -->
-                        <el-checkbox-group v-model="formRawInfo.remember">
-                            <el-checkbox label="remember">{{ $t("auth.template.remember-me") }}</el-checkbox>
-                        </el-checkbox-group>
-                        <!-- 切换登录方式 -->
-                        <el-button
-                            type="text"
-                            @click="loginMethod = loginMethod === 'empNo' ? 'qrcode' : 'empNo'">
-                            {{
-                                loginMethod === "qrcode"
-                                    ? $t("auth.template.account-pwd-login")
-                                    : $t("auth.template.qrcode-login")
-                            }}
-                        </el-button>
+                    <el-form-item style="width: 100%">
+                        <div style="display: flex; width: 100%; justify-content: space-between">
+                            <!-- 记住登录 -->
+                            <el-checkbox-group v-model="formRawInfo.remember">
+                                <el-checkbox label="remember">{{ $t("auth.template.remember-me") }}</el-checkbox>
+                            </el-checkbox-group>
+                            <!-- 切换登录方式 -->
+                            <el-button
+                                type="text"
+                                @click="loginMethod = loginMethod === 'empNo' ? 'qrcode' : 'empNo'">
+                                {{
+                                    loginMethod === "qrcode"
+                                        ? $t("auth.template.account-pwd-login")
+                                        : $t("auth.template.qrcode-login")
+                                }}
+                            </el-button>
+                        </div>
                     </el-form-item>
 
                     <!-- 登录按钮 -->
-                    <el-form-item>
+                    <el-form-item style="width: 100%">
                         <el-button
                             type="primary"
                             @click="handleSubmit(formRef)"
-                            >{{ $t("auth.template.btn-login") }}</el-button
+                            round
+                            size="large"
+                            style="width: 100% !important"
+                            ><i class="fas fa-arrow-right-to-bracket" />{{ $t("auth.template.btn-login") }}</el-button
                         >
                     </el-form-item>
                 </el-form>
@@ -82,7 +97,7 @@
                         alt="logo"
                         class="da-main-right-logo" />
 
-                    <h1>{{ $t("common.sys-name") }}</h1>
+                    <h1 style="color: var(--primary-color)">{{ $t("common.name") }}</h1>
                 </div>
 
                 <!-- 二维码 -->
@@ -110,7 +125,6 @@
      * */
     import { ref, reactive, computed } from "vue";
     import type { Ref, Reactive } from "vue";
-    import DgFloatInput from "@/components/DgFloatInput.vue";
     import { hash } from "@/utils";
     import { useAuthStore } from "@/stores/auth.store";
     import { Nullable, Optional } from "@/types/common";
@@ -200,10 +214,11 @@
         display: flex
         justify-content: center
         align-items: center
+        background: var(--bg-gray)
 
         &-main
             display: flex
-            background-color: #d3cfcf
+            background-color: var(--bg-card)
 
             @include pc()  // PC
                 width: 50%
@@ -219,6 +234,7 @@
 
             &-left
                 display: flex
+                flex-direction: column
                 justify-content: center
                 align-items: center
 
@@ -228,10 +244,19 @@
                 @include mobile()
                     flex: 5
 
+                &-container
+                    display: flex
+                    justify-content: center
+                    align-items: center
+                    padding: 20px 0
+
+                &-title
+                    color: var(--primary-color)
+
                 &-form
                     display: flex
                     flex-direction: column
-                    align-items: flex-start
+                    gap: 20px
 
                     @include pc()
                         width: 70%
@@ -307,7 +332,7 @@
                     aspect-ratio: 1/1
 
                     @include pc()
-                        width: 15%
+                        width: 25%
 
                     @include mobile()
                         width: 20%

@@ -140,7 +140,7 @@
      * @copyright CC BY-NC-SA
      * */
     import DgLogo from "@/components/DgLogo.vue";
-    import { useUserStore } from "@/stores/user.store.ts";
+    import { useUserStore } from "@/stores/user.store";
     import DgAttendanceStatus from "@/views/home/statistics/DgAttendanceStatus.vue";
     import DgAttendanceRate from "@/views/home/statistics/DgAttendanceRate.vue";
     import DgPendingApproval from "@/views/home/statistics/DgPendingApproval.vue";
@@ -151,14 +151,6 @@
 
 <style lang="sass" scoped>
     @use "@/style/global" as *
-
-    @mixin card-style()
-        background: white
-        border-radius: var(--card-radius)
-        border: 1px solid var(--border-light)
-        box-shadow: var(--shadow-sm)
-        transition: all 0.2s ease
-
 
     .dh
         width: 100%
@@ -350,28 +342,6 @@
 
                     @include mobile()
                         gap: 12px
-
-                    .stat-card
-                        flex: 1
-                        padding: 20px 24px
-                        min-width: 140px
-                        @include card-style()
-
-                        &-title
-                            font-size: 0.8rem
-                            text-transform: uppercase
-                            color: var(--text-muted)
-                            margin-bottom: 12px
-
-                        &-value
-                            font-size: 1.8rem
-                            font-weight: 700
-                            color: var(--text-dark)
-
-                        &-sub
-                            font-size: 0.7rem
-                            color: var(--primary-color)
-                            margin-top: 8px
 
                 &-reviews, &-approval
                     @include pc()
