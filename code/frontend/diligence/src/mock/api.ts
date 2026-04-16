@@ -64,7 +64,11 @@ class MockServer extends MockServerBase {
             if (realHash === userInfo.passwordHash) {
                 const { passwordHash, salt, ...rest } = userInfo; // 剔除密码和盐
 
-                return { token: `Bearer ${Math.random().toString(36).slice(-8)}`, userInfo: rest };
+                const now = new Date();
+
+                now.setHours(now.getHours() + 2);
+
+                return { token: `${empNo}-${now.getTime()}`, userInfo: rest };
             }
         }
 

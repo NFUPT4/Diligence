@@ -8,8 +8,9 @@
  */
 
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "@/views/DgHome.vue";
+import Home from "@/views/home/DgHome.vue";
 import { useAuthStore } from "@/stores/auth.store";
+import { useUserStore } from "@/stores/user.store";
 
 
 const router = createRouter({
@@ -31,22 +32,23 @@ const router = createRouter({
 });
 
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, from) => {
     const authStore = useAuthStore();
+    const userStore = useUserStore();
 
     // 需要认证的路由
     if (to.meta.requiresAuth) {
         // 已登录
-        if (authStore.authenticated)
-            next();
+        if (authStore.authenticated && userStore._info)
+            return true;
 
         else
-            next({ name: "auth" });
+            return "/auth";
     }
 
     // 游客访问路由
     else
-        next();
+        return true;
 });
 
 

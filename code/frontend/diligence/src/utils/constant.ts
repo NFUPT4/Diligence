@@ -34,3 +34,6 @@ export const DG_TOKEN_KEY: LocalStorageKey<"token"> = "DG_TOKEN_KEY";
  * @desc 该值用于存储是否记住密码，在登录成功后，将是否记住密码存储在localStorage中，以便在其他页面访问时使用。
  * */
 export const DG_REMEMBER_KEY: LocalStorageKey<"remember"> = "DG_REMEMBER_KEY";
+
+
+export const DG_THEME_KEY: LocalStorageKey<"theme"> = "DG_THEME_KEY";

@@ -34,3 +34,8 @@ export async function hash(str: string): Promise<string> {
 
     return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 }
+
+
+export function timeStampToTime(timestamp: string): Date {
+    return new Date(parseInt(timestamp, 10));
+}

@@ -16,6 +16,7 @@
      * @description
      * */
     import { defineComponent } from "vue";
+    import { useThemeStore } from "@/stores/theme.store";
     import router from "@/router/router";
 
     onload = () => {
@@ -25,7 +26,10 @@
     };
 
     export default defineComponent({
-        name: "App"
+        name: "App",
+        beforeMount() {
+            useThemeStore().init();
+        }
     });
 </script>
 
@@ -34,9 +38,15 @@
 </template>
 
 <style lang="sass">
+    @use "@/style/theme" as *
+
     html, body, #app
         padding: 0
         margin: 0
         width: 100%
         height: 100%
+
+    a
+        text-decoration: none
+        color: unset
 </style>
