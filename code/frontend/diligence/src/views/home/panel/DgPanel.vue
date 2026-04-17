@@ -34,17 +34,22 @@
     @use "@/style/global" as *
 
     .dp
-        padding: 24px
-        background: white
-        border-radius: var(--card-radius)
-        border: 1px solid var(--border-light)
-        box-shadow: var(--shadow-sm)
-        transition: all 0.2s ease
-
         @include pc()
             grid-column: span 6
         @include mobile()
             grid-column: 1 / -1
+
+        & :slotted([class*="title"])
+            font-weight: 600
+            font-size: 1.2rem
+
+        & :slotted([class*="badge"])
+            background: #ffedd5
+            color: #b45309
+            padding: 4px 12px
+            border-radius: 40px
+            font-size: 0.7rem
+            font-weight: 600
 
         &-header
             display: flex
@@ -53,4 +58,6 @@
             margin-bottom: 20px
             border-bottom: 1px solid #f0f2f5
             padding-bottom: 12px
+
+        & :deep()
 </style>

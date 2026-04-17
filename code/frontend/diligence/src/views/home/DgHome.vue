@@ -90,41 +90,41 @@
                 <!-- 统计卡组 -->
                 <div class="dh-main-content-stats">
                     <!-- 今日打卡状态 -->
-                    <dg-attendance-status />
+                    <dg-attendance-status class="dh-main-content-stats-item" />
 
                     <!-- 本月考勤率 -->
-                    <dg-attendance-rate />
+                    <dg-attendance-rate class="dh-main-content-stats-item" />
 
                     <!-- 待处理审批 -->
-                    <dg-pending-approval />
+                    <dg-pending-approval class="dh-main-content-stats-item" />
                 </div>
 
                 <!-- 打卡功能 -->
-                <dg-reviews />
+                <dg-reviews class="dh-main-content-panel" />
 
                 <!-- 待审批申请 -->
-                <div class="dh-main-content-approval"></div>
+                <dg-approval class="dh-main-content-panel" />
 
                 <!-- 便捷操作 -->
                 <div class="dh-main-content-shortcuts">
                     <!-- 考勤申请 -->
-                    <div class="dh-main-content-shortcuts-attendance"> </div>
+                    <dg-shortcut-approval class="dh-main-content-shortcuts-item" />
 
                     <!-- 个人考勤记录 -->
-                    <div class="dh-main-content-shortcuts-records"> </div>
+                    <dg-shortcut-record class="dh-main-content-shortcuts-item" />
 
                     <!-- 部门考勤报表 -->
-                    <div class="dh-main-content-shortcuts-report"></div>
+                    <dg-shortcut-charts class="dh-main-content-shortcuts-item" />
 
                     <!-- 组织架构 -->
-                    <div class="dh-main-content-shortcuts-organization"></div>
+                    <dg-shortcut-orgnization class="dh-main-content-shortcuts-item" />
                 </div>
 
                 <!-- 月度考勤趋势 -->
-                <div class="dh-main-content-trend"></div>
+                <dg-trend class="dh-main-content-panel" />
 
                 <!-- 系统公告 -->
-                <div class="dh-main-content-notice"></div>
+                <dg-notice class="dh-main-content-panel" />
             </div>
         </main>
     </div>
@@ -145,12 +145,26 @@
     import DgAttendanceRate from "@/views/home/statistics/DgAttendanceRate.vue";
     import DgPendingApproval from "@/views/home/statistics/DgPendingApproval.vue";
     import DgReviews from "@/views/home/panel/DgReviews.vue";
+    import DgApproval from "@/views/home/panel/DgApproval.vue";
+    import DgShortcutApproval from "@/views/home/shortcut/DgShortcutApproval.vue";
+    import DgShortcutRecord from "@/views/home/shortcut/DgShortcutRecord.vue";
+    import DgShortcutCharts from "@/views/home/shortcut/DgShortcutCharts.vue";
+    import DgShortcutOrgnization from "@/views/home/shortcut/DgShortcutOrganization.vue";
+    import DgTrend from "@/views/home/panel/DgTrend.vue";
+    import DgNotice from "@/views/home/panel/DgNotice.vue";
 
     const userStore = useUserStore();
 </script>
 
 <style lang="sass" scoped>
     @use "@/style/global" as *
+
+    @mixin card-style
+        background: white
+        border-radius: var(--card-radius)
+        border: 1px solid var(--border-light)
+        box-shadow: var(--shadow-sm)
+        transition: all 0.2s ease
 
     .dh
         width: 100%
@@ -166,12 +180,12 @@
         // ----- 侧边栏 / 移动端底部导航 -----
         &-side
             @include pc()
-            flex: 0 0 280px
-            display: flex
-            flex-direction: column
-            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)
-            border-right: 1px solid var(--border-light)
-            overflow-y: auto
+                flex: 0 0 280px
+                display: flex
+                flex-direction: column
+                background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)
+                border-right: 1px solid var(--border-light)
+                overflow-y: auto
 
             @include mobile()
                 width: 100%
@@ -334,42 +348,30 @@
                 grid-template-columns: repeat(12, 1fr)
                 gap: 24px
 
-                &-stats
+                // 小卡片
+                &-stats, &-shortcuts
                     grid-column: 1 / -1
                     display: flex
-                    gap: 24px
                     flex-wrap: wrap
+
+                    &-item :deep()
+                        @include card-style()
+
+                &-stats
+                    gap: 24px
 
                     @include mobile()
                         gap: 12px
 
-                &-reviews, &-approval
-                    @include pc()
-                        grid-column: span 6
-
-                    @include mobile()
-                        grid-column: 1 / -1
-
                 &-shortcuts
-                    grid-row: span 1
-                    grid-column: 1 / -1
-                    display: flex
-                    flex-direction: row
-                    align-items: center
                     gap: 20px
 
-                &-trend
-                    grid-row: span 2
+                // 大卡片
+                &-panel :deep()
+                    @include card-style()
+                    padding: 24px
 
-                    @include pc()
-                        grid-column: span 6
-
-                    @include mobile()
-                        grid-column: 1 / -1
-
-                &-notice
-                    grid-row: span 2
-
+                &-reviews, &-approval, &-trend, &-notice
                     @include pc()
                         grid-column: span 6
 

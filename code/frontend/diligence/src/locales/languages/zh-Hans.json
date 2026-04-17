@@ -21,7 +21,7 @@
             "account-login": "账号登录",
             "account-pwd-login": "账号密码登录",
             "qrcode-login": "APP扫码登录",
-            "login-failed-chech-emp-pwd": "登录失败，请检查员工号和密码!",
+            "login-failed-check-emp-pwd": "登录失败，请检查员工号和密码!",
             "emp-include-letter-and-number": "员工号只能包含字母和数字",
             "pwd-less-than-6-characters": "密码长度不能少于6位",
             "pwd-include-b-l-letter-number-at-least": "密码至少包含大小写字母和数字"
@@ -55,6 +55,46 @@
             "template": {
                 "title": "智能打卡",
                 "badge": "GPS验证"
+            }
+        },
+        "approval": {
+            "template": {
+                "title": "待审批申请",
+                "badge": "条待处理"
+            }
+        },
+        "shortcut-approval": {
+            "template": {
+                "title": "考勤申请",
+                "desc": "请假/加班/补卡"
+            }
+        },
+        "shortcut-record": {
+            "template": {
+                "title": "个人考勤记录",
+                "desc": "日历/列表视图"
+            }
+        },
+        "shortcut-charts": {
+            "template": {
+                "title": "部门考勤报表",
+                "desc": "团队出勤率"
+            }
+        },
+        "shortcut-organization": {
+            "template": {
+                "title": "组织架构",
+                "desc": "部门/岗位管理"
+            }
+        },
+        "trend": {
+            "template": {
+                "title": "月度考勤趋势"
+            }
+        },
+        "notice": {
+            "template": {
+                "title": "系统公告"
             }
         }
     }

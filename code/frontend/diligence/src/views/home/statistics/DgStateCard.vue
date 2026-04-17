@@ -40,11 +40,8 @@
         flex: 1
         padding: 20px 24px
         min-width: 140px
-        background: white
-        border-radius: var(--card-radius)
-        border: 1px solid var(--border-light)
-        box-shadow: var(--shadow-sm)
-        transition: all 0.2s ease
+
+        & :deep()
 
         &-title
             font-size: 0.8rem

@@ -12,11 +12,8 @@
         <div class="da-main">
             <!-- 表单 -->
             <div class="da-main-left">
-
                 <div class="da-main-left-container">
-
                     <h2 class="da-main-left-title">{{ $t("auth.template.user-login") }}</h2>
-
                 </div>
 
                 <el-form
@@ -219,6 +216,7 @@
         &-main
             display: flex
             background-color: var(--bg-card)
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(0,0,0,0.02)
 
             @include pc()  // PC
                 width: 50%

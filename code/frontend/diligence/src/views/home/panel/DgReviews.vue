@@ -8,7 +8,7 @@
   -->
 
 <template>
-    <dg-panel class="dg-home-reviews">
+    <dg-panel class="dg-home-reviews dhr">
         <template #title>
             <h3 class="dhr-title"
                 ><i
@@ -23,7 +23,7 @@
 
         <template #default>
             <div class="dhr-clock">
-                <!-- TODO: 带实现 -->
+                <!-- TODO: 待实现 -->
                 <div class="dhr-clock-location"> </div>
             </div>
 
@@ -52,18 +52,6 @@
 <style lang="sass" scoped>
 
     .dhr
-        &-title
-            font-weight: 600
-            font-size: 1.2rem
-
-        &-badge
-            background: #ffedd5
-            color: #b45309
-            padding: 4px 12px
-            border-radius: 40px
-            font-size: 0.7rem
-            font-weight: 600
-
         &-tip
             margin-top: 18px
             background: #f1f5f9

@@ -8,42 +8,41 @@
   -->
 
 <template>
-    <dg-panel class="dg-home-approval dha">
+
+    <dg-shortcut>
+
+        <template #icon>
+
+            <i class="fas fa-chart-pie" />
+
+        </template>
+
         <template #title>
-            <h3 class="dha-title"
-                ><i
-                    class="fas fa-clipboard-list"
-                    style="color: #2d6a4f"></i>
-                {{ $t("home.approval.template.title") }}</h3
-            >
-        </template>
 
-        <template #badge>
-            <span class="dha-badge">{{}} {{ $t('home.approval.template.badge') }}</span>
-        </template>
-
-        <template #default>
-
-
+            {{ $t('home.shortcut-record.template.title') }}
 
         </template>
 
-    </dg-panel>
+        <template #desc>
+
+            {{ $t('home.shortcut-record.template.desc') }}
+
+        </template>
+
+    </dg-shortcut>
+
 </template>
 
 <script lang="ts" setup>
     /**
-     * @file DgApproval.vue
+     * @file DgShortcutRecord.vue
      * @author edocsitahw
      * @version 1.1
-     * @date 2026/04/16 22:40
+     * @date 2026/04/17 11:04
      * @desc
      * @copyright CC BY-NC-SA
      * */
-    import DgPanel from "@/views/home/panel/DgPanel.vue";
+import DgShortcut from "@/views/home/shortcut/DgShortcut.vue";
 </script>
 
-<style lang="sass" scoped>
-
-
-</style>
+<style lang="sass" scoped></style>
