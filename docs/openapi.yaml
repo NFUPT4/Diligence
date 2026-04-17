@@ -75,11 +75,11 @@ components:
                 empNo:
                     type: string
                     description: 员工工号
-                    example: "EMP001"
+                    example: "EXP20260001"
                 password:
                     type: string
-                    description: 密码
-                    example: "123456"
+                    description: 密码的哈希值
+                    example: "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92"
         LoginResponse:
             type: object
             properties:

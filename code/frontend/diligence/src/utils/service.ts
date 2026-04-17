@@ -15,10 +15,10 @@
  * @desc
  * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
  * */
-import type { AxiosInstance, AxiosRequestConfig } from "axios";
+import type { AxiosInstance, AxiosRequestConfig , AxiosResponse} from "axios";
 import axios from "axios";
 import { DG_TOKEN_KEY } from "@/utils/constant";
-import type { Nullable } from "@/types/common";
+import type { Nullable, HttpResponse } from "@/types/common";
 
 /**
  * @desc axios实例，用于请求后端接口
@@ -47,7 +47,8 @@ service.interceptors.request.use(
 
 // 响应拦截器
 service.interceptors.response.use(
-    response => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (response: AxiosResponse<HttpResponse<any>>) => {
         const result = response.data;
 
         if (result.code === 200) return result.data;

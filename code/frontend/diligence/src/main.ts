@@ -7,10 +7,15 @@
  * permission, please contact NFUPT4 https://gitee.com/nfupt4.
  */
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
+import { createI18nInstance } from "@/locales/i18n";
 
-import App from './App.vue'
-import router from './router'
+import App from './App.vue';
+import router from './router/router';
+import ElementPlus from "element-plus";
 
-createApp(App).use(createPinia()).use(router).mount('#app')
+import "element-plus/dist/index.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+
+createApp(App).use(createPinia()).use(await createI18nInstance()).use(router).use(ElementPlus).mount('#app')
