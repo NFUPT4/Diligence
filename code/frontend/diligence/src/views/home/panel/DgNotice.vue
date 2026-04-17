@@ -8,23 +8,18 @@
   -->
 
 <template>
-    <dg-panel class="dg-home-approval dha">
+    <dg-panel class="dg-home-notice dhn">
         <template #title>
-            <h3 class="dha-title"
-                ><i
-                    class="fas fa-clipboard-list"
-                    style="color: #2d6a4f"></i>
-                {{ $t("home.approval.template.title") }}</h3
-            >
-        </template>
-
-        <template #badge>
-            <span class="dha-badge">{{}} {{ $t('home.approval.template.badge') }}</span>
+            <h3><i class="fas fa-bullhorn"></i> {{ $t('home.notice.template.title') }}</h3>
         </template>
 
         <template #default>
 
+            <div class="dhn-all">
 
+
+
+            </div>
 
         </template>
 
@@ -33,17 +28,14 @@
 
 <script lang="ts" setup>
     /**
-     * @file DgApproval.vue
+     * @file DgNotice.vue
      * @author edocsitahw
      * @version 1.1
-     * @date 2026/04/16 22:40
+     * @date 2026/04/17 13:19
      * @desc
      * @copyright CC BY-NC-SA
      * */
     import DgPanel from "@/views/home/panel/DgPanel.vue";
 </script>
 
-<style lang="sass" scoped>
-
-
-</style>
+<style lang="sass" scoped></style>

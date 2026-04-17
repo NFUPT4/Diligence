@@ -8,35 +8,33 @@
   -->
 
 <template>
-    <dg-panel class="dg-home-approval dha">
+
+    <dg-panel class="dg-home-trend dht">
+
         <template #title>
-            <h3 class="dha-title"
-                ><i
-                    class="fas fa-clipboard-list"
-                    style="color: #2d6a4f"></i>
-                {{ $t("home.approval.template.title") }}</h3
-            >
+            <h3 class="dht-title"><i class="fas fa-chart-column" />{{ $t("home.trend.template.title") }}</h3>
         </template>
 
         <template #badge>
-            <span class="dha-badge">{{}} {{ $t('home.approval.template.badge') }}</span>
+            <i class="fas fa-ellipsis-h" />
         </template>
 
         <template #default>
-
-
-
+            <div class="dht-summary">
+                <i class="fas fa-chart-simple"></i> {{}}
+            </div>
         </template>
 
     </dg-panel>
+
 </template>
 
 <script lang="ts" setup>
     /**
-     * @file DgApproval.vue
+     * @file DgTrend.vue
      * @author edocsitahw
      * @version 1.1
-     * @date 2026/04/16 22:40
+     * @date 2026/04/17 11:31
      * @desc
      * @copyright CC BY-NC-SA
      * */
@@ -44,6 +42,5 @@
 </script>
 
 <style lang="sass" scoped>
-
 
 </style>
