@@ -8,7 +8,8 @@
  */
 
 import { MockServerBase, route as mockRoute } from "@/mock/common";
-import type { HttpRequest, LoginData, LoginResult, UserInfo } from "@/types/common";
+import type { HttpRequest, LoginData, LoginResult, Nullable, TodayStatusResult, UserInfo } from "@/types/common";
+import { randomBoolean, randomChoice } from "@/utils";
 
 type AxiosRequest<T = unknown> = HttpRequest<{
     data: T;
@@ -38,6 +39,11 @@ function route(...args: Parameters<typeof mockRoute>): ReturnType<typeof mockRou
 class MockServer extends MockServerBase {
     private userList: DbUserInfo[] = [];
 
+    private readonly datePairs: ReturnType<typeof MockServer.genRandomDatePairs> = [];
+
+    private readonly startDate = new Date(Date.now());
+    private readonly endDate = new Date(Date.now());
+
     constructor() {
         super();
         this.userList.push({
@@ -50,13 +56,20 @@ class MockServer extends MockServerBase {
             deptId: 0,
             deptName: "t"
         });
+
+        this.startDate.setHours(7, 30);
+        this.endDate.setHours(17);
+
+        this.datePairs = MockServer.genRandomDatePairs(this.startDate, this.endDate, Math.floor(Math.random() * 4) + 1);
     }
 
     @route("/auth/login", "POST")
     login(request: AxiosRequest<LoginData>): HttpRequest<null> | LoginResult {
         const { empNo, passwordHash } = request.body.data;
 
-        const userInfo = this.userList.find(ui => ui.empNo === empNo);
+        const uid = this.userList.findIndex(ui => ui.empNo === empNo);
+
+        const userInfo = this.userList[uid];
 
         if (userInfo) {
             const realHash = passwordHash + userInfo.salt; // 在后端要加盐后在哈希
@@ -68,11 +81,90 @@ class MockServer extends MockServerBase {
 
                 now.setHours(now.getHours() + 2);
 
-                return { token: `${empNo}-${now.getTime()}`, userInfo: rest };
+                return { token: `${uid}-${empNo}-${now.getTime()}`, userInfo: rest };
             }
         }
 
         return { code: 401, msg: "用户名或密码错误", data: null };
+    }
+
+    @route("/clock/today-status", "POST")
+    getTodayStatus(
+        request: AxiosRequest<null>
+    ): HttpRequest<null> | TodayStatusResult {
+        const info = MockServer.parseToken(request);
+
+        if (!info)
+            return { code: 401, msg: "请先登录", data: null };
+
+        const { uid, empNo } = info;
+
+        return {
+            status: this.datePairs.map(pair => ({
+                state: randomBoolean(),
+                startTime: pair.start.toISOString(),
+                endTime: pair.end.toISOString()
+            }))
+        };
+    }
+
+    static parseToken<T>(request: HttpRequest<T>): Nullable<{ uid: number; empNo: string }> {
+        const authHeader = request.headers.authorization;
+
+        const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+
+        if (token) {
+            const [uid, empNo] = token.split("-");
+
+            return { uid: Number(uid), empNo: empNo! };
+        }
+
+        return null;
+    }
+
+    static genRandomDatePairs(start: Date, end: Date, n: number) {
+        if (n <= 0) return [];
+
+        if (start >= end) throw new Error("start date should be earlier than end date");
+
+        const totalMs = end.getTime() - start.getTime();
+
+        const segmentsCount = 2 * n + 1;
+
+        const randomValues = [];
+
+        let sumRandom = 0;
+
+        for (let i = 0; i < segmentsCount; i++) {
+            const val = Math.random() * 0.9 + 0.1;
+
+            randomValues.push(val);
+
+            sumRandom += val;
+        }
+
+        const actualDurations = randomValues.map(v => (v / sumRandom) * totalMs);
+
+        const gaps: number[] = actualDurations.slice(0, n + 1);
+        const durations: number[] = actualDurations.slice(n + 1);
+
+        const result: { start: Date; end: Date; }[] = [];
+
+        let cursor = start.getTime();
+
+        for (let i = 0; i < n; i++) {
+            cursor += gaps[i]!;
+
+            const segmentStart = new Date(cursor);
+
+            cursor += durations[i]!;
+
+            const segmentEnd = new Date(cursor);
+
+            result.push({ start: segmentStart, end: segmentEnd });
+        }
+
+        return result;
     }
 }
 

@@ -124,7 +124,7 @@
     import type { Ref, Reactive } from "vue";
     import { hash } from "@/utils";
     import { useAuthStore } from "@/stores/auth.store";
-    import { Nullable, Optional } from "@/types/common";
+    import type { Nullable, Optional } from "@/types/common";
     import { ElMessage } from "element-plus";
     import { useQRCode } from "@vueuse/integrations/useQRCode";
     import { useI18n } from "vue-i18n";

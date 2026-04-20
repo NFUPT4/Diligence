@@ -37,7 +37,7 @@ export const useAuthStore = defineStore("auth", () => {
 
     // 是否已认证
     const authenticated = computed(
-        () => token.value.length > 0 && timeStampToTime(token.value.split("-")[1]!) > new Date()
+        () => token.value.length > 0 && timeStampToTime(token.value.split("-")[2]!) > new Date()
     );
 
     /* methods */

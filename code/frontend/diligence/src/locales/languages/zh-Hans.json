@@ -8,7 +8,10 @@
             "home": "首页面板",
             "my-attendance": "我的考勤",
             "data-view": "数据查看",
-            "system-management": "系统管理"
+            "system-management": "系统管理",
+            "day": "天",
+            "week": "小时",
+            "second": "秒"
         }
     },
     "auth": {
@@ -36,7 +39,8 @@
             "template": {
                 "title": "今日考勤状态",
                 "value": "已完成",
-                "start-work": "上班"
+                "note": "今日考勤提醒",
+                "deadline": "距离<strong>{name}</strong>的结束还有"
             }
         },
         "attendance-rate": {

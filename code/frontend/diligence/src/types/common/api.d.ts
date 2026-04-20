@@ -69,3 +69,14 @@ export interface LoginResult {
     token: string;
     userInfo: UserInfo;
 }
+
+
+export interface TodayStatusResult {
+    status: {
+        state: boolean;
+        startTime: string | false;
+        endTime: string | false;
+        name?: string;
+    }[];
+}
+

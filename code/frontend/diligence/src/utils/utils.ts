@@ -16,6 +16,8 @@
  * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
  * */
 
+import type { Optional } from "@/types/common";
+
 /**
  * @summary 生成字符串哈希
  *
@@ -35,7 +37,22 @@ export async function hash(str: string): Promise<string> {
     return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
-
 export function timeStampToTime(timestamp: string): Date {
     return new Date(parseInt(timestamp, 10));
+}
+
+export function randomChoice<T>(arr: T[]): Optional<T> {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+export function randomBoolean(): boolean {
+    return Math.random() < 0.5;
+}
+
+export function randomTodayTime(): Date {
+    return new Date(new Date().setHours(0, 0, 0, 0) + Math.random() * 24 * 60 * 60 * 1000);
+}
+
+export function timeOffset(time: Date, offsetMs: number) {
+    return new Date(time.getTime() + offsetMs);
 }
