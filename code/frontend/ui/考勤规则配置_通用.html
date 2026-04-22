@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>勤致 · 考勤规则配置</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+            padding: 24px 20px;
+        }
+
+        .rule-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 头部 */
+        .page-header {
+            margin-bottom: 28px;
+        }
+        .page-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: #5b6e8c;
+            margin-top: 6px;
+        }
+
+        /* 标签页 */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 28px;
+            background: white;
+            padding: 6px;
+            border-radius: 60px;
+            display: inline-flex;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .tab-btn {
+            padding: 10px 28px;
+            border-radius: 40px;
+            font-weight: 500;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .tab-btn.active {
+            background: #2d6a4f;
+            color: white;
+            box-shadow: 0 2px 8px rgba(45,106,79,0.2);
+        }
+
+        /* 卡片通用 */
+        .card {
+            background: white;
+            border-radius: 32px;
+            border: 1px solid #ecfdf5;
+            overflow: hidden;
+            margin-bottom: 28px;
+        }
+        .card-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid #f0f2f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .card-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background: #2d6a4f;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+        }
+        .btn-outline {
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            padding: 0 24px 24px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        th, td {
+            padding: 14px 8px;
+            text-align: left;
+            border-bottom: 1px solid #f0f2f5;
+        }
+        th {
+            font-weight: 600;
+            color: #5b6e8c;
+        }
+        .action-icons i {
+            font-size: 1rem;
+            margin: 0 6px;
+            cursor: pointer;
+            color: #5b6e8c;
+        }
+        .action-icons i:hover {
+            color: #2d6a4f;
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            max-width: 550px;
+            width: 90%;
+            border-radius: 32px;
+            padding: 28px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        .close-modal {
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 24px;
+            font-size: 0.85rem;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .btn-cancel {
+            background: #f1f5f9;
+            border: none;
+            flex: 1;
+            padding: 10px;
+            border-radius: 40px;
+        }
+        .btn-save {
+            background: #2d6a4f;
+            color: white;
+            border: none;
+            flex: 1;
+            padding: 10px;
+            border-radius: 40px;
+        }
+        .employee-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 8px;
+        }
+        .employee-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+        }
+        hr {
+            margin: 12px 0;
+        }
+        @media (max-width: 700px) {
+            .card-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="rule-container">
+    <div class="page-header">
+        <h1>考勤规则配置</h1>
+        <div class="breadcrumb"><i class="fas fa-home"></i> 首页 / 系统管理 / 考勤规则</div>
+    </div>
+
+    <!-- 标签切换 -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="location">打卡地点管理</button>
+        <button class="tab-btn" data-tab="group">考勤组管理</button>
+        <button class="tab-btn" data-tab="rule">考勤规则管理</button>
+    </div>
+
+    <!-- 打卡地点管理 -->
+    <div id="locationPanel" class="tab-panel">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-map-marker-alt"></i> 打卡地点列表</h3>
+                <button class="btn-primary" id="addLocationBtn"><i class="fas fa-plus"></i> 新增地点</button>
+            </div>
+            <div class="table-wrapper">
+                <table id="locationTable">
+                    <thead><tr><th>地点名称</th><th>详细地址</th><th>经度</th><th>纬度</th><th>允许半径(米)</th><th>状态</th><th>操作</th></tr></thead>
+                    <tbody id="locationTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 考勤组管理 -->
+    <div id="groupPanel" class="tab-panel" style="display:none;">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-layer-group"></i> 考勤组列表</h3>
+                <button class="btn-primary" id="addGroupBtn"><i class="fas fa-plus"></i> 新增考勤组</button>
+            </div>
+            <div class="table-wrapper">
+                <table id="groupTable">
+                    <thead><tr><th>考勤组名称</th><th>关联部门</th><th>关联规则</th><th>关联地点</th><th>员工数</th><th>状态</th><th>操作</th></tr></thead>
+                    <tbody id="groupTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 考勤规则管理 -->
+    <div id="rulePanel" class="tab-panel" style="display:none;">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-gavel"></i> 考勤规则列表</h3>
+                <button class="btn-primary" id="addRuleBtn"><i class="fas fa-plus"></i> 新增规则</button>
+            </div>
+            <div class="table-wrapper">
+                <table id="ruleTable">
+                    <thead><tr><th>规则名称</th><th>规则类型</th><th>上班时间</th><th>下班时间</th><th>迟到阈值(min)</th><th>早退阈值(min)</th><th>状态</th><th>操作</th></tr></thead>
+                    <tbody id="ruleTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 通用模态框（动态内容） -->
+<div id="genericModal" class="modal">
+    <div class="modal-content" id="modalDynamicContent"></div>
+</div>
+
+<script>
+    // ==================== 模拟数据 ====================
+    // 打卡地点
+    let locations = [
+        { id: 1, name: "勤致大厦正门", address: "广东省深圳市南山区科技中一路1号", lng: 113.952, lat: 22.543, radius: 100, status: 1 },
+        { id: 2, name: "研发中心", address: "深圳市南山区科技园科发路10号", lng: 113.951, lat: 22.545, radius: 150, status: 1 }
+    ];
+    // 考勤规则
+    let rules = [
+        { id: 1, name: "固定班次-研发部", type: "fixed", morningStart: "09:00", morningEnd: "12:00", afternoonStart: "13:00", afternoonEnd: "18:00", lateMinutes: 30, earlyMinutes: 30, status: 1 },
+        { id: 2, name: "弹性工时-销售部", type: "flexible", workHoursPerDay: 8, coreStart: "10:00", coreEnd: "16:00", lateMinutes: 30, earlyMinutes: 30, status: 1 }
+    ];
+    // 考勤组
+    let groups = [
+        { id: 1, name: "技术研发考勤组", dept: "技术研发部", ruleId: 1, locationIds: [1], employeeIds: [1,2,3], status: 1 },
+        { id: 2, name: "产品部考勤组", dept: "产品部", ruleId: 1, locationIds: [1], employeeIds: [4,5], status: 1 }
+    ];
+    // 员工池（用于分配）
+    let allEmployees = [
+        { id: 1, name: "张明远", dept: "技术研发部" },
+        { id: 2, name: "李思敏", dept: "技术研发部" },
+        { id: 3, name: "王启航", dept: "技术研发部" },
+        { id: 4, name: "陈敏", dept: "产品部" },
+        { id: 5, name: "赵欣怡", dept: "产品部" },
+        { id: 6, name: "刘强", dept: "销售部" },
+        { id: 7, name: "杨静", dept: "人力资源部" }
+    ];
+    let nextLocationId = 3, nextRuleId = 3, nextGroupId = 3;
+
+    // 辅助函数
+    function getLocationName(id) { let l = locations.find(l=>l.id==id); return l?l.name:'未知'; }
+    function getRuleName(id) { let r = rules.find(r=>r.id==id); return r?r.name:'未知'; }
+    function getEmployeeNames(ids) { return ids.map(id=>allEmployees.find(e=>e.id==id)?.name).filter(n=>n).join(', ') || '无'; }
+
+    // 渲染打卡地点
+    function renderLocations() {
+        let tbody = document.getElementById('locationTableBody');
+        tbody.innerHTML = locations.map(loc => `
+            <tr>
+                <td>${loc.name}</td><td>${loc.address}</td><td>${loc.lng}</td><td>${loc.lat}</td><td>${loc.radius}</td>
+                <td><span class="status-badge ${loc.status==1?'status-enabled':'status-disabled'}">${loc.status==1?'启用':'禁用'}</span></td>
+                <td class="action-icons">
+                    <i class="fas fa-edit" data-type="location" data-id="${loc.id}"></i>
+                    <i class="fas fa-trash-alt" data-type="location" data-id="${loc.id}"></i>
+                    <i class="fas ${loc.status==1?'fa-ban':'fa-check-circle'}" data-type="location-toggle" data-id="${loc.id}"></i>
+                </td>
+            </tr>
+        `).join('');
+        attachTableActions();
+    }
+    // 渲染考勤组
+    function renderGroups() {
+        let tbody = document.getElementById('groupTableBody');
+        tbody.innerHTML = groups.map(grp => `
+            <tr>
+                <td>${grp.name}</td><td>${grp.dept}</td>
+                <td>${getRuleName(grp.ruleId)}</td>
+                <td>${grp.locationIds.map(id=>getLocationName(id)).join(', ') || '未关联'}</td>
+                <td>${grp.employeeIds.length}</td>
+                <td><span class="status-badge ${grp.status==1?'status-enabled':'status-disabled'}">${grp.status==1?'启用':'禁用'}</span></td>
+                <td class="action-icons">
+                    <i class="fas fa-edit" data-type="group" data-id="${grp.id}"></i>
+                    <i class="fas fa-users" data-type="group-employees" data-id="${grp.id}" title="分配员工"></i>
+                    <i class="fas fa-trash-alt" data-type="group" data-id="${grp.id}"></i>
+                    <i class="fas ${grp.status==1?'fa-ban':'fa-check-circle'}" data-type="group-toggle" data-id="${grp.id}"></i>
+                </td>
+            </tr>
+        `).join('');
+        attachTableActions();
+    }
+    // 渲染考勤规则
+    function renderRules() {
+        let tbody = document.getElementById('ruleTableBody');
+        tbody.innerHTML = rules.map(rule => {
+            let timeInfo = rule.type === 'fixed' ? `${rule.morningStart}-${rule.morningEnd} / ${rule.afternoonStart}-${rule.afternoonEnd}` : `弹性工时 ${rule.workHoursPerDay}h/日`;
+            return `
+                <tr>
+                    <td>${rule.name}</td><td>${rule.type==='fixed'?'固定班次':'弹性工作制'}</td>
+                    <td>${rule.type==='fixed'?rule.morningStart:'弹性起'}</td>
+                    <td>${rule.type==='fixed'?rule.afternoonEnd:'弹性止'}</td>
+                    <td>${rule.lateMinutes}</td><td>${rule.earlyMinutes}</td>
+                    <td><span class="status-badge ${rule.status==1?'status-enabled':'status-disabled'}">${rule.status==1?'启用':'禁用'}</span></td>
+                    <td class="action-icons">
+                        <i class="fas fa-edit" data-type="rule" data-id="${rule.id}"></i>
+                        <i class="fas fa-trash-alt" data-type="rule" data-id="${rule.id}"></i>
+                        <i class="fas ${rule.status==1?'fa-ban':'fa-check-circle'}" data-type="rule-toggle" data-id="${rule.id}"></i>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        attachTableActions();
+    }
+    function attachTableActions() {
+        document.querySelectorAll('.action-icons i').forEach(icon => {
+            icon.addEventListener('click', (e) => {
+                let type = icon.dataset.type;
+                let id = parseInt(icon.dataset.id);
+                if (type === 'location') openLocationModal(id);
+                else if (type === 'location-toggle') toggleLocationStatus(id);
+                else if (type === 'group') openGroupModal(id);
+                else if (type === 'group-employees') openEmployeeAssignModal(id);
+                else if (type === 'group-toggle') toggleGroupStatus(id);
+                else if (type === 'rule') openRuleModal(id);
+                else if (type === 'rule-toggle') toggleRuleStatus(id);
+                else if (type === 'location' || type === 'group' || type === 'rule') {
+                    if (icon.classList.contains('fa-trash-alt')) deleteItem(type, id);
+                }
+            });
+        });
+    }
+    function deleteItem(type, id) {
+        if (confirm('确定删除吗？')) {
+            if (type === 'location') locations = locations.filter(l=>l.id!==id);
+            else if (type === 'group') groups = groups.filter(g=>g.id!==id);
+            else if (type === 'rule') rules = rules.filter(r=>r.id!==id);
+            refreshCurrentPanel();
+        }
+    }
+    function toggleLocationStatus(id) { let loc = locations.find(l=>l.id===id); if(loc){loc.status=loc.status===1?0:1; refreshCurrentPanel();} }
+    function toggleGroupStatus(id) { let grp = groups.find(g=>g.id===id); if(grp){grp.status=grp.status===1?0:1; refreshCurrentPanel();} }
+    function toggleRuleStatus(id) { let rule = rules.find(r=>r.id===id); if(rule){rule.status=rule.status===1?0:1; refreshCurrentPanel();} }
+
+    // 模态框通用
+    let currentModalType = null;
+    let currentEditId = null;
+    function showModal(title, contentHtml, onSave) {
+        const modal = document.getElementById('genericModal');
+        const contentDiv = document.getElementById('modalDynamicContent');
+        contentDiv.innerHTML = `
+            <div class="modal-header"><span>${title}</span><span class="close-modal">&times;</span></div>
+            <form id="modalForm">${contentHtml}<div class="modal-buttons"><button type="button" class="btn-cancel" id="modalCancel">取消</button><button type="submit" class="btn-save">保存</button></div></form>
+        `;
+        modal.style.display = 'flex';
+        document.querySelector('.close-modal').addEventListener('click', () => modal.style.display = 'none');
+        document.getElementById('modalCancel').addEventListener('click', () => modal.style.display = 'none');
+        document.getElementById('modalForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            onSave();
+            modal.style.display = 'none';
+            refreshCurrentPanel();
+        });
+    }
+
+    // 打卡地点新增/编辑
+    function openLocationModal(id=null) {
+        let loc = id ? locations.find(l=>l.id===id) : null;
+        let title = loc ? '编辑打卡地点' : '新增打卡地点';
+        let formHtml = `
+            <div class="form-group"><label>地点名称</label><input type="text" id="locName" value="${loc?loc.name:''}" required></div>
+            <div class="form-group"><label>详细地址</label><input type="text" id="locAddress" value="${loc?loc.address:''}" required></div>
+            <div class="form-group"><label>经度</label><input type="number" step="0.000001" id="locLng" value="${loc?loc.lng:''}" required></div>
+            <div class="form-group"><label>纬度</label><input type="number" step="0.000001" id="locLat" value="${loc?loc.lat:''}" required></div>
+            <div class="form-group"><label>允许半径(米)</label><input type="number" id="locRadius" value="${loc?loc.radius:100}" required></div>
+            <div class="form-group"><label>状态</label><select id="locStatus"><option value="1" ${loc && loc.status==1?'selected':''}>启用</option><option value="0" ${loc && loc.status==0?'selected':''}>禁用</option></select></div>
+        `;
+        showModal(title, formHtml, () => {
+            let name = document.getElementById('locName').value.trim();
+            let address = document.getElementById('locAddress').value.trim();
+            let lng = parseFloat(document.getElementById('locLng').value);
+            let lat = parseFloat(document.getElementById('locLat').value);
+            let radius = parseInt(document.getElementById('locRadius').value);
+            let status = parseInt(document.getElementById('locStatus').value);
+            if (!name || !address || isNaN(lng) || isNaN(lat)) { alert('请填写完整信息'); return; }
+            if (loc) {
+                loc.name = name; loc.address = address; loc.lng = lng; loc.lat = lat; loc.radius = radius; loc.status = status;
+            } else {
+                locations.push({ id: nextLocationId++, name, address, lng, lat, radius, status: status });
+            }
+        });
+    }
+
+    // 考勤组新增/编辑
+    function openGroupModal(id=null) {
+        let grp = id ? groups.find(g=>g.id===id) : null;
+        let title = grp ? '编辑考勤组' : '新增考勤组';
+        let ruleOptions = rules.map(r=>`<option value="${r.id}" ${grp && grp.ruleId===r.id?'selected':''}>${r.name}</option>`).join('');
+        let locationOptions = locations.map(l=>`<option value="${l.id}" ${grp && grp.locationIds.includes(l.id)?'selected':''}>${l.name}</option>`).join('');
+        let deptOptions = [...new Set(allEmployees.map(e=>e.dept))].map(d=>`<option value="${d}" ${grp && grp.dept===d?'selected':''}>${d}</option>`).join('');
+        let formHtml = `
+            <div class="form-group"><label>考勤组名称</label><input type="text" id="groupName" value="${grp?grp.name:''}" required></div>
+            <div class="form-group"><label>关联部门</label><select id="groupDept">${deptOptions}</select></div>
+            <div class="form-group"><label>关联考勤规则</label><select id="groupRuleId">${ruleOptions}</select></div>
+            <div class="form-group"><label>关联打卡地点（多选）</label><select id="groupLocationIds" multiple size="3">${locationOptions}</select><small style="color:#5b6e8c;">按住Ctrl多选</small></div>
+            <div class="form-group"><label>状态</label><select id="groupStatus"><option value="1" ${grp && grp.status==1?'selected':''}>启用</option><option value="0" ${grp && grp.status==0?'selected':''}>禁用</option></select></div>
+        `;
+        showModal(title, formHtml, () => {
+            let name = document.getElementById('groupName').value.trim();
+            let dept = document.getElementById('groupDept').value;
+            let ruleId = parseInt(document.getElementById('groupRuleId').value);
+            let locationIds = Array.from(document.getElementById('groupLocationIds').selectedOptions).map(opt=>parseInt(opt.value));
+            let status = parseInt(document.getElementById('groupStatus').value);
+            if (!name) { alert('考勤组名称不能为空'); return; }
+            if (locationIds.length===0) { alert('至少关联一个打卡地点'); return; }
+            if (grp) {
+                grp.name = name; grp.dept = dept; grp.ruleId = ruleId; grp.locationIds = locationIds; grp.status = status;
+            } else {
+                groups.push({ id: nextGroupId++, name, dept, ruleId, locationIds, employeeIds: [], status });
+            }
+        });
+    }
+
+    // 分配员工弹窗
+    function openEmployeeAssignModal(groupId) {
+        let grp = groups.find(g=>g.id===groupId);
+        if (!grp) return;
+        let allEmps = allEmployees.filter(e => e.dept === grp.dept || grp.dept === '全公司');
+        let assignedIds = grp.employeeIds;
+        let formHtml = `<div class="employee-list">${allEmps.map(emp => `
+            <div class="employee-item"><input type="checkbox" value="${emp.id}" id="emp_${emp.id}" ${assignedIds.includes(emp.id)?'checked':''}> <label for="emp_${emp.id}">${emp.name} (${emp.dept})</label></div>
+        `).join('')}</div><div class="form-group"><label>当前已分配员工数: ${assignedIds.length}</label></div>`;
+        showModal(`分配员工 - ${grp.name}`, formHtml, () => {
+            let selected = [];
+            document.querySelectorAll('#modalForm input[type="checkbox"]:checked').forEach(cb => selected.push(parseInt(cb.value)));
+            grp.employeeIds = selected;
+            alert('员工分配已更新');
+        });
+    }
+
+    // 考勤规则新增/编辑
+    function openRuleModal(id=null) {
+        let rule = id ? rules.find(r=>r.id===id) : null;
+        let title = rule ? '编辑考勤规则' : '新增考勤规则';
+        let type = rule ? rule.type : 'fixed';
+        let fixedHtml = `
+            <div class="form-group"><label>上午上班时间</label><input type="time" id="morningStart" value="${rule && rule.morningStart?rule.morningStart:'09:00'}"></div>
+            <div class="form-group"><label>上午下班时间</label><input type="time" id="morningEnd" value="${rule && rule.morningEnd?rule.morningEnd:'12:00'}"></div>
+            <div class="form-group"><label>下午上班时间</label><input type="time" id="afternoonStart" value="${rule && rule.afternoonStart?rule.afternoonStart:'13:00'}"></div>
+            <div class="form-group"><label>下午下班时间</label><input type="time" id="afternoonEnd" value="${rule && rule.afternoonEnd?rule.afternoonEnd:'18:00'}"></div>
+        `;
+        let flexHtml = `
+            <div class="form-group"><label>每日工时(小时)</label><input type="number" step="0.5" id="workHours" value="${rule && rule.workHoursPerDay?rule.workHoursPerDay:8}"></div>
+            <div class="form-group"><label>核心开始时间</label><input type="time" id="coreStart" value="${rule && rule.coreStart?rule.coreStart:'10:00'}"></div>
+            <div class="form-group"><label>核心结束时间</label><input type="time" id="coreEnd" value="${rule && rule.coreEnd?rule.coreEnd:'16:00'}"></div>
+        `;
+        let formHtml = `
+            <div class="form-group"><label>规则名称</label><input type="text" id="ruleName" value="${rule?rule.name:''}" required></div>
+            <div class="form-group"><label>规则类型</label><select id="ruleType" onchange="toggleRuleTypeFields()"><option value="fixed" ${type==='fixed'?'selected':''}>固定班次</option><option value="flexible" ${type==='flexible'?'selected':''}>弹性工作制</option></select></div>
+            <div id="fixedFields" style="${type==='fixed'?'block':'none'}">${fixedHtml}</div>
+            <div id="flexFields" style="${type==='flexible'?'block':'none'}">${flexHtml}</div>
+            <div class="form-group"><label>迟到阈值(分钟)</label><input type="number" id="lateMinutes" value="${rule?rule.lateMinutes:30}"></div>
+            <div class="form-group"><label>早退阈值(分钟)</label><input type="number" id="earlyMinutes" value="${rule?rule.earlyMinutes:30}"></div>
+            <div class="form-group"><label>状态</label><select id="ruleStatus"><option value="1" ${rule && rule.status==1?'selected':''}>启用</option><option value="0" ${rule && rule.status==0?'selected':''}>禁用</option></select></div>
+        `;
+        window.toggleRuleTypeFields = function() {
+            let selected = document.getElementById('ruleType').value;
+            document.getElementById('fixedFields').style.display = selected==='fixed'?'block':'none';
+            document.getElementById('flexFields').style.display = selected==='flexible'?'block':'none';
+        };
+        showModal(title, formHtml, () => {
+            let name = document.getElementById('ruleName').value.trim();
+            let typeVal = document.getElementById('ruleType').value;
+            let lateMinutes = parseInt(document.getElementById('lateMinutes').value);
+            let earlyMinutes = parseInt(document.getElementById('earlyMinutes').value);
+            let status = parseInt(document.getElementById('ruleStatus').value);
+            if (!name) { alert('规则名称不能为空'); return; }
+            let newRule = { id: rule?rule.id:nextRuleId++, name, type: typeVal, lateMinutes, earlyMinutes, status };
+            if (typeVal === 'fixed') {
+                newRule.morningStart = document.getElementById('morningStart').value;
+                newRule.morningEnd = document.getElementById('morningEnd').value;
+                newRule.afternoonStart = document.getElementById('afternoonStart').value;
+                newRule.afternoonEnd = document.getElementById('afternoonEnd').value;
+            } else {
+                newRule.workHoursPerDay = parseFloat(document.getElementById('workHours').value);
+                newRule.coreStart = document.getElementById('coreStart').value;
+                newRule.coreEnd = document.getElementById('coreEnd').value;
+            }
+            if (rule) {
+                Object.assign(rule, newRule);
+            } else {
+                rules.push(newRule);
+            }
+        });
+    }
+
+    function refreshCurrentPanel() {
+        let activeTab = document.querySelector('.tab-btn.active').dataset.tab;
+        if (activeTab === 'location') renderLocations();
+        else if (activeTab === 'group') renderGroups();
+        else if (activeTab === 'rule') renderRules();
+    }
+
+    // 标签页切换
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');
+            let tab = btn.dataset.tab;
+            document.getElementById('locationPanel').style.display = tab==='location'?'block':'none';
+            document.getElementById('groupPanel').style.display = tab==='group'?'block':'none';
+            document.getElementById('rulePanel').style.display = tab==='rule'?'block':'none';
+            refreshCurrentPanel();
+        });
+    });
+    document.getElementById('addLocationBtn').addEventListener('click', ()=>openLocationModal());
+    document.getElementById('addGroupBtn').addEventListener('click', ()=>openGroupModal());
+    document.getElementById('addRuleBtn').addEventListener('click', ()=>openRuleModal());
+
+    // 初始渲染
+    renderLocations();
+    renderGroups();
+    renderRules();
+</script>
+<style>
+    .status-enabled { background: #e9f5ef; color: #2d6a4f; padding: 4px 10px; border-radius: 40px; display: inline-block; }
+    .status-disabled { background: #ffe6e5; color: #c53030; padding: 4px 10px; border-radius: 40px; display: inline-block; }
+</style>
+</body>
+</html>

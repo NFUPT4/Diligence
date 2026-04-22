@@ -12,15 +12,15 @@
  * @author edocsitahw
  * @version 1.1
  * @date 2026/04/03 16:28
- * @desc
+ * @desc 登录与认证相关的状态管理
  * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
  * */
+import { DG_TOKEN_KEY, DG_REMEMBER_KEY } from "@/utils/constant";
+import { useUserStore } from "@/stores/user.store";
+import { timeStampToTime } from "@/utils";
+import { authApi } from "@/api/auth";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import { DG_TOKEN_KEY, DG_REMEMBER_KEY } from "@/utils/constant";
-import { authApi } from "@/api/auth";
-import { timeStampToTime } from "@/utils";
-import { useUserStore } from "@/stores/user.store";
 
 
 export const useAuthStore = defineStore("auth", () => {
@@ -37,22 +37,26 @@ export const useAuthStore = defineStore("auth", () => {
 
     // 是否已认证
     const authenticated = computed(
-        () => token.value.length > 0 && timeStampToTime(token.value.split("-")[1]!) > new Date()
+        () => token.value.length > 0 && timeStampToTime(token.value.split("-")[2]!) > new Date()
     );
 
     /* methods */
+
+    // 设置令牌
     const setToken = (t: string) => {
         token.value = t;
 
         localStorage.setItem(DG_TOKEN_KEY, token.value);
     };
 
+    // 设置是否记住用户
     const setRemember = (r: boolean) => {
         remember.value = r;
 
         localStorage.setItem(DG_REMEMBER_KEY, remember.value.toString());
     }
 
+    // 登录
     const login = async (...data: Parameters<typeof authApi.login>) => {
         return authApi.login(...data).then(resp => {
             if (remember.value)

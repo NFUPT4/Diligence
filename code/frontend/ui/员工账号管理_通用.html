@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>勤致 · 员工账号管理</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+            padding: 24px 20px;
+        }
+
+        .account-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 头部 */
+        .page-header {
+            margin-bottom: 28px;
+        }
+        .page-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: #5b6e8c;
+            margin-top: 6px;
+        }
+
+        /* 操作栏卡片 */
+        .action-card {
+            background: white;
+            border-radius: 28px;
+            padding: 16px 24px;
+            margin-bottom: 28px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            border: 1px solid #ecfdf5;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+        .search-area {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .search-input {
+            padding: 10px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            width: 220px;
+            outline: none;
+        }
+        .search-input:focus {
+            border-color: #2d6a4f;
+        }
+        .btn-primary {
+            background: #2d6a4f;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-outline {
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .status-filter {
+            padding: 10px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            background: white;
+        }
+
+        /* 表格卡片 */
+        .card {
+            background: white;
+            border-radius: 32px;
+            border: 1px solid #ecfdf5;
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid #f0f2f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .card-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            padding: 0 24px 24px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        th, td {
+            padding: 14px 8px;
+            text-align: left;
+            border-bottom: 1px solid #f0f2f5;
+        }
+        th {
+            font-weight: 600;
+            color: #5b6e8c;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        .status-enabled {
+            background: #e9f5ef;
+            color: #2d6a4f;
+        }
+        .status-disabled {
+            background: #ffe6e5;
+            color: #c53030;
+        }
+        .action-icons i {
+            font-size: 1.1rem;
+            margin: 0 6px;
+            cursor: pointer;
+            color: #5b6e8c;
+            transition: 0.1s;
+        }
+        .action-icons i:hover {
+            color: #2d6a4f;
+        }
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            padding: 16px 24px 24px;
+            gap: 8px;
+            align-items: center;
+        }
+        .page-btn {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 6px 12px;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+        .page-btn.active {
+            background: #2d6a4f;
+            color: white;
+            border-color: #2d6a4f;
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            max-width: 500px;
+            width: 90%;
+            border-radius: 32px;
+            padding: 28px;
+            position: relative;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        .close-modal {
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 24px;
+            font-size: 0.85rem;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .btn-cancel {
+            background: #f1f5f9;
+            border: none;
+            flex: 1;
+            padding: 10px;
+            border-radius: 40px;
+        }
+        .btn-save {
+            background: #2d6a4f;
+            color: white;
+            border: none;
+            flex: 1;
+            padding: 10px;
+            border-radius: 40px;
+        }
+
+        @media (max-width: 700px) {
+            .action-card {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-area {
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="account-container">
+    <div class="page-header">
+        <h1>员工账号管理</h1>
+        <div class="breadcrumb"><i class="fas fa-home"></i> 首页 / 系统管理 / 员工账号</div>
+    </div>
+
+    <!-- 操作栏 -->
+    <div class="action-card">
+        <div class="search-area">
+            <input type="text" id="searchInput" class="search-input" placeholder="工号 / 姓名 / 部门">
+            <select id="statusFilter" class="status-filter">
+                <option value="all">全部状态</option>
+                <option value="1">启用</option>
+                <option value="0">禁用</option>
+            </select>
+            <button id="searchBtn" class="btn-primary"><i class="fas fa-search"></i> 搜索</button>
+        </div>
+        <div>
+            <button id="addBtn" class="btn-primary"><i class="fas fa-plus"></i> 新增员工</button>
+            <button id="batchEnableBtn" class="btn-outline"><i class="fas fa-check-circle"></i> 批量启用</button>
+            <button id="batchDisableBtn" class="btn-outline"><i class="fas fa-ban"></i> 批量禁用</button>
+        </div>
+    </div>
+
+    <!-- 员工列表卡片 -->
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-users"></i> 员工账号列表</h3>
+            <span style="font-size:0.8rem; color:#5b6e8c;">共 <span id="totalCount">0</span> 人</span>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selectAllCheckbox"></th>
+                        <th>工号</th><th>姓名</th><th>部门</th><th>岗位</th><th>手机号</th><th>状态</th><th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="employeeTableBody"></tbody>
+            </table>
+        </div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+</div>
+
+<!-- 新增/编辑弹窗 -->
+<div id="employeeModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span id="modalTitle">新增员工</span>
+            <span class="close-modal">&times;</span>
+        </div>
+        <form id="employeeForm">
+            <input type="hidden" id="editId">
+            <div class="form-group">
+                <label>工号 <span style="color:#e53e3e;">*</span></label>
+                <input type="text" id="empNo" placeholder="6-20位字母数字组合" required>
+            </div>
+            <div class="form-group">
+                <label>姓名 <span style="color:#e53e3e;">*</span></label>
+                <input type="text" id="empName" required>
+            </div>
+            <div class="form-group">
+                <label>部门</label>
+                <select id="deptId">
+                    <option value="技术研发部">技术研发部</option>
+                    <option value="产品部">产品部</option>
+                    <option value="销售部">销售部</option>
+                    <option value="人力资源部">人力资源部</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>岗位</label>
+                <input type="text" id="position" placeholder="如：Java工程师">
+            </div>
+            <div class="form-group">
+                <label>手机号</label>
+                <input type="tel" id="phone" placeholder="11位手机号">
+            </div>
+            <div class="form-group">
+                <label>邮箱</label>
+                <input type="email" id="email" placeholder="example@company.com">
+            </div>
+            <div class="form-group">
+                <label>角色</label>
+                <select id="role">
+                    <option value="0">普通员工</option>
+                    <option value="1">部门主管</option>
+                    <option value="2">系统管理员</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>账号状态</label>
+                <select id="accStatus">
+                    <option value="1">启用</option>
+                    <option value="0">禁用</option>
+                </select>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" id="cancelModalBtn">取消</button>
+                <button type="submit" class="btn-save">保存</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // 模拟员工数据
+    let employees = [
+        { id: 1, empNo: "10001", name: "张明远", dept: "技术研发部", position: "后端工程师", phone: "13800138001", email: "zhangmy@diligence.com", role: "0", status: 1 },
+        { id: 2, empNo: "10002", name: "李思敏", dept: "技术研发部", position: "前端工程师", phone: "13800138002", email: "lism@diligence.com", role: "0", status: 1 },
+        { id: 3, empNo: "10003", name: "王启航", dept: "技术研发部", position: "测试工程师", phone: "13800138003", email: "wangqh@diligence.com", role: "0", status: 1 },
+        { id: 4, empNo: "20001", name: "陈敏", dept: "产品部", position: "产品经理", phone: "13800138004", email: "chenm@diligence.com", role: "1", status: 1 },
+        { id: 5, empNo: "20002", name: "赵欣怡", dept: "产品部", position: "UI设计师", phone: "13800138005", email: "zhaoxy@diligence.com", role: "0", status: 0 },
+        { id: 6, empNo: "30001", name: "刘强", dept: "销售部", position: "销售专员", phone: "13800138006", email: "liuq@diligence.com", role: "0", status: 1 },
+        { id: 7, empNo: "40001", name: "杨静", dept: "人力资源部", position: "HRBP", phone: "13800138007", email: "yangj@diligence.com", role: "2", status: 1 }
+    ];
+    let nextId = 8;
+    let currentPage = 1;
+    const pageSize = 5;
+    let searchKeyword = '';
+    let statusFilter = 'all';
+
+    // 渲染表格
+    function renderTable() {
+        let filtered = employees.filter(emp => {
+            const matchKeyword = searchKeyword === '' || emp.empNo.includes(searchKeyword) || emp.name.includes(searchKeyword) || emp.dept.includes(searchKeyword);
+            const matchStatus = statusFilter === 'all' || emp.status == statusFilter;
+            return matchKeyword && matchStatus;
+        });
+        document.getElementById('totalCount').innerText = filtered.length;
+        const totalPages = Math.ceil(filtered.length / pageSize);
+        const start = (currentPage - 1) * pageSize;
+        const pageData = filtered.slice(start, start + pageSize);
+        const tbody = document.getElementById('employeeTableBody');
+        if (pageData.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">暂无数据</td></tr>';
+            renderPagination(totalPages);
+            return;
+        }
+        let html = '';
+        pageData.forEach(emp => {
+            html += `<tr>
+                        <td><input type="checkbox" class="emp-checkbox" data-id="${emp.id}"></td>
+                        <td>${emp.empNo}</td>
+                        <td>${emp.name}</td>
+                        <td>${emp.dept}</td>
+                        <td>${emp.position || '-'}</td>
+                        <td>${emp.phone || '-'}</td>
+                        <td><span class="status-badge ${emp.status === 1 ? 'status-enabled' : 'status-disabled'}">${emp.status === 1 ? '启用' : '禁用'}</span></td>
+                        <td class="action-icons">
+                            <i class="fas fa-edit" data-id="${emp.id}" data-action="edit"></i>
+                            <i class="fas fa-key" data-id="${emp.id}" data-action="resetPwd"></i>
+                            <i class="fas ${emp.status === 1 ? 'fa-ban' : 'fa-check-circle'}" data-id="${emp.id}" data-action="toggleStatus" style="color:${emp.status === 1 ? '#c53030' : '#2d6a4f'}"></i>
+                        </td>
+                     </tr>`;
+        });
+        tbody.innerHTML = html;
+        renderPagination(totalPages);
+
+        // 绑定操作按钮事件
+        document.querySelectorAll('.action-icons i').forEach(icon => {
+            icon.addEventListener('click', (e) => {
+                const id = parseInt(icon.dataset.id);
+                const action = icon.dataset.action;
+                if (action === 'edit') openEditModal(id);
+                else if (action === 'resetPwd') resetPassword(id);
+                else if (action === 'toggleStatus') toggleStatus(id);
+            });
+        });
+        // 绑定复选框
+        document.querySelectorAll('.emp-checkbox').forEach(cb => {
+            cb.addEventListener('change', updateSelectAll);
+        });
+    }
+
+    function renderPagination(totalPages) {
+        const paginationDiv = document.getElementById('pagination');
+        if (totalPages <= 1) {
+            paginationDiv.innerHTML = '';
+            return;
+        }
+        let html = `<button class="page-btn" id="prevPage"><i class="fas fa-chevron-left"></i></button>`;
+        for (let i = 1; i <= totalPages; i++) {
+            html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+        }
+        html += `<button class="page-btn" id="nextPage"><i class="fas fa-chevron-right"></i></button>`;
+        paginationDiv.innerHTML = html;
+        document.querySelectorAll('[data-page]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentPage = parseInt(btn.dataset.page);
+                renderTable();
+            });
+        });
+        document.getElementById('prevPage')?.addEventListener('click', () => {
+            if (currentPage > 1) { currentPage--; renderTable(); }
+        });
+        document.getElementById('nextPage')?.addEventListener('click', () => {
+            if (currentPage < totalPages) { currentPage++; renderTable(); }
+        });
+    }
+
+    // 全选逻辑
+    function updateSelectAll() {
+        const allCb = document.querySelectorAll('.emp-checkbox');
+        const checkedAll = allCb.length === document.querySelectorAll('.emp-checkbox:checked').length;
+        document.getElementById('selectAllCheckbox').checked = checkedAll;
+    }
+    document.getElementById('selectAllCheckbox').addEventListener('change', (e) => {
+        document.querySelectorAll('.emp-checkbox').forEach(cb => cb.checked = e.target.checked);
+    });
+
+    // 获取选中的员工ID列表
+    function getSelectedIds() {
+        const ids = [];
+        document.querySelectorAll('.emp-checkbox:checked').forEach(cb => ids.push(parseInt(cb.dataset.id)));
+        return ids;
+    }
+
+    // 批量启用/禁用
+    function batchSetStatus(status) {
+        const ids = getSelectedIds();
+        if (ids.length === 0) { alert('请先选择员工'); return; }
+        employees = employees.map(emp => {
+            if (ids.includes(emp.id)) emp.status = status;
+            return emp;
+        });
+        renderTable();
+        alert(`已批量${status === 1 ? '启用' : '禁用'} ${ids.length} 名员工`);
+    }
+
+    // 重置密码
+    function resetPassword(id) {
+        const emp = employees.find(e => e.id === id);
+        if (emp) {
+            alert(`已将 ${emp.name} 的密码重置为默认密码：${emp.empNo}@123`);
+        }
+    }
+
+    // 切换单个状态
+    function toggleStatus(id) {
+        const emp = employees.find(e => e.id === id);
+        if (emp) {
+            emp.status = emp.status === 1 ? 0 : 1;
+            renderTable();
+            alert(`${emp.name} 账号已${emp.status === 1 ? '启用' : '禁用'}`);
+        }
+    }
+
+    // 打开新增模态框
+    function openAddModal() {
+        document.getElementById('modalTitle').innerText = '新增员工';
+        document.getElementById('employeeForm').reset();
+        document.getElementById('editId').value = '';
+        document.getElementById('empNo').disabled = false;
+        document.getElementById('accStatus').value = '1';
+        document.getElementById('role').value = '0';
+        document.getElementById('employeeModal').style.display = 'flex';
+    }
+
+    // 打开编辑模态框
+    function openEditModal(id) {
+        const emp = employees.find(e => e.id === id);
+        if (!emp) return;
+        document.getElementById('modalTitle').innerText = '编辑员工';
+        document.getElementById('editId').value = emp.id;
+        document.getElementById('empNo').value = emp.empNo;
+        document.getElementById('empNo').disabled = true; // 工号不可修改
+        document.getElementById('empName').value = emp.name;
+        document.getElementById('deptId').value = emp.dept;
+        document.getElementById('position').value = emp.position || '';
+        document.getElementById('phone').value = emp.phone || '';
+        document.getElementById('email').value = emp.email || '';
+        document.getElementById('role').value = emp.role;
+        document.getElementById('accStatus').value = emp.status;
+        document.getElementById('employeeModal').style.display = 'flex';
+    }
+
+    // 保存员工（新增/编辑）
+    function saveEmployee(event) {
+        event.preventDefault();
+        const id = document.getElementById('editId').value;
+        const empNo = document.getElementById('empNo').value.trim();
+        const name = document.getElementById('empName').value.trim();
+        const dept = document.getElementById('deptId').value;
+        const position = document.getElementById('position').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const role = document.getElementById('role').value;
+        const status = parseInt(document.getElementById('accStatus').value);
+        if (!empNo || !name) { alert('工号和姓名不能为空'); return; }
+        if (empNo.length < 6 || empNo.length > 20) { alert('工号长度6-20位'); return; }
+        if (phone && !/^1[3-9]\d{9}$/.test(phone)) { alert('手机号格式不正确'); return; }
+        if (!id) {
+            // 新增：检查工号唯一
+            if (employees.some(e => e.empNo === empNo)) { alert('工号已存在'); return; }
+            const newId = nextId++;
+            employees.push({ id: newId, empNo, name, dept, position, phone, email, role, status });
+            alert('新增成功，初始密码为工号后6位');
+        } else {
+            // 编辑
+            const index = employees.findIndex(e => e.id == id);
+            if (index !== -1) {
+                employees[index] = { ...employees[index], name, dept, position, phone, email, role, status };
+                alert('编辑成功');
+            }
+        }
+        closeModal();
+        currentPage = 1;
+        renderTable();
+    }
+
+    function closeModal() {
+        document.getElementById('employeeModal').style.display = 'none';
+    }
+
+    // 搜索
+    function performSearch() {
+        searchKeyword = document.getElementById('searchInput').value.trim();
+        statusFilter = document.getElementById('statusFilter').value;
+        currentPage = 1;
+        renderTable();
+    }
+
+    // 事件绑定
+    document.getElementById('addBtn').addEventListener('click', openAddModal);
+    document.getElementById('searchBtn').addEventListener('click', performSearch);
+    document.getElementById('batchEnableBtn').addEventListener('click', () => batchSetStatus(1));
+    document.getElementById('batchDisableBtn').addEventListener('click', () => batchSetStatus(0));
+    document.querySelectorAll('.close-modal, #cancelModalBtn').forEach(btn => btn.addEventListener('click', closeModal));
+    document.getElementById('employeeForm').addEventListener('submit', saveEmployee);
+    window.addEventListener('click', (e) => { if (e.target === document.getElementById('employeeModal')) closeModal(); });
+
+    // 初始渲染
+    renderTable();
+</script>
+</body>
+</html>

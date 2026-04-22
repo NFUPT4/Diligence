@@ -8,49 +8,46 @@
   -->
 
 <template>
-
     <dg-state-card>
-
         <template #title>
-
-            <i style="margin-right: 4px" class="fas fa-tasks" />
-
-            {{ $t("home.pending-approval.template.title") }}
-
+            <i
+                style="margin-right: 4px"
+                class="fas fa-tasks" />
+            {{ $t(LOCAL('title')) }}
         </template>
 
         <template #value>
-
-            {{}}
-
+            {{ pendingCount?.count ?? "--" }}
         </template>
 
         <template #sub>
-
-            {{ $t("home.pending-approval.template.sub") }}
-
+            <i18n-t
+                :keypath="LOCAL('sub')"
+                tag="span">
+                <template #count>
+                    {{ pendingCount?.count ?? 0 }}
+                </template>
+            </i18n-t>
         </template>
-
     </dg-state-card>
-
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
     /**
      * @file DgPendingApproval.vue
      * @author edocsitahw
      * @version 1.1
      * @date 2026/04/16 20:20
-     * @desc
+     * @desc 主页审批申请组件
      * @copyright CC BY-NC-SA
      * */
-    import { defineComponent } from "vue";
     import DgStateCard from "@/views/home/statistics/DgStateCard.vue";
+    import { useAsyncState } from "@vueuse/core";
+    import { homeApi } from "@/api/home";
 
-
-    export default defineComponent({
-        components: { DgStateCard }
-    })
+    /* state */
+    const { state: pendingCount } = useAsyncState(homeApi.getPendingApprovalCount, null, { immediate: true });
+    const LOCAL = (key: string, type: string = "template") => `home.pending-approval.${type}.${key}`;
 
 </script>
 
