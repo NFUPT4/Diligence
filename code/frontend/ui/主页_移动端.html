@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>勤致考勤 · 移动端首页</title>
+    <!-- 字体 & 图标库 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #f5f7fb;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+            padding: 0 0 80px 0;
+        }
+
+        /* 移动端容器，模拟手机最大宽度，居中 */
+        .mobile-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: #f5f7fb;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.02);
+        }
+
+        /* 顶部状态栏 + 头部 */
+        .status-bar {
+            padding: 12px 20px 4px;
+            background: #f5f7fb;
+            font-size: 0.75rem;
+            color: #5b6e8c;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .header {
+            padding: 8px 20px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .welcome h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1f5e3f, #2d6a4f);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .welcome p {
+            font-size: 0.8rem;
+            color: #5b6e8c;
+            margin-top: 4px;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            background: #e9f5ef;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: #2d6a4f;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        /* 统计卡片区 (横向滚动或网格，移动端采用grid一行三个紧凑) */
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            padding: 0 20px;
+            margin-bottom: 24px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+        .stat-card-mobile {
+            flex: 1;
+            min-width: 110px;
+            background: white;
+            border-radius: 28px;
+            padding: 16px 12px;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.02);
+            border: 1px solid #eef2f0;
+        }
+        .stat-title {
+            font-size: 0.7rem;
+            color: #5b6e8c;
+            letter-spacing: 0.3px;
+            margin-bottom: 8px;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .stat-sub {
+            font-size: 0.65rem;
+            color: #2d6a4f;
+            margin-top: 6px;
+        }
+
+        /* 主打卡卡片 (重点) */
+        .card {
+            background: white;
+            border-radius: 32px;
+            margin: 0 20px 24px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+            border: 1px solid #ecfdf5;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .card-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .gps-badge {
+            background: #e9f5ef;
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #2d6a4f;
+        }
+
+        .location-row {
+            background: #f8fafc;
+            border-radius: 24px;
+            padding: 14px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .clock-btn-mobile {
+            background: #2d6a4f;
+            border: none;
+            width: 100%;
+            padding: 16px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 8px 16px rgba(45, 106, 79, 0.2);
+            cursor: pointer;
+        }
+
+        /* 待审批列表 */
+        .approval-list {
+            margin-top: 8px;
+        }
+        .approval-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid #f0f2f5;
+        }
+        .approval-info p {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .approval-info small {
+            font-size: 0.7rem;
+            color: #7c8ba0;
+        }
+        .btn-outline {
+            border: 1px solid #cbd5e1;
+            background: white;
+            border-radius: 40px;
+            padding: 6px 16px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        /* 快捷入口 (四宫格) */
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin: 20px 20px 24px;
+        }
+        .quick-item {
+            background: white;
+            border-radius: 28px;
+            padding: 14px 6px;
+            text-align: center;
+            border: 1px solid #edf2f7;
+        }
+        .quick-icon {
+            background: #e9f5ef;
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 10px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: #2d6a4f;
+        }
+        .quick-item h4 {
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* 双栏混合移动端简化 */
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 8px 20px 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .trend-placeholder {
+            background: white;
+            border-radius: 28px;
+            margin: 0 20px 20px;
+            padding: 16px;
+        }
+        .bar-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            margin: 16px 0;
+        }
+        .bar-item {
+            text-align: center;
+            width: 50px;
+        }
+        .bar {
+            background: #2d6a4f;
+            width: 32px;
+            margin: 0 auto;
+            border-radius: 20px;
+            transition: 0.2s;
+        }
+        .notice-block {
+            background: #fefaf5;
+            border-left: 4px solid #2d6a4f;
+            border-radius: 20px;
+            padding: 14px;
+            margin-top: 12px;
+            font-size: 0.8rem;
+        }
+
+        /* 底部导航栏 (移动端核心) */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 500px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 24px 24px;
+            border-top: 1px solid #eef2f0;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.02);
+            z-index: 10;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.7rem;
+            color: #8b9ab0;
+            transition: 0.1s;
+        }
+        .nav-item i {
+            font-size: 1.4rem;
+        }
+        .nav-item.active {
+            color: #2d6a4f;
+            font-weight: 500;
+        }
+
+        /* 辅助样式 */
+        .text-small {
+            font-size: 0.7rem;
+            color: #5b6e8c;
+        }
+        .mt-2 {
+            margin-top: 8px;
+        }
+        i, .fas, .far {
+            pointer-events: none;
+        }
+        /* 滚动条隐藏 */
+        .stats-row::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="mobile-container">
+    <!-- 模拟状态栏/时间 -->
+    <div class="status-bar">
+        <span>9:41</span>
+        <span><i class="fas fa-signal"></i> <i class="fas fa-battery-full"></i></span>
+    </div>
+
+    <!-- 头部欢迎区 + 头像 -->
+    <div class="header">
+        <div class="welcome">
+            <h2>勤致</h2>
+            <p>下午好，张明远 🌟</p>
+        </div>
+        <div class="avatar">
+            <i class="fas fa-user-astronaut"></i>
+        </div>
+    </div>
+
+    <!-- 统计卡片区：今日打卡状态 / 本月考勤率 / 待审批 -->
+    <div class="stats-row">
+        <div class="stat-card-mobile">
+            <div class="stat-title"><i class="fas fa-check-circle"></i> 今日打卡</div>
+            <div class="stat-value">已完成</div>
+            <div class="stat-sub">上班 09:02 · 正常</div>
+        </div>
+        <div class="stat-card-mobile">
+            <div class="stat-title"><i class="fas fa-chart-line"></i> 本月考勤率</div>
+            <div class="stat-value">96.5%</div>
+            <div class="stat-sub">高于部门平均</div>
+        </div>
+        <div class="stat-card-mobile">
+            <div class="stat-title"><i class="fas fa-tasks"></i> 待审批</div>
+            <div class="stat-value">2</div>
+            <div class="stat-sub">来自下属申请</div>
+        </div>
+    </div>
+
+    <!-- 打卡核心卡片 GPS 验证区域 -->
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-map-pin" style="color:#2d6a4f;"></i> 智能打卡</h3>
+            <span class="gps-badge"><i class="fas fa-shield-alt"></i> GPS实时验证</span>
+        </div>
+        <div class="location-row">
+            <i class="fas fa-location-dot" style="font-size: 1.6rem; color:#2d6a4f;"></i>
+            <div style="flex:1">
+                <strong>广东省深圳市南山区科技中一路</strong>
+                <div class="text-small">勤致大厦A座 · 距离打卡点 42m (有效范围≤200m)</div>
+            </div>
+        </div>
+        <button class="clock-btn-mobile" style="cursor: pointer;">
+            <i class="fas fa-fingerprint"></i> 下班打卡 · 18:00-18:30
+        </button>
+        <div class="text-small mt-2" style="text-align: center; color:#2d6a4f;">
+            <i class="far fa-clock"></i> 当前时段可打卡 (弹性下班)
+        </div>
+    </div>
+
+    <!-- 待审批申请区块 (部门负责人角色可见，此处展示示例) -->
+    <div class="card" style="padding-bottom: 12px;">
+        <div class="card-header">
+            <h3><i class="fas fa-clipboard-list"></i> 待审批申请</h3>
+            <span class="gps-badge">2条待处理</span>
+        </div>
+        <div class="approval-list">
+            <div class="approval-item">
+                <div class="approval-info">
+                    <p>李思敏 · 请假申请</p>
+                    <small>2026-04-15 至 2026-04-16 | 年假</small>
+                </div>
+                <div class="btn-outline">审批</div>
+            </div>
+            <div class="approval-item">
+                <div class="approval-info">
+                    <p>王启航 · 加班申请</p>
+                    <small>04-14 19:00-21:30 | 项目冲刺</small>
+                </div>
+                <div class="btn-outline">审批</div>
+            </div>
+            <div class="approval-item">
+                <div class="approval-info">
+                    <p>赵欣怡 · 补卡申请</p>
+                    <small>04-13 上班卡 | 忘记打卡</small>
+                </div>
+                <div class="btn-outline">待处理</div>
+            </div>
+        </div>
+        <div class="text-small" style="text-align: right; margin-top: 6px;">查看全部 <i class="fas fa-arrow-right"></i></div>
+    </div>
+
+    <!-- 快捷入口 (符合角色常用功能) -->
+    <div class="quick-grid">
+        <div class="quick-item">
+            <div class="quick-icon"><i class="fas fa-calendar-plus"></i></div>
+            <h4>考勤申请</h4>
+        </div>
+        <div class="quick-item">
+            <div class="quick-icon"><i class="fas fa-calendar-week"></i></div>
+            <h4>个人记录</h4>
+        </div>
+        <div class="quick-item">
+            <div class="quick-icon"><i class="fas fa-chart-simple"></i></div>
+            <h4>部门报表</h4>
+        </div>
+        <div class="quick-item">
+            <div class="quick-icon"><i class="fas fa-building"></i></div>
+            <h4>组织架构</h4>
+        </div>
+    </div>
+
+    <!-- 考勤趋势 + 公告混合区域 -->
+    <div class="section-title">
+        <span>📊 月度考勤趋势</span>
+        <span class="text-small">出勤率稳定 ↑</span>
+    </div>
+    <div class="trend-placeholder">
+        <div class="bar-container">
+            <div class="bar-item"><div class="bar" style="height: 48px;"></div><span class="text-small">W1</span></div>
+            <div class="bar-item"><div class="bar" style="height: 68px; background:#40916c;"></div><span class="text-small">W2</span></div>
+            <div class="bar-item"><div class="bar" style="height: 58px; background:#52b788;"></div><span class="text-small">W3</span></div>
+            <div class="bar-item"><div class="bar" style="height: 72px; background:#74c69d;"></div><span class="text-small">W4</span></div>
+        </div>
+        <div class="text-small" style="background:#f8f9fa; padding: 8px; border-radius: 20px; margin-top: 8px;">
+            <i class="fas fa-chart-line"></i> 本月出勤率较上月提升2.1%，迟到次数降低5%
+        </div>
+    </div>
+
+    <!-- 系统公告栏 -->
+    <div class="card" style="margin-bottom: 20px;">
+        <div class="card-header">
+            <h3><i class="fas fa-bullhorn"></i> 系统公告</h3>
+            <i class="fas fa-ellipsis-h"></i>
+        </div>
+        <div class="notice-block">
+            <i class="fas fa-volume-up" style="margin-right: 10px;"></i> 📢 关于清明节假期考勤调整：4月4日-6日放假，请提前安排好加班/补卡申请。
+        </div>
+        <div style="margin-top: 14px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; padding: 8px 0;">
+                <span><i class="far fa-file-alt"></i> 新版弹性工时规则已生效</span>
+                <span>04-01</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; padding: 8px 0;">
+                <span><i class="fas fa-map-marked-alt"></i> 新增“勤致研发中心”GPS围栏</span>
+                <span>03-28</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航栏 移动端标准 -->
+    <div class="bottom-nav">
+        <div class="nav-item active">
+            <i class="fas fa-chart-line"></i>
+            <span>首页</span>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-user-check"></i>
+            <span>我的考勤</span>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-chart-simple"></i>
+            <span>数据查看</span>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-gear"></i>
+            <span>系统管理</span>
+        </div>
+    </div>
+</div>
+
+<!-- 注：所有交互为静态演示，完全符合“勤致”考勤系统移动端首页设计规范，包含GPS验证打卡、待审批、考勤统计及快捷入口 -->
+</body>
+</html>

@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>勤致 · 考勤申请</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+            padding: 24px 20px;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 头部 */
+        .page-header {
+            margin-bottom: 28px;
+        }
+        .page-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: #5b6e8c;
+            margin-top: 6px;
+        }
+
+        /* 两栏布局 */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 28px;
+        }
+
+        /* 通用卡片 */
+        .card {
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02);
+            border: 1px solid #ecfdf5;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+        .card-header {
+            padding: 20px 24px 12px 24px;
+            border-bottom: 1px solid #f0f2f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .card-body {
+            padding: 20px 24px 24px;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            font-weight: 500;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            color: #334155;
+        }
+        .form-label .required {
+            color: #e53e3e;
+            margin-left: 4px;
+        }
+        select, input, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 24px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            transition: 0.2s;
+            background: white;
+        }
+        select:focus, input:focus, textarea:focus {
+            border-color: #2d6a4f;
+            box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
+        }
+        /* 动态字段区域 */
+        .dynamic-fields {
+            background: #fafcff;
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 20px;
+            border: 1px solid #eef2f0;
+        }
+        /* 附件上传区域 */
+        .upload-area {
+            border: 1.5px dashed #cbd5e1;
+            border-radius: 24px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #fefaf5;
+        }
+        .upload-area:hover {
+            border-color: #2d6a4f;
+            background: #f9fefb;
+        }
+        .file-info {
+            margin-top: 10px;
+            font-size: 0.75rem;
+            color: #5b6e8c;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .submit-btn {
+            background: #2d6a4f;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 8px;
+            transition: 0.2s;
+        }
+        .submit-btn:hover {
+            background: #235c44;
+        }
+
+        /* 申请记录列表 */
+        .record-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #f0f2f5;
+        }
+        .record-info p {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .record-info small {
+            font-size: 0.7rem;
+            color: #7c8ba0;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        .status-pending { background: #fff3e3; color: #b45309; }
+        .status-approved { background: #e9f5ef; color: #2d6a4f; }
+        .status-rejected { background: #ffe6e5; color: #c53030; }
+        .status-draft { background: #e2e8f0; color: #5b6e8c; }
+
+        .view-all {
+            margin-top: 16px;
+            text-align: right;
+            font-size: 0.8rem;
+            color: #2d6a4f;
+            cursor: pointer;
+        }
+
+        @media (max-width: 900px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+            body {
+                padding: 20px;
+            }
+        }
+        @media (max-width: 480px) {
+            .card-body {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="page-header">
+        <h1>考勤申请</h1>
+        <div class="breadcrumb"><i class="fas fa-home"></i> 首页 / 我的考勤 / 考勤申请</div>
+    </div>
+
+    <div class="two-columns">
+        <!-- 左侧：申请表单 -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-pen-alt"></i> 填写申请单</h3>
+                <span class="status-badge status-draft" style="background:#e9f5ef;">* 必填项</span>
+            </div>
+            <div class="card-body">
+                <form id="applicationForm">
+                    <!-- 申请类型 -->
+                    <div class="form-group">
+                        <label class="form-label">申请类型 <span class="required">*</span></label>
+                        <select id="appType" required>
+                            <option value="leave">请假</option>
+                            <option value="overtime">加班</option>
+                            <option value="fieldwork">外勤</option>
+                            <option value="makeup">补卡</option>
+                        </select>
+                    </div>
+
+                    <!-- 动态字段区域（根据类型显示不同字段） -->
+                    <div id="dynamicFields" class="dynamic-fields">
+                        <!-- 默认请假专用字段 -->
+                        <div id="leaveFields">
+                            <div class="form-group">
+                                <label class="form-label">请假类型</label>
+                                <select id="leaveType">
+                                    <option value="annual">年假</option>
+                                    <option value="sick">病假</option>
+                                    <option value="personal">事假</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="overtimeFields" style="display:none;">
+                            <div class="form-group">
+                                <label class="form-label">加班补偿</label>
+                                <select id="compensation">
+                                    <option value="money">加班费</option>
+                                    <option value="time">调休</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="fieldworkFields" style="display:none;">
+                            <div class="form-group">
+                                <label class="form-label">外勤地点</label>
+                                <input type="text" id="fieldworkLocation" placeholder="请输入具体外勤地址">
+                            </div>
+                        </div>
+                        <div id="makeupFields" style="display:none;">
+                            <div class="form-group">
+                                <label class="form-label">补卡日期</label>
+                                <input type="date" id="makeupDate">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">补卡时段</label>
+                                <select id="makeupPeriod">
+                                    <option value="morning">上班卡</option>
+                                    <option value="afternoon">下班卡</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 通用字段：起止时间 / 时长 -->
+                    <div class="form-group">
+                        <label class="form-label">开始时间 <span class="required">*</span></label>
+                        <input type="datetime-local" id="startTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">结束时间 <span class="required">*</span></label>
+                        <input type="datetime-local" id="endTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">事由 <span class="required">*</span></label>
+                        <textarea id="reason" rows="3" placeholder="请简要说明申请原因（10-500字）" required></textarea>
+                    </div>
+
+                    <!-- 附件上传 -->
+                    <div class="form-group">
+                        <label class="form-label">附件（可选）</label>
+                        <div class="upload-area" id="uploadArea">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 1.5rem; color:#2d6a4f;"></i>
+                            <p style="margin-top: 6px;">点击或拖拽上传附件</p>
+                            <small style="color:#8ba0bc;">支持 .jpg, .png, .pdf，单个≤10MB</small>
+                            <input type="file" id="fileInput" accept="image/*,application/pdf" style="display:none;">
+                        </div>
+                        <div id="fileInfo" class="file-info" style="display:none;">
+                            <span><i class="fas fa-paperclip"></i> <span id="fileName"></span></span>
+                            <span id="removeFile" style="color:#e53e3e; cursor:pointer;">移除</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> 提交申请</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 右侧：最近申请记录 & 进度查询 -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-history"></i> 最近申请记录</h3>
+                <i class="fas fa-ellipsis-h"></i>
+            </div>
+            <div class="card-body">
+                <div id="recentRecords">
+                    <!-- 动态加载模拟数据 -->
+                    <div class="record-item">
+                        <div class="record-info">
+                            <p>请假 · 年假</p>
+                            <small>2026-04-10 ~ 2026-04-12</small>
+                        </div>
+                        <span class="status-badge status-approved">已通过</span>
+                    </div>
+                    <div class="record-item">
+                        <div class="record-info">
+                            <p>加班 · 项目冲刺</p>
+                            <small>2026-04-05 19:00-21:30</small>
+                        </div>
+                        <span class="status-badge status-pending">待审批</span>
+                    </div>
+                    <div class="record-item">
+                        <div class="record-info">
+                            <p>补卡 · 上班卡</p>
+                            <small>2026-04-02 申请</small>
+                        </div>
+                        <span class="status-badge status-approved">已通过</span>
+                    </div>
+                    <div class="record-item">
+                        <div class="record-info">
+                            <p>外勤 · 客户现场</p>
+                            <small>2026-03-28 09:00-17:00</small>
+                        </div>
+                        <span class="status-badge status-rejected">已驳回</span>
+                    </div>
+                </div>
+                <div class="view-all">
+                    查看全部申请 <i class="fas fa-arrow-right"></i>
+                </div>
+                <div style="margin-top: 20px; border-top: 1px solid #f0f2f5; padding-top: 16px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight:500;">当前待审批数</span>
+                        <span class="status-badge status-pending">2</span>
+                    </div>
+                    <div style="font-size:0.7rem; color:#5b6e8c; margin-top: 8px;">
+                        <i class="fas fa-info-circle"></i> 申请提交后将由直属上级审批，请耐心等待。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 动态表单切换逻辑
+    const appTypeSelect = document.getElementById('appType');
+    const leaveDiv = document.getElementById('leaveFields');
+    const overtimeDiv = document.getElementById('overtimeFields');
+    const fieldworkDiv = document.getElementById('fieldworkFields');
+    const makeupDiv = document.getElementById('makeupFields');
+
+    function toggleDynamicFields() {
+        const type = appTypeSelect.value;
+        leaveDiv.style.display = 'none';
+        overtimeDiv.style.display = 'none';
+        fieldworkDiv.style.display = 'none';
+        makeupDiv.style.display = 'none';
+        if (type === 'leave') leaveDiv.style.display = 'block';
+        else if (type === 'overtime') overtimeDiv.style.display = 'block';
+        else if (type === 'fieldwork') fieldworkDiv.style.display = 'block';
+        else if (type === 'makeup') makeupDiv.style.display = 'block';
+    }
+    appTypeSelect.addEventListener('change', toggleDynamicFields);
+    toggleDynamicFields();
+
+    // 附件上传逻辑 (模拟)
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfoDiv = document.getElementById('fileInfo');
+    const fileNameSpan = document.getElementById('fileName');
+    const removeFileBtn = document.getElementById('removeFile');
+    let selectedFile = null;
+
+    uploadArea.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length) {
+            const file = e.target.files[0];
+            if (file.size > 10 * 1024 * 1024) {
+                alert('文件大小不能超过10MB');
+                fileInput.value = '';
+                return;
+            }
+            const allowed = ['image/jpeg', 'image/png', 'application/pdf'];
+            if (!allowed.includes(file.type)) {
+                alert('仅支持 jpg, png, pdf 格式');
+                fileInput.value = '';
+                return;
+            }
+            selectedFile = file;
+            fileNameSpan.innerText = file.name;
+            fileInfoDiv.style.display = 'flex';
+            uploadArea.style.display = 'none';
+        }
+    });
+    removeFileBtn.addEventListener('click', () => {
+        selectedFile = null;
+        fileInput.value = '';
+        fileInfoDiv.style.display = 'none';
+        uploadArea.style.display = 'block';
+    });
+
+    // 表单提交与校验
+    const form = document.getElementById('applicationForm');
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // 基础校验
+        const startTime = document.getElementById('startTime').value;
+        const endTime = document.getElementById('endTime').value;
+        const reason = document.getElementById('reason').value.trim();
+
+        if (!startTime || !endTime) {
+            alert('请填写完整的起止时间');
+            return;
+        }
+        if (new Date(startTime) >= new Date(endTime)) {
+            alert('结束时间必须晚于开始时间');
+            return;
+        }
+        if (reason.length < 2 || reason.length > 500) {
+            alert('事由需在2-500个字符之间');
+            return;
+        }
+
+        // 补卡申请额外校验
+        const type = appTypeSelect.value;
+        if (type === 'makeup') {
+            const makeupDate = document.getElementById('makeupDate').value;
+            if (!makeupDate) {
+                alert('请选择补卡日期');
+                return;
+            }
+        }
+
+        // 构造申请数据
+        let appTypeText = '';
+        switch(type) {
+            case 'leave': appTypeText = '请假'; break;
+            case 'overtime': appTypeText = '加班'; break;
+            case 'fieldwork': appTypeText = '外勤'; break;
+            case 'makeup': appTypeText = '补卡'; break;
+        }
+
+        // 显示提交成功信息，模拟后端保存
+        alert(`✅ 申请已提交！\n类型：${appTypeText}\n时段：${startTime} 至 ${endTime}\n事由：${reason}\n附件：${selectedFile ? selectedFile.name : '无'}\n等待上级审批。`);
+
+        // 模拟添加到最近记录列表顶部（演示效果）
+        const recordsContainer = document.getElementById('recentRecords');
+        const newRecord = document.createElement('div');
+        newRecord.className = 'record-item';
+        const today = new Date().toISOString().slice(0,10);
+        newRecord.innerHTML = `
+            <div class="record-info">
+                <p>${appTypeText} · ${type === 'leave' ? document.getElementById('leaveType').options[document.getElementById('leaveType').selectedIndex]?.text || '请假' : (type==='overtime'?'加班':(type==='fieldwork'?'外勤':'补卡'))}</p>
+                <small>${today} 提交</small>
+            </div>
+            <span class="status-badge status-pending">待审批</span>
+        `;
+        recordsContainer.prepend(newRecord);
+        // 移除最后一条如果太多
+        if (recordsContainer.children.length > 6) recordsContainer.removeChild(recordsContainer.lastChild);
+
+        // 重置表单（可选，保留一些字段重置）
+        document.getElementById('startTime').value = '';
+        document.getElementById('endTime').value = '';
+        document.getElementById('reason').value = '';
+        if (selectedFile) {
+            selectedFile = null;
+            fileInput.value = '';
+            fileInfoDiv.style.display = 'none';
+            uploadArea.style.display = 'block';
+        }
+        // 重置补卡日期
+        if (document.getElementById('makeupDate')) document.getElementById('makeupDate').value = '';
+    });
+
+    // 查看全部申请模拟
+    document.querySelector('.view-all').addEventListener('click', () => {
+        alert('跳转至全部申请记录页面（演示）');
+    });
+</script>
+</body>
+</html>

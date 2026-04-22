@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>勤致 · 部门/公司考勤查看</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- ECharts CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+            padding: 24px 20px;
+        }
+
+        .report-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 头部 */
+        .page-header {
+            margin-bottom: 28px;
+        }
+        .page-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: #5b6e8c;
+            margin-top: 6px;
+        }
+
+        /* 筛选栏卡片 */
+        .filter-card {
+            background: white;
+            border-radius: 28px;
+            padding: 20px 24px;
+            margin-bottom: 28px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            border: 1px solid #ecfdf5;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+        }
+        .filter-group {
+            flex: 1;
+            min-width: 160px;
+        }
+        .filter-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #5b6e8c;
+        }
+        .filter-group select, .filter-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 24px;
+            font-size: 0.85rem;
+            outline: none;
+            background: white;
+        }
+        .filter-group select:focus, .filter-group input:focus {
+            border-color: #2d6a4f;
+        }
+        .btn-primary {
+            background: #2d6a4f;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+        .btn-outline {
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 统计卡片行 */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 28px;
+            padding: 18px 20px;
+            border: 1px solid #ecfdf5;
+        }
+        .stat-title {
+            font-size: 0.75rem;
+            color: #5b6e8c;
+            margin-bottom: 8px;
+        }
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        /* 双栏布局：表格+图表 */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 28px;
+            margin-bottom: 28px;
+        }
+        .card {
+            background: white;
+            border-radius: 32px;
+            border: 1px solid #ecfdf5;
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid #f0f2f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .card-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .card-body {
+            padding: 0 24px 24px;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        th, td {
+            padding: 14px 8px;
+            text-align: left;
+            border-bottom: 1px solid #f0f2f5;
+        }
+        th {
+            font-weight: 600;
+            color: #5b6e8c;
+        }
+        .detail-link {
+            color: #2d6a4f;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        .export-btn {
+            background: #e9f5ef;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .chart-container {
+            width: 100%;
+            height: 280px;
+            margin-top: 8px;
+        }
+        /* 下钻弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            max-width: 500px;
+            width: 90%;
+            border-radius: 32px;
+            padding: 24px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .close-modal {
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        @media (max-width: 1000px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .filter-card {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="report-container">
+    <div class="page-header">
+        <h1>部门/公司考勤查看</h1>
+        <div class="breadcrumb"><i class="fas fa-home"></i> 首页 / 数据查看 / 考勤报表</div>
+    </div>
+
+    <!-- 筛选栏 -->
+    <div class="filter-card">
+        <div class="filter-group">
+            <label>选择部门</label>
+            <select id="deptSelect">
+                <option value="all">全公司（管理员）</option>
+                <option value="tech">技术研发部</option>
+                <option value="product">产品部</option>
+                <option value="sales">销售部</option>
+                <option value="hr">人力资源部</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>开始日期</label>
+            <input type="date" id="startDate" value="2026-04-01">
+        </div>
+        <div class="filter-group">
+            <label>结束日期</label>
+            <input type="date" id="endDate" value="2026-04-30">
+        </div>
+        <div class="filter-group">
+            <button id="queryBtn" class="btn-primary"><i class="fas fa-search"></i> 查询</button>
+            <button id="exportBtn" class="btn-outline" style="margin-left: 10px;"><i class="fas fa-download"></i> 导出Excel</button>
+        </div>
+    </div>
+
+    <!-- 汇总卡片 -->
+    <div class="stats-row">
+        <div class="stat-card"><div class="stat-title">总人数</div><div class="stat-value" id="totalEmp">0</div></div>
+        <div class="stat-card"><div class="stat-title">平均出勤率</div><div class="stat-value" id="attendanceRate">0%</div></div>
+        <div class="stat-card"><div class="stat-title">总迟到人次</div><div class="stat-value" id="totalLate">0</div></div>
+        <div class="stat-card"><div class="stat-title">缺勤/缺卡人次</div><div class="stat-value" id="totalAbsent">0</div></div>
+    </div>
+
+    <!-- 表格 + 图表 -->
+    <div class="two-columns">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-table-list"></i> 考勤明细报表</h3>
+                <button class="export-btn" id="quickExport"><i class="fas fa-file-excel"></i> 导出当前报表</button>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table id="reportTable">
+                        <thead>
+                            <tr><th>姓名</th><th>工号</th><th>部门</th><th>应出勤</th><th>实际出勤</th><th>正常</th><th>迟到</th><th>早退</th><th>缺勤</th><th>出勤率</th><th>操作</th></tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- 动态渲染 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-chart-pie"></i> 考勤分析</h3>
+                <div style="display: flex; gap: 8px;">
+                    <button id="showBar" class="btn-outline" style="padding: 4px 12px; font-size:0.7rem;">柱状图</button>
+                    <button id="showPie" class="btn-outline" style="padding: 4px 12px; font-size:0.7rem;">饼图</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="chartContainer" class="chart-container"></div>
+                <div style="margin-top: 16px; font-size:0.75rem; color:#5b6e8c; text-align:center;">
+                    <i class="fas fa-chart-line"></i> 部门考勤趋势及异常占比
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 员工下钻弹窗 -->
+<div id="drillModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span id="modalEmployeeName">员工考勤详情</span>
+            <span class="close-modal">&times;</span>
+        </div>
+        <div id="modalDetailBody">
+            <!-- 动态加载个人明细 -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // 模拟员工考勤数据（部门维度）
+    const employeesData = {
+        tech: [
+            { name: "张明远", empNo: "10001", dept: "技术研发部", attendance: { should: 22, actual: 21, normal: 19, late: 2, early: 0, absent: 1 } },
+            { name: "李思敏", empNo: "10002", dept: "技术研发部", attendance: { should: 22, actual: 22, normal: 21, late: 1, early: 0, absent: 0 } },
+            { name: "王启航", empNo: "10003", dept: "技术研发部", attendance: { should: 22, actual: 20, normal: 18, late: 2, early: 0, absent: 2 } }
+        ],
+        product: [
+            { name: "陈敏", empNo: "20001", dept: "产品部", attendance: { should: 22, actual: 22, normal: 20, late: 2, early: 0, absent: 0 } },
+            { name: "赵欣怡", empNo: "20002", dept: "产品部", attendance: { should: 22, actual: 21, normal: 19, late: 1, early: 1, absent: 1 } }
+        ],
+        sales: [
+            { name: "刘强", empNo: "30001", dept: "销售部", attendance: { should: 22, actual: 19, normal: 16, late: 3, early: 0, absent: 3 } },
+            { name: "吴倩", empNo: "30002", dept: "销售部", attendance: { should: 22, actual: 20, normal: 18, late: 2, early: 0, absent: 2 } }
+        ],
+        hr: [
+            { name: "杨静", empNo: "40001", dept: "人力资源部", attendance: { should: 22, actual: 22, normal: 22, late: 0, early: 0, absent: 0 } }
+        ]
+    };
+    // 全公司合并
+    function getAllEmployees() {
+        let all = [];
+        for (let key in employeesData) {
+            all.push(...employeesData[key]);
+        }
+        return all;
+    }
+
+    let currentChart = null;
+    let currentChartType = 'bar'; // bar or pie
+    let currentFilterDept = 'all';
+    let currentStart = '2026-04-01';
+    let currentEnd = '2026-04-30';
+
+    // 计算应出勤天数（基于日期范围）
+    function getWorkDays(startDate, endDate) {
+        let start = new Date(startDate);
+        let end = new Date(endDate);
+        let count = 0;
+        let cur = new Date(start);
+        while (cur <= end) {
+            let day = cur.getDay();
+            if (day !== 0 && day !== 6) count++; // 周一到周五算工作日
+            cur.setDate(cur.getDate() + 1);
+        }
+        return count;
+    }
+
+    // 获取过滤后的员工列表（部门 + 日期范围只是调整应出勤天数，模拟数据中应出勤按工作日计算）
+    function getFilteredEmployees() {
+        let employees = [];
+        if (currentFilterDept === 'all') {
+            employees = getAllEmployees();
+        } else {
+            employees = employeesData[currentFilterDept] || [];
+        }
+        const workDays = getWorkDays(currentStart, currentEnd);
+        // 返回带计算字段的列表
+        return employees.map(emp => {
+            const att = emp.attendance;
+            // 实际出勤率按应出勤天数比例缩放（模拟，实际应基于考勤记录，此处按比例展示）
+            let ratio = att.actual / att.should;
+            let actualScaled = Math.round(workDays * ratio);
+            let normalScaled = Math.round(att.normal / att.should * workDays);
+            let lateScaled = Math.round(att.late / att.should * workDays);
+            let earlyScaled = Math.round(att.early / att.should * workDays);
+            let absentScaled = workDays - actualScaled;
+            let attendanceRateVal = workDays > 0 ? (actualScaled / workDays * 100).toFixed(1) : 0;
+            return {
+                ...emp,
+                workDays: workDays,
+                actualDays: actualScaled,
+                normalDays: normalScaled,
+                lateDays: lateScaled,
+                earlyDays: earlyScaled,
+                absentDays: absentScaled,
+                attendanceRate: attendanceRateVal
+            };
+        });
+    }
+
+    // 渲染表格
+    function renderTable() {
+        const data = getFilteredEmployees();
+        const tbody = document.getElementById('tableBody');
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;">暂无数据</td></tr>';
+            return;
+        }
+        let html = '';
+        data.forEach(emp => {
+            html += `<tr>
+                        <td>${emp.name}</td>
+                        <td>${emp.empNo}</td>
+                        <td>${emp.dept}</td>
+                        <td>${emp.workDays}</td>
+                        <td>${emp.actualDays}</td>
+                        <td>${emp.normalDays}</td>
+                        <td>${emp.lateDays}</td>
+                        <td>${emp.earlyDays}</td>
+                        <td>${emp.absentDays}</td>
+                        <td>${emp.attendanceRate}%</td>
+                        <td><a class="detail-link" data-name="${emp.name}" data-empno="${emp.empNo}" data-dept="${emp.dept}">查看详情</a></td>
+                     </tr>`;
+        });
+        tbody.innerHTML = html;
+
+        // 绑定下钻事件
+        document.querySelectorAll('.detail-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const name = link.dataset.name;
+                const empNo = link.dataset.empno;
+                const dept = link.dataset.dept;
+                showEmployeeDetail(name, empNo, dept);
+            });
+        });
+
+        // 更新汇总卡片
+        const totalEmp = data.length;
+        const totalActual = data.reduce((sum, e) => sum + e.actualDays, 0);
+        const totalWorkDaysSum = data.reduce((sum, e) => sum + e.workDays, 0);
+        const avgRate = totalWorkDaysSum > 0 ? (totalActual / totalWorkDaysSum * 100).toFixed(1) : 0;
+        const totalLate = data.reduce((sum, e) => sum + e.lateDays, 0);
+        const totalAbsent = data.reduce((sum, e) => sum + e.absentDays, 0);
+        document.getElementById('totalEmp').innerText = totalEmp;
+        document.getElementById('attendanceRate').innerText = avgRate + '%';
+        document.getElementById('totalLate').innerText = totalLate;
+        document.getElementById('totalAbsent').innerText = totalAbsent;
+    }
+
+    // 渲染图表（基于当前过滤后的数据）
+    function renderChart(type = currentChartType) {
+        const data = getFilteredEmployees();
+        if (!data.length) {
+            if (currentChart) currentChart.dispose();
+            const container = document.getElementById('chartContainer');
+            container.innerHTML = '<div style="text-align:center; padding:40px;">暂无数据</div>';
+            return;
+        }
+        const names = data.map(e => e.name);
+        const normalData = data.map(e => e.normalDays);
+        const lateData = data.map(e => e.lateDays);
+        const absentData = data.map(e => e.absentDays);
+        
+        if (type === 'bar') {
+            if (currentChart) currentChart.dispose();
+            const chartDom = document.getElementById('chartContainer');
+            chartDom.innerHTML = '<div id="barChart" style="width:100%; height:100%;"></div>';
+            const barChart = echarts.init(document.getElementById('barChart'));
+            currentChart = barChart;
+            barChart.setOption({
+                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                legend: { data: ['正常', '迟到', '缺勤'] },
+                xAxis: { type: 'category', data: names, axisLabel: { rotate: 30, interval: 0 } },
+                yAxis: { type: 'value', name: '天数' },
+                series: [
+                    { name: '正常', type: 'bar', data: normalData, itemStyle: { color: '#2d6a4f' } },
+                    { name: '迟到', type: 'bar', data: lateData, itemStyle: { color: '#b45309' } },
+                    { name: '缺勤', type: 'bar', data: absentData, itemStyle: { color: '#c53030' } }
+                ]
+            });
+        } else {
+            // 饼图：汇总部门整体考勤状态占比
+            const totalNormal = data.reduce((s, e) => s + e.normalDays, 0);
+            const totalLate = data.reduce((s, e) => s + e.lateDays, 0);
+            const totalEarly = data.reduce((s, e) => s + e.earlyDays, 0);
+            const totalAbsent = data.reduce((s, e) => s + e.absentDays, 0);
+            if (currentChart) currentChart.dispose();
+            const chartDom = document.getElementById('chartContainer');
+            chartDom.innerHTML = '<div id="pieChart" style="width:100%; height:100%;"></div>';
+            const pieChart = echarts.init(document.getElementById('pieChart'));
+            currentChart = pieChart;
+            pieChart.setOption({
+                tooltip: { trigger: 'item' },
+                legend: { top: 'bottom' },
+                series: [{
+                    name: '考勤占比', type: 'pie', radius: '55%',
+                    data: [
+                        { value: totalNormal, name: '正常', itemStyle: { color: '#2d6a4f' } },
+                        { value: totalLate, name: '迟到', itemStyle: { color: '#b45309' } },
+                        { value: totalEarly, name: '早退', itemStyle: { color: '#e67e22' } },
+                        { value: totalAbsent, name: '缺勤/缺卡', itemStyle: { color: '#c53030' } }
+                    ],
+                    emphasis: { scale: true }
+                }]
+            });
+        }
+    }
+
+    // 员工下钻详情弹窗
+    function showEmployeeDetail(name, empNo, dept) {
+        // 找到该员工的详细考勤记录（模拟某月每天的打卡情况）
+        const modal = document.getElementById('drillModal');
+        document.getElementById('modalEmployeeName').innerText = `${name} · 考勤明细`;
+        // 生成模拟的最近10天记录
+        const workDays = getWorkDays(currentStart, currentEnd);
+        let detailHtml = `<div style="margin-bottom:12px;"><strong>工号：</strong> ${empNo}</div>
+                          <div style="margin-bottom:12px;"><strong>部门：</strong> ${dept}</div>
+                          <div style="margin-bottom:12px;"><strong>查询范围：</strong> ${currentStart} 至 ${currentEnd}</div>
+                          <table style="width:100%; font-size:0.8rem; border-collapse:collapse;">
+                            <thead><tr style="background:#f8fafc;"><th>日期</th><th>上班时间</th><th>下班时间</th><th>状态</th></tr></thead><tbody>`;
+        // 模拟随机生成该员工在日期范围内的打卡记录（用于演示）
+        let start = new Date(currentStart);
+        let end = new Date(currentEnd);
+        let current = new Date(start);
+        let dayCount = 0;
+        while (current <= end && dayCount < 15) {
+            let dayOfWeek = current.getDay();
+            if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                let dateStr = current.toISOString().slice(0,10);
+                let rand = Math.random();
+                let status = '';
+                let morning = '', evening = '';
+                if (rand < 0.7) { status = '正常'; morning = '09:00-09:05'; evening = '18:00-18:10'; }
+                else if (rand < 0.85) { status = '迟到'; morning = '09:20-09:35'; evening = '18:05-18:15'; }
+                else { status = '缺卡'; morning = '--:--'; evening = '--:--'; }
+                detailHtml += `<tr><td>${dateStr}</td><td>${morning}</td><td>${evening}</td><td>${status}</td></tr>`;
+                dayCount++;
+            }
+            current.setDate(current.getDate() + 1);
+        }
+        detailHtml += `</tbody></table><div style="margin-top:12px; font-size:0.7rem; color:#5b6e8c;"><i class="fas fa-info-circle"></i> 仅展示部分示例数据，实际明细以考勤记录为准。</div>`;
+        document.getElementById('modalDetailBody').innerHTML = detailHtml;
+        modal.style.display = 'flex';
+    }
+
+    // 导出模拟（提示）
+    function exportExcel() {
+        const data = getFilteredEmployees();
+        if (data.length === 0) {
+            alert('无数据可导出');
+            return;
+        }
+        // 模拟导出
+        alert(`导出Excel成功！\n共导出 ${data.length} 条考勤记录，文件名：考勤报表_${currentFilterDept}_${currentStart}_${currentEnd}.xlsx`);
+        // 实际可调用后端接口
+    }
+
+    // 刷新全部
+    function refresh() {
+        currentFilterDept = document.getElementById('deptSelect').value;
+        currentStart = document.getElementById('startDate').value;
+        currentEnd = document.getElementById('endDate').value;
+        if (new Date(currentStart) > new Date(currentEnd)) {
+            alert('结束日期不能早于开始日期');
+            return;
+        }
+        renderTable();
+        renderChart(currentChartType);
+    }
+
+    // 事件绑定
+    document.getElementById('queryBtn').addEventListener('click', refresh);
+    document.getElementById('exportBtn').addEventListener('click', exportExcel);
+    document.getElementById('quickExport').addEventListener('click', exportExcel);
+    document.getElementById('showBar').addEventListener('click', () => {
+        currentChartType = 'bar';
+        renderChart('bar');
+    });
+    document.getElementById('showPie').addEventListener('click', () => {
+        currentChartType = 'pie';
+        renderChart('pie');
+    });
+
+    // 弹窗关闭
+    const modal = document.getElementById('drillModal');
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+    });
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) modal.style.display = 'none';
+    });
+
+    // 初始化
+    refresh();
+</script>
+</body>
+</html>

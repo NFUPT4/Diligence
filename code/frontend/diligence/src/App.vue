@@ -160,10 +160,15 @@
     @use "@/style/theme" as *
 
     html, body, #app
+        font-family: 'Inter', sans-serif
         padding: 0
         margin: 0
         width: 100%
         height: 100%
+
+    h1, h2, h3, h4, h5, h6, p
+        margin: 0
+        padding: 0
 
     a
         text-decoration: none
