@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>致勤考勤系统登录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", "Helvetica Neue", Arial, sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: #ffffff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 1000px;
+            min-height: 520px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* 左侧表单区域 */
+        .form-section {
+            flex: 1;
+            padding: 60px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #2d6a4f;
+            margin-bottom: 48px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 32px;
+        }
+
+        .form-input {
+            width: 100%;
+            height: 44px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            padding: 0 12px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            border-color: #4096ff;
+        }
+
+        .form-input.error {
+            border-color: #ff4d4f;
+        }
+
+        .form-input::placeholder {
+            color: #bfbfbf;
+        }
+
+        .required {
+            color: #ff4d4f;
+            margin-right: 4px;
+        }
+
+        .form-label {
+            display: inline-block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .scan-login {
+            color: #4096ff;
+            text-decoration: none;
+        }
+
+        .login-btn {
+            width: 100%;
+            height: 48px;
+            background-color: #4096ff;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .login-btn:hover {
+            background-color: #1890ff;
+        }
+
+        .error-text {
+            color: #ff4d4f;
+            font-size: 12px;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .error-text::before {
+            content: "ⓘ";
+        }
+
+        /* 中间分隔线 */
+        .divider {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+        }
+
+        .divider-line {
+            width: 1px;
+            height: 300px;
+            background-color: #e8e8e8;
+            position: relative;
+        }
+
+        .divider-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 8px 4px;
+            color: #666;
+            font-size: 16px;
+            writing-mode: vertical-rl;
+            letter-spacing: 4px;
+        }
+
+        /* 右侧Logo区域 */
+        .logo-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+        }
+
+        .logo-icon {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .system-name {
+            font-size: 36px;
+            font-weight: 600;
+            color: #2d6a4f;
+        }
+
+        /* 密码显示隐藏 */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .login-card {
+                flex-direction: column;
+                max-width: 400px;
+            }
+
+            .divider {
+                display: none;
+            }
+
+            .form-section {
+                padding: 40px 30px;
+            }
+
+            .logo-section {
+                padding: 30px;
+                border-bottom: 1px solid #e8e8e8;
+            }
+
+            .logo-icon {
+                width: 60px;
+                height: 60px;
+                margin-bottom: 12px;
+            }
+
+            .system-name {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <!-- 左侧表单 -->
+        <div class="form-section">
+            <h2 class="login-title">用户登录</h2>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="required">*</span>工号
+                    </label>
+                    <input type="text" class="form-input" id="workId" placeholder="请输入员工号">
+                    <div class="error-text" id="workIdError" style="display: none;">工号不能为空</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="required">*</span>密码
+                    </label>
+                    <div class="password-wrapper">
+                        <input type="password" class="form-input" id="password" placeholder="请输入密码">
+                        <span class="toggle-password" id="togglePassword">👁</span>
+                    </div>
+                    <div class="error-text" id="passwordError" style="display: none;">密码不能为空</div>
+                </div>
+
+                <div class="form-actions">
+                    <label class="remember-me">
+                        <input type="checkbox" id="remember">
+                        <span>记住我</span>
+                    </label>
+                    <a href="#" class="scan-login">APP扫码登录</a>
+                </div>
+
+                <button type="submit" class="login-btn">
+                    <span>➔</span>
+                    <span>登录</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- 中间分隔线 -->
+        <div class="divider">
+            <div class="divider-line">
+                <span class="divider-text">账号登录</span>
+            </div>
+        </div>
+
+        <!-- 右侧Logo -->
+        <div class="logo-section">
+            <div class="logo-icon">
+                <!-- 这里替换成你的实际logo图片地址 -->
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="15" y="15" width="70" height="70" rx="16" fill="#f5f5f5"/>
+                    <path d="M50 25C36.19 25 25 36.19 25 50C25 63.81 36.19 75 50 75C63.81 75 75 63.81 75 50C75 36.19 63.81 25 50 25ZM50 67C40.61 67 33 59.39 33 50C33 40.61 40.61 33 50 33C59.39 33 67 40.61 67 50C67 59.39 59.39 67 50 67Z" fill="#34495e"/>
+                    <path d="M50 35V50L60.5 60.5" stroke="#34495e" stroke-width="4" stroke-linecap="round"/>
+                    <circle cx="50" cy="50" r="4" fill="#34495e"/>
+                    <path d="M50 20L50 10" stroke="#ff7f24" stroke-width="6" stroke-linecap="round"/>
+                    <path d="M50 10L70 25" stroke="#ff7f24" stroke-width="6" stroke-linecap="round"/>
+                    <circle cx="42" cy="35" r="4" fill="#e74c3c"/>
+                    <path d="M42 35L42 28" stroke="#e74c3c" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h1 class="system-name">致勤</h1>
+        </div>
+    </div>
+
+    <script>
+        // 密码显示/隐藏切换
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            togglePassword.textContent = type === 'password' ? '👁' : '🙈';
+        });
+
+        // 表单验证逻辑
+        const loginForm = document.getElementById('loginForm');
+        const workIdInput = document.getElementById('workId');
+        const passwordInputForm = document.getElementById('password');
+        const workIdError = document.getElementById('workIdError');
+        const passwordError = document.getElementById('passwordError');
+
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            let isValid = true;
+
+            // 验证工号
+            if (!workIdInput.value.trim()) {
+                workIdInput.classList.add('error');
+                workIdError.style.display = 'block';
+                isValid = false;
+            } else {
+                workIdInput.classList.remove('error');
+                workIdError.style.display = 'none';
+            }
+
+            // 验证密码
+            if (!passwordInputForm.value.trim()) {
+                passwordInputForm.classList.add('error');
+                passwordError.style.display = 'block';
+                isValid = false;
+            } else {
+                passwordInputForm.classList.remove('error');
+                passwordError.style.display = 'none';
+            }
+
+            if (isValid) {
+                alert('登录验证通过！');
+            }
+        });
+
+        // 输入时移除错误状态
+        workIdInput.addEventListener('input', function() {
+            if (this.value.trim()) {
+                this.classList.remove('error');
+                workIdError.style.display = 'none';
+            }
+        });
+
+        passwordInputForm.addEventListener('input', function() {
+            if (this.value.trim()) {
+                this.classList.remove('error');
+                passwordError.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

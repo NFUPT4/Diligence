@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的考勤 - 致勤考勤系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", "Helvetica Neue", Arial, sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+            background-color: #f0f2f5;
+        }
+
+        .layout {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* 左侧侧边栏 */
+        .sidebar {
+            width: 240px;
+            background-color: #ffffff;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+
+        .logo-area {
+            padding: 0 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2d6a4f;
+        }
+
+        .logo-subtitle {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 0 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            color: #666;
+            font-size: 15px;
+            cursor: pointer;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        .nav-item.active {
+            background-color: #e8f0f7;
+            color: #2d6a4f;
+            font-weight: 500;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+        }
+
+        .user-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e8f0f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .user-dept {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* 右侧主内容 */
+        .main-content {
+            flex: 1;
+            padding: 32px 40px;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        /* 标签切换 */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            padding: 10px 22px;
+            background: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #666;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            user-select: none;
+        }
+
+        .tab.active {
+            background: #2b65d9;
+            color: #fff;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* 通用卡片 */
+        .card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #1a1a1a;
+        }
+
+        /* 双列布局 */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* 月份切换 */
+        .month-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .month-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .month-btn {
+            background: #f5f7fa;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .month-btn:hover {
+            background: #e8ebf1;
+        }
+
+        /* 日历 - 已修复布局 */
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            text-align: center;
+        }
+
+        .calendar-week {
+            font-size: 14px;
+            color: #999;
+            font-weight: 500;
+            padding: 8px 0;
+        }
+
+        .calendar-day {
+            padding: 10px 0;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 50px;
+        }
+
+        .calendar-day:hover {
+            background-color: #f5f7fa;
+        }
+
+        .calendar-day.active {
+            background: #2b65d9;
+            color: #fff;
+        }
+
+        .calendar-day.has-record::after {
+            content: "";
+            width: 6px;
+            height: 6px;
+            background: #2b65d9;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 6px;
+        }
+
+        .calendar-day.active.has-record::after {
+            background: #fff;
+        }
+
+        /* 统计 */
+        .stats {
+            background: #f7f9fc;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .stats-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            margin: 8px 0;
+            color: #555;
+        }
+
+        /* 打卡记录 */
+        .record-item {
+            padding: 16px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .record-item:last-child {
+            border-bottom: none;
+        }
+
+        .record-date {
+            font-size: 17px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: #222;
+        }
+
+        .record-detail {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .record-status {
+            font-size: 14px;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .status-normal {
+            background: #e6f7ef;
+            color: #00b42a;
+        }
+
+        .status-late {
+            background: #fff2e6;
+            color: #ff7d00;
+        }
+
+        .status-early {
+            background: #fff1f0;
+            color: #f53f3f;
+        }
+
+        .status-none {
+            background: #f5f5f5;
+            color: #999;
+        }
+
+        /* 按钮 */
+        .btn-primary {
+            width: 100%;
+            height: 50px;
+            background: #2b65d9;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #1e47b8;
+        }
+
+        .btn-primary:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        /* 申请表单 */
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #222;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            height: 48px;
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
+            padding: 0 14px;
+            font-size: 15px;
+            background: #fff;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            border-color: #4096ff;
+        }
+
+        .form-textarea {
+            height: 110px;
+            resize: none;
+            padding: 14px;
+            line-height: 1.6;
+        }
+
+        .repair-fields {
+            display: none;
+            margin-bottom: 22px;
+        }
+
+        .repair-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .repair-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .upload-container {
+            width: 100%;
+        }
+
+        .upload-btn {
+            display: block;
+            width: 100%;
+            height: 48px;
+            border: 1px dashed #d9d9d9;
+            border-radius: 8px;
+            background: #fafafa;
+            text-align: center;
+            line-height: 48px;
+            font-size: 15px;
+            color: #666;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .upload-btn:hover {
+            border-color: #4096ff;
+            background: #f0f7ff;
+        }
+
+        #attachment {
+            display: none;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #2b65d9;
+        }
+
+        .error-msg {
+            color: #f53f3f;
+            font-size: 13px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        /* 打卡功能样式 */
+        .checkin-info-item {
+            margin-bottom: 28px;
+        }
+
+        .checkin-info-label {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .checkin-info-value {
+            font-size: 20px;
+            font-weight: 500;
+            color: #222;
+        }
+
+        /* 弹窗 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .modal-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 32px;
+            width: 90%;
+            max-width: 460px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #1a1a1a;
+        }
+
+        .detail-item {
+            padding: 14px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .btn-close {
+            width: 100%;
+            height: 48px;
+            background: #2b65d9;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            margin-top: 24px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+
+        .btn-close:hover {
+            background: #1e47b8;
+        }
+
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            padding: 16px 32px;
+            border-radius: 8px;
+            display: none;
+            z-index: 1000;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <!-- 左侧菜单 -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon">⏰</div>
+                <div class="logo-text">
+                    <div class="logo-title">致勤</div>
+                    <div class="logo-subtitle">勤能致远</div>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span>首页面板</span>
+                </div>
+                <div class="nav-item active">
+                    <span class="nav-icon">👤</span>
+                    <span>我的考勤</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>数据查看</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-icon">⚙️</span>
+                    <span>系统管理</span>
+                </div>
+            </nav>
+            <div class="user-footer">
+                <div class="user-avatar">👤</div>
+                <div class="user-info">
+                    <div class="user-name">员工</div>
+                    <div class="user-dept">员工</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 右侧内容 -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">我的考勤</h1>
+            </div>
+
+            <!-- 标签切换 - 新增"立即打卡"标签 -->
+            <div class="tabs">
+                <div class="tab active" data-tab="checkin">立即打卡</div>
+                <div class="tab" data-tab="overview">考勤总览</div>
+                <div class="tab" data-tab="record">打卡记录</div>
+                <div class="tab" data-tab="apply">考勤申请</div>
+            </div>
+
+            <!-- 面板1：立即打卡（新增完整功能） -->
+            <div class="tab-panel active" id="panel-checkin">
+                <div class="card" style="max-width: 600px;">
+                    <div class="card-title">今日打卡</div>
+                    
+                    <div class="checkin-info-item">
+                        <div class="checkin-info-label">当前时间</div>
+                        <div class="checkin-info-value" id="currentTime">2026-04-22 10:30</div>
+                    </div>
+                    
+                    <div class="checkin-info-item">
+                        <div class="checkin-info-label">当前位置</div>
+                        <div class="checkin-info-value" id="locationText">获取中...</div>
+                    </div>
+                    
+                    <div class="checkin-info-item">
+                        <div class="checkin-info-label">打卡类型</div>
+                        <div class="checkin-info-value" id="checkType">上班打卡</div>
+                    </div>
+                    
+                    <div class="checkin-info-item">
+                        <div class="checkin-info-label">打卡状态</div>
+                        <div class="record-status status-normal" id="checkStatus">正常</div>
+                    </div>
+
+                    <button class="btn-primary" id="checkBtn">上班打卡</button>
+                </div>
+            </div>
+
+            <!-- 面板2：考勤总览 -->
+            <div class="tab-panel" id="panel-overview">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-title">月度考勤日历</div>
+                        <div class="month-bar">
+                            <button class="month-btn" id="prevMonth">&lt;</button>
+                            <div class="month-title" id="monthTitle">2026年04月</div>
+                            <button class="month-btn" id="nextMonth">&gt;</button>
+                        </div>
+                        <!-- 日历容器 - 星期和日期都在这里 -->
+                        <div class="calendar" id="calendarBody">
+                            <div class="calendar-week">日</div>
+                            <div class="calendar-week">一</div>
+                            <div class="calendar-week">二</div>
+                            <div class="calendar-week">三</div>
+                            <div class="calendar-week">四</div>
+                            <div class="calendar-week">五</div>
+                            <div class="calendar-week">六</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">今日考勤统计</div>
+                        <div class="stats">
+                            <div class="stats-row"><span>应打卡</span><span>2次</span></div>
+                            <div class="stats-row"><span>已打卡</span><span>1次</span></div>
+                            <div class="stats-row"><span>异常</span><span>0次</span></div>
+                        </div>
+                        <div style="margin-top: 24px;">
+                            <div class="card-title" style="font-size: 18px; margin-bottom: 16px;">最近打卡</div>
+                            <div class="record-item" style="padding: 0; border: none;">
+                                <div class="record-date">2026-04-22 星期三</div>
+                                <div class="record-detail">
+                                    <span>上班：09:05</span>
+                                    <span class="record-status status-normal">正常</span>
+                                </div>
+                                <div class="record-detail">
+                                    <span>下班：未打卡</span>
+                                    <span class="record-status status-none">未打卡</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 面板3：打卡记录 -->
+            <div class="tab-panel" id="panel-record">
+                <div class="card">
+                    <div class="card-title">打卡记录</div>
+                    <div class="record-item">
+                        <div class="record-date">2026-04-22 星期三</div>
+                        <div class="record-detail">
+                            <span>上班：09:05</span>
+                            <span class="record-status status-normal">正常</span>
+                        </div>
+                        <div class="record-detail">
+                            <span>下班：未打卡</span>
+                            <span class="record-status status-none">未打卡</span>
+                        </div>
+                    </div>
+                    <div class="record-item">
+                        <div class="record-date">2026-04-21 星期二</div>
+                        <div class="record-detail">
+                            <span>上班：09:12</span>
+                            <span class="record-status status-late">迟到</span>
+                        </div>
+                        <div class="record-detail">
+                            <span>下班：18:05</span>
+                            <span class="record-status status-normal">正常</span>
+                        </div>
+                    </div>
+                    <div class="record-item">
+                        <div class="record-date">2026-04-20 星期一</div>
+                        <div class="record-detail">
+                            <span>上班：08:58</span>
+                            <span class="record-status status-normal">正常</span>
+                        </div>
+                        <div class="record-detail">
+                            <span>下班：18:10</span>
+                            <span class="record-status status-normal">正常</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 面板4：考勤申请 -->
+            <div class="tab-panel" id="panel-apply">
+                <div class="card" style="max-width: 600px;">
+                    <div class="card-title">考勤申请</div>
+                    <div class="form-group">
+                        <label class="form-label">申请类型</label>
+                        <select class="form-select" id="applyType">
+                            <option value="leave">请假</option>
+                            <option value="overtime">加班</option>
+                            <option value="outwork">外勤</option>
+                            <option value="repair">补卡</option>
+                        </select>
+                    </div>
+                    <div class="repair-fields" id="repairFields">
+                        <div class="repair-row">
+                            <div class="form-group">
+                                <label class="form-label">补卡日期</label>
+                                <input type="date" class="form-input" id="repairDate">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">打卡时段</label>
+                                <select class="form-select" id="repairSlot">
+                                    <option>上班打卡</option>
+                                    <option>下班打卡</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" id="startTimeGroup">
+                        <label class="form-label">开始时间</label>
+                        <input type="datetime-local" class="form-input" id="startTime">
+                        <div class="error-msg" id="startError">请选择开始时间</div>
+                    </div>
+                    <div class="form-group" id="endTimeGroup">
+                        <label class="form-label">结束时间</label>
+                        <input type="datetime-local" class="form-input" id="endTime">
+                        <div class="error-msg" id="endError">请选择结束时间</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">申请原因</label>
+                        <textarea class="form-textarea" id="reason" placeholder="请详细说明申请原因"></textarea>
+                        <div class="error-msg" id="reasonError">请填写申请原因</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">上传附件（可选）</label>
+                        <div class="upload-container">
+                            <label for="attachment" class="upload-btn">📎 点击上传证明材料</label>
+                            <input type="file" id="attachment">
+                            <div class="file-name" id="fileName"></div>
+                        </div>
+                    </div>
+                    <button class="btn-primary" id="submitBtn">提交申请</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 详情弹窗 -->
+    <div class="modal" id="detailModal">
+        <div class="modal-card">
+            <div class="modal-title" id="detailTitle">打卡详情</div>
+            <div class="detail-item">
+                <div>上班打卡</div>
+                <div id="detailIn">08:55 ✅ 正常</div>
+            </div>
+            <div class="detail-item">
+                <div>下班打卡</div>
+                <div id="detailOut">18:05 ✅ 正常</div>
+            </div>
+            <div class="detail-item">
+                <div>状态</div>
+                <div id="detailStatus" style="color:#00b42a;">正常出勤</div>
+            </div>
+            <button class="btn-close" id="closeDetail">关闭</button>
+        </div>
+    </div>
+
+    <!-- 提交成功提示 -->
+    <div class="toast" id="toast">操作成功</div>
+
+    <script>
+        // ==================== 标签切换 ====================
+        const tabs = document.querySelectorAll('.tab');
+        const panels = document.querySelectorAll('.tab-panel');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                panels.forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // ==================== 打卡功能 ====================
+        // 1. 实时时间
+        function updateTime() {
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            const h = String(now.getHours()).padStart(2, '0');
+            const mi = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('currentTime').innerText = `${y}-${m}-${d} ${h}:${mi}`;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // 2. 获取位置
+        function getLocation() {
+            if (!navigator.geolocation) {
+                document.getElementById('locationText').innerText = "浏览器不支持定位";
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(pos => {
+                document.getElementById('locationText').innerText = "已在打卡范围内";
+            }, err => {
+                document.getElementById('locationText').innerText = "未授权位置权限";
+            });
+        }
+        getLocation();
+
+        // 3. 自动判断上班/下班
+        function autoCheckType() {
+            const h = new Date().getHours();
+            const type = h < 12 ? '上班打卡' : '下班打卡';
+            document.getElementById('checkType').innerText = type;
+            document.getElementById('checkBtn').innerText = type;
+        }
+        autoCheckType();
+
+        // 4. 打卡逻辑
+        document.getElementById('checkBtn').addEventListener('click', function () {
+            const btn = this;
+            btn.disabled = true;
+            btn.innerText = "打卡中...";
+
+            setTimeout(() => {
+                document.getElementById('toast').innerText = "打卡成功";
+                document.getElementById('toast').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('toast').style.display = 'none';
+                    btn.innerText = "已打卡";
+                }, 1500);
+            }, 800);
+        });
+
+        // ==================== 日历逻辑 ====================
+        let currentYear = new Date().getFullYear();
+        let currentMonth = new Date().getMonth();
+
+        const checkData = {
+            "2026-04-01": "rest",
+            "2026-04-02": "normal",
+            "2026-04-03": "normal",
+            "2026-04-04": "late",
+            "2026-04-05": "absent",
+            "2026-04-06": "normal",
+            "2026-04-07": "normal",
+            "2026-04-08": "rest",
+            "2026-04-21": "late",
+            "2026-04-22": "normal"
+        };
+
+        renderCalendar();
+
+        document.getElementById('prevMonth').onclick = () => {
+            currentMonth--;
+            if (currentMonth < 0) { 
+                currentMonth = 11; 
+                currentYear--; 
+            }
+            renderCalendar();
+        };
+
+        document.getElementById('nextMonth').onclick = () => {
+            currentMonth++;
+            if (currentMonth > 11) { 
+                currentMonth = 0; 
+                currentYear++; 
+            }
+            renderCalendar();
+        };
+
+        function renderCalendar() {
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const body = document.getElementById('calendarBody');
+            
+            // 保留星期行，清空日期
+            body.innerHTML = `
+                <div class="calendar-week">日</div>
+                <div class="calendar-week">一</div>
+                <div class="calendar-week">二</div>
+                <div class="calendar-week">三</div>
+                <div class="calendar-week">四</div>
+                <div class="calendar-week">五</div>
+                <div class="calendar-week">六</div>
+            `;
+
+            document.getElementById('monthTitle').innerText = 
+                `${currentYear}年${(currentMonth + 1).toString().padStart(2, '0')}月`;
+
+            // 空白填充
+            for (let i = 0; i < firstDay; i++) {
+                const empty = document.createElement('div');
+                empty.className = 'calendar-day';
+                body.appendChild(empty);
+            }
+
+            // 日期
+            const today = new Date();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const item = document.createElement('div');
+                item.className = 'calendar-day';
+
+                // 今日高亮
+                const isToday = currentYear === today.getFullYear() && 
+                               currentMonth === today.getMonth() && 
+                               day === today.getDate();
+                if (isToday) {
+                    item.classList.add('active');
+                }
+
+                // 日期文本
+                const dayText = document.createElement('span');
+                dayText.innerText = day;
+                item.appendChild(dayText);
+
+                // 状态点
+                const monthStr = (currentMonth + 1).toString().padStart(2, '0');
+                const dayStr = day.toString().padStart(2, '0');
+                const key = `${currentYear}-${monthStr}-${dayStr}`;
+                const status = checkData[key];
+                if (status) {
+                    item.classList.add('has-record');
+                }
+
+                body.appendChild(item);
+
+                // 点击事件
+                item.onclick = () => openDetail(key, status, day);
+            }
+        }
+
+        const modal = document.getElementById('detailModal');
+        function openDetail(date, status, day) {
+            document.getElementById('detailTitle').innerText = 
+                `${currentMonth + 1}月${day}日 打卡详情`;
+            
+            if (status === 'normal') {
+                document.getElementById('detailIn').innerText = '08:55 ✅ 正常';
+                document.getElementById('detailOut').innerText = '18:05 ✅ 正常';
+                document.getElementById('detailStatus').innerText = '正常出勤';
+                document.getElementById('detailStatus').style.color = '#00b42a';
+            } else if (status === 'late') {
+                document.getElementById('detailIn').innerText = '09:12 ⚠️ 迟到';
+                document.getElementById('detailOut').innerText = '18:10 ✅ 正常';
+                document.getElementById('detailStatus').innerText = '迟到';
+                document.getElementById('detailStatus').style.color = '#ff7d00';
+            } else if (status === 'absent') {
+                document.getElementById('detailIn').innerText = '— ❌ 未打卡';
+                document.getElementById('detailOut').innerText = '— ❌ 未打卡';
+                document.getElementById('detailStatus').innerText = '缺勤';
+                document.getElementById('detailStatus').style.color = '#f53f3f';
+            } else if (status === 'rest') {
+                document.getElementById('detailIn').innerText = '— 休息日';
+                document.getElementById('detailOut').innerText = '— 休息日';
+                document.getElementById('detailStatus').innerText = '休息日';
+                document.getElementById('detailStatus').style.color = '#999';
+            } else {
+                document.getElementById('detailIn').innerText = '— 暂无数据';
+                document.getElementById('detailOut').innerText = '— 暂无数据';
+                document.getElementById('detailStatus').innerText = '未打卡';
+                document.getElementById('detailStatus').style.color = '#999';
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        document.getElementById('closeDetail').onclick = () => {
+            modal.style.display = 'none';
+        };
+
+        // 点击弹窗外部关闭
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        // ==================== 申请逻辑 ====================
+        const applyType = document.getElementById('applyType');
+        const repairFields = document.getElementById('repairFields');
+        const startTimeGroup = document.getElementById('startTimeGroup');
+        const endTimeGroup = document.getElementById('endTimeGroup');
+
+        applyType.addEventListener('change', function () {
+            if (this.value === 'repair') {
+                repairFields.style.display = 'block';
+                startTimeGroup.style.display = 'none';
+                endTimeGroup.style.display = 'none';
+            } else {
+                repairFields.style.display = 'none';
+                startTimeGroup.style.display = 'block';
+                endTimeGroup.style.display = 'block';
+            }
+        });
+
+        const attachment = document.getElementById('attachment');
+        const fileName = document.getElementById('fileName');
+        attachment.addEventListener('change', function () {
+            if (this.files.length > 0) {
+                fileName.innerText = '已选择：' + this.files[0].name;
+            } else {
+                fileName.innerText = '';
+            }
+        });
+
+        const submitBtn = document.getElementById('submitBtn');
+        const toast = document.getElementById('toast');
+
+        submitBtn.addEventListener('click', function () {
+            const type = applyType.value;
+            const start = document.getElementById('startTime').value;
+            const end = document.getElementById('endTime').value;
+            const reason = document.getElementById('reason').value.trim();
+            const repairDate = document.getElementById('repairDate').value;
+
+            document.getElementById('startError').style.display = 'none';
+            document.getElementById('endError').style.display = 'none';
+            document.getElementById('reasonError').style.display = 'none';
+
+            let valid = true;
+            if (type === 'repair') {
+                if (!repairDate) { 
+                    alert('请选择补卡日期'); 
+                    valid = false; 
+                    return; 
+                }
+            } else {
+                if (!start) { 
+                    document.getElementById('startError').style.display = 'block'; 
+                    valid = false; 
+                }
+                if (!end) { 
+                    document.getElementById('endError').style.display = 'block'; 
+                    valid = false; 
+                }
+            }
+            if (!reason) { 
+                document.getElementById('reasonError').style.display = 'block'; 
+                valid = false; 
+            }
+            if (!valid) return;
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "提交中...";
+            setTimeout(() => {
+                toast.innerText = "申请提交成功，已通知上级审批";
+                toast.style.display = 'block';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                    submitBtn.innerText = "提交成功";
+                    submitBtn.disabled = false;
+                }, 2000);
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
