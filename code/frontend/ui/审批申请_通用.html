@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>勤致 · 审批申请</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+            padding: 24px 20px;
+        }
+
+        .approval-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 头部 */
+        .page-header {
+            margin-bottom: 28px;
+        }
+        .page-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: #5b6e8c;
+            margin-top: 6px;
+        }
+
+        /* 两栏布局 */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 28px;
+        }
+
+        /* 卡片通用样式 */
+        .card {
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02);
+            border: 1px solid #ecfdf5;
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 20px 24px 12px 24px;
+            border-bottom: 1px solid #f0f2f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .card-body {
+            padding: 20px 24px 24px;
+        }
+
+        /* 筛选栏 */
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .filter-input {
+            flex: 1;
+            min-width: 140px;
+            padding: 10px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 28px;
+            font-size: 0.85rem;
+            outline: none;
+        }
+        .filter-input:focus {
+            border-color: #2d6a4f;
+        }
+
+        /* 待审批列表 */
+        .approval-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid #f0f2f5;
+            cursor: pointer;
+            transition: background 0.1s;
+            border-radius: 20px;
+        }
+        .list-item:hover {
+            background: #f8fafc;
+        }
+        .list-item.active {
+            background: #e9f5ef;
+            border-left: 4px solid #2d6a4f;
+        }
+        .item-info p {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .item-info small {
+            font-size: 0.7rem;
+            color: #7c8ba0;
+        }
+        .item-badge {
+            background: #fff3e3;
+            color: #b45309;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        /* 申请详情区域 */
+        .detail-section {
+            margin-top: 16px;
+        }
+        .detail-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f2f5;
+        }
+        .detail-label {
+            width: 100px;
+            font-weight: 500;
+            color: #5b6e8c;
+        }
+        .detail-value {
+            flex: 1;
+            color: #1e293b;
+        }
+        .attachment-link {
+            color: #2d6a4f;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            margin-top: 24px;
+        }
+        .btn-approve {
+            flex: 1;
+            background: #2d6a4f;
+            border: none;
+            padding: 12px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-reject {
+            flex: 1;
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            padding: 12px;
+            border-radius: 40px;
+            color: #c53030;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .reject-reason {
+            margin-top: 16px;
+            display: none;
+        }
+        .reject-reason textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 20px;
+            font-family: 'Inter', sans-serif;
+            resize: vertical;
+        }
+        .toast-msg {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            z-index: 1000;
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+            body {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="approval-container">
+    <div class="page-header">
+        <h1>审批申请</h1>
+        <div class="breadcrumb"><i class="fas fa-home"></i> 首页 / 我的考勤 / 待审批</div>
+    </div>
+
+    <div class="two-columns">
+        <!-- 左侧：待审批列表 -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-clipboard-list"></i> 待审批申请</h3>
+                <span class="item-badge" id="pendingCount">3条待处理</span>
+            </div>
+            <div class="card-body">
+                <div class="filter-bar">
+                    <input type="text" id="searchInput" class="filter-input" placeholder="申请人姓名">
+                    <select id="typeFilter" class="filter-input">
+                        <option value="all">全部类型</option>
+                        <option value="请假">请假</option>
+                        <option value="加班">加班</option>
+                        <option value="外勤">外勤</option>
+                        <option value="补卡">补卡</option>
+                    </select>
+                </div>
+                <div id="approvalList" class="approval-list">
+                    <!-- 动态渲染 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：申请详情 + 审批操作 -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-file-alt"></i> 申请详情</h3>
+                <i class="fas fa-ellipsis-h"></i>
+            </div>
+            <div class="card-body">
+                <div id="detailPanel">
+                    <!-- 默认提示 -->
+                    <div style="text-align: center; padding: 40px 20px; color: #8ba0bc;">
+                        <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 12px; display: block;"></i>
+                        请从左侧选择一条待审批申请
+                    </div>
+                </div>
+                <div id="actionPanel" style="display: none;">
+                    <div class="action-buttons">
+                        <button class="btn-approve" id="approveBtn"><i class="fas fa-check-circle"></i> 通过</button>
+                        <button class="btn-reject" id="rejectBtn"><i class="fas fa-times-circle"></i> 驳回</button>
+                    </div>
+                    <div id="rejectReasonBox" class="reject-reason">
+                        <textarea id="rejectReason" rows="2" placeholder="请填写驳回理由（10-200字）"></textarea>
+                        <div style="display: flex; gap: 12px; margin-top: 12px;">
+                            <button id="confirmReject" class="btn-reject" style="background:#c53030; color:white; border:none;">确认驳回</button>
+                            <button id="cancelReject" class="btn-reject" style="background:#f0f2f5; color:#5b6e8c;">取消</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="toast" class="toast-msg"></div>
+
+<script>
+    // 模拟待审批数据
+    let pendingApplications = [
+        {
+            id: 1,
+            applicant: "李思敏",
+            type: "请假",
+            typeCode: "leave",
+            startTime: "2026-04-15 09:00",
+            endTime: "2026-04-16 18:00",
+            duration: 2,
+            reason: "参加行业峰会，需请假两天。",
+            attachment: "会议邀请函.pdf",
+            submitTime: "2026-04-10 14:23",
+            leaveType: "年假"
+        },
+        {
+            id: 2,
+            applicant: "王启航",
+            type: "加班",
+            typeCode: "overtime",
+            startTime: "2026-04-14 19:00",
+            endTime: "2026-04-14 21:30",
+            duration: 2.5,
+            reason: "项目紧急上线，需要加班完成测试。",
+            attachment: null,
+            submitTime: "2026-04-14 10:15",
+            compensation: "调休"
+        },
+        {
+            id: 3,
+            applicant: "赵欣怡",
+            type: "补卡",
+            typeCode: "makeup",
+            startTime: "2026-04-13 09:00",
+            endTime: "2026-04-13 09:00",
+            duration: null,
+            reason: "早上忘记打卡，实际到岗时间08:55。",
+            attachment: "打卡记录截图.png",
+            submitTime: "2026-04-13 18:30",
+            makeupDate: "2026-04-13",
+            makeupPeriod: "上班卡"
+        },
+        {
+            id: 4,
+            applicant: "陈敏",
+            type: "外勤",
+            typeCode: "fieldwork",
+            startTime: "2026-04-16 14:00",
+            endTime: "2026-04-16 17:00",
+            duration: 3,
+            reason: "拜访客户，沟通项目需求。",
+            attachment: null,
+            submitTime: "2026-04-15 09:20",
+            location: "广州天河区珠江新城"
+        }
+    ];
+
+    let currentSelectedId = null;
+    let pendingRejectId = null; // 暂存驳回申请ID
+
+    // 过滤状态
+    let searchKeyword = '';
+    let typeFilter = 'all';
+
+    // 渲染列表
+    function renderList() {
+        let filtered = pendingApplications.filter(app => {
+            if (typeFilter !== 'all' && app.type !== typeFilter) return false;
+            if (searchKeyword && !app.applicant.includes(searchKeyword)) return false;
+            return true;
+        });
+        const listContainer = document.getElementById('approvalList');
+        const pendingCountSpan = document.getElementById('pendingCount');
+        pendingCountSpan.innerText = `${filtered.length}条待处理`;
+        if (filtered.length === 0) {
+            listContainer.innerHTML = '<div style="text-align:center; padding:40px;">暂无待审批申请</div>';
+            return;
+        }
+        listContainer.innerHTML = filtered.map(app => `
+            <div class="list-item ${currentSelectedId === app.id ? 'active' : ''}" data-id="${app.id}">
+                <div class="item-info">
+                    <p>${app.applicant} · ${app.type}</p>
+                    <small>${app.submitTime} 提交</small>
+                </div>
+                <span class="item-badge">待审批</span>
+            </div>
+        `).join('');
+
+        // 绑定点击事件
+        document.querySelectorAll('.list-item').forEach(el => {
+            el.addEventListener('click', (e) => {
+                const id = parseInt(el.dataset.id);
+                currentSelectedId = id;
+                renderList(); // 重新渲染高亮
+                showDetail(id);
+            });
+        });
+    }
+
+    // 展示详情
+    function showDetail(id) {
+        const app = pendingApplications.find(a => a.id === id);
+        if (!app) return;
+        let detailHtml = `
+            <div class="detail-section">
+                <div class="detail-row"><div class="detail-label">申请人</div><div class="detail-value">${app.applicant}</div></div>
+                <div class="detail-row"><div class="detail-label">申请类型</div><div class="detail-value">${app.type}</div></div>
+                <div class="detail-row"><div class="detail-label">起止时间</div><div class="detail-value">${app.startTime} 至 ${app.endTime}</div></div>
+                ${app.duration ? `<div class="detail-row"><div class="detail-label">时长</div><div class="detail-value">${app.duration} 小时</div></div>` : ''}
+                <div class="detail-row"><div class="detail-label">事由</div><div class="detail-value">${app.reason}</div></div>
+        `;
+        // 补充特定字段
+        if (app.type === '请假' && app.leaveType) {
+            detailHtml += `<div class="detail-row"><div class="detail-label">请假类型</div><div class="detail-value">${app.leaveType}</div></div>`;
+        }
+        if (app.type === '加班' && app.compensation) {
+            detailHtml += `<div class="detail-row"><div class="detail-label">补偿方式</div><div class="detail-value">${app.compensation}</div></div>`;
+        }
+        if (app.type === '外勤' && app.location) {
+            detailHtml += `<div class="detail-row"><div class="detail-label">外勤地点</div><div class="detail-value">${app.location}</div></div>`;
+        }
+        if (app.type === '补卡') {
+            detailHtml += `<div class="detail-row"><div class="detail-label">补卡日期</div><div class="detail-value">${app.makeupDate || app.startTime.slice(0,10)}</div></div>`;
+            detailHtml += `<div class="detail-row"><div class="detail-label">补卡时段</div><div class="detail-value">${app.makeupPeriod || '上班卡'}</div></div>`;
+        }
+        detailHtml += `
+                <div class="detail-row"><div class="detail-label">附件</div><div class="detail-value">${app.attachment ? `<a href="#" class="attachment-link" id="attachmentLink"><i class="fas fa-paperclip"></i> ${app.attachment}</a>` : '无'}</div></div>
+                <div class="detail-row"><div class="detail-label">提交时间</div><div class="detail-value">${app.submitTime}</div></div>
+            </div>
+        `;
+        document.getElementById('detailPanel').innerHTML = detailHtml;
+        document.getElementById('actionPanel').style.display = 'block';
+        // 重置驳回框
+        document.getElementById('rejectReasonBox').style.display = 'none';
+        document.getElementById('rejectReason').value = '';
+        pendingRejectId = null;
+
+        // 绑定附件预览模拟
+        const attachmentLink = document.getElementById('attachmentLink');
+        if (attachmentLink) {
+            attachmentLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                alert(`预览附件：${app.attachment}（演示模式）`);
+            });
+        }
+    }
+
+    // 显示toast消息
+    function showToast(msg, isError = false) {
+        const toast = document.getElementById('toast');
+        toast.innerText = msg;
+        toast.style.backgroundColor = isError ? '#c53030' : '#2d6a4f';
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 2500);
+    }
+
+    // 审批通过
+    function approveApplication(id) {
+        const app = pendingApplications.find(a => a.id === id);
+        if (!app) return;
+        // 模拟后端审批通过
+        const index = pendingApplications.findIndex(a => a.id === id);
+        if (index !== -1) {
+            pendingApplications.splice(index, 1);
+            showToast(`✅ 已通过 ${app.applicant} 的${app.type}申请`, false);
+            // 清空当前选中
+            currentSelectedId = null;
+            renderList();
+            document.getElementById('detailPanel').innerHTML = `<div style="text-align: center; padding: 40px 20px; color: #8ba0bc;"><i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 12px; display: block;"></i>审批完成，已通过</div>`;
+            document.getElementById('actionPanel').style.display = 'none';
+        }
+    }
+
+    // 驳回逻辑
+    function rejectApplication(id, reason) {
+        const app = pendingApplications.find(a => a.id === id);
+        if (!app) return;
+        const index = pendingApplications.findIndex(a => a.id === id);
+        if (index !== -1) {
+            pendingApplications.splice(index, 1);
+            showToast(`❌ 已驳回 ${app.applicant} 的申请，理由：${reason.substring(0,30)}`, true);
+            currentSelectedId = null;
+            renderList();
+            document.getElementById('detailPanel').innerHTML = `<div style="text-align: center; padding: 40px 20px; color: #8ba0bc;"><i class="fas fa-times-circle" style="font-size: 3rem; margin-bottom: 12px; display: block;"></i>已驳回申请</div>`;
+            document.getElementById('actionPanel').style.display = 'none';
+        }
+    }
+
+    // 事件绑定
+    document.getElementById('approveBtn').addEventListener('click', () => {
+        if (currentSelectedId) {
+            approveApplication(currentSelectedId);
+        } else {
+            showToast('请先选择一条申请', true);
+        }
+    });
+
+    document.getElementById('rejectBtn').addEventListener('click', () => {
+        if (!currentSelectedId) {
+            showToast('请先选择一条申请', true);
+            return;
+        }
+        // 显示驳回理由输入框
+        document.getElementById('rejectReasonBox').style.display = 'block';
+        pendingRejectId = currentSelectedId;
+    });
+
+    document.getElementById('confirmReject').addEventListener('click', () => {
+        const reason = document.getElementById('rejectReason').value.trim();
+        if (!reason) {
+            showToast('请填写驳回理由', true);
+            return;
+        }
+        if (reason.length < 2) {
+            showToast('驳回理由至少2个字符', true);
+            return;
+        }
+        if (pendingRejectId) {
+            rejectApplication(pendingRejectId, reason);
+            document.getElementById('rejectReasonBox').style.display = 'none';
+            document.getElementById('rejectReason').value = '';
+            pendingRejectId = null;
+        }
+    });
+
+    document.getElementById('cancelReject').addEventListener('click', () => {
+        document.getElementById('rejectReasonBox').style.display = 'none';
+        document.getElementById('rejectReason').value = '';
+        pendingRejectId = null;
+    });
+
+    // 筛选事件
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        searchKeyword = e.target.value;
+        renderList();
+    });
+    document.getElementById('typeFilter').addEventListener('change', (e) => {
+        typeFilter = e.target.value;
+        renderList();
+    });
+
+    // 初始渲染
+    renderList();
+    // 默认选中第一条（如果有）
+    if (pendingApplications.length > 0) {
+        currentSelectedId = pendingApplications[0].id;
+        renderList();
+        showDetail(currentSelectedId);
+    } else {
+        document.getElementById('actionPanel').style.display = 'none';
+    }
+</script>
+</body>
+</html>

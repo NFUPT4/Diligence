@@ -12,9 +12,12 @@
  * @author edocsitahw
  * @version 1.1
  * @date 2026/04/14 11:28
- * @desc
+ * @desc api相关接口类型定义
  * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
  * */
+
+import { Nullable } from "@/types/common/utils";
+
 
 /**
  * HTTP响应接口
@@ -59,24 +62,79 @@ export interface UserInfo {
     deptName: string;
 }
 
+
+/** @interface LoginData
+ *
+ * @summary 登录请求参数接口
+ *
+ * @property {string} empNo 员工工号
+ * @property {string} passwordHash 密码哈希值
+ * */
 export interface LoginData {
     empNo: string;
     passwordHash: string;
-    remember: boolean;
 }
 
+/** @interface LoginResult
+ *
+ * @summary 登录响应参数接口
+ *
+ * @property {string} token 登录令牌
+ * @property {UserInfo} userInfo 用户信息
+ * */
 export interface LoginResult {
     token: string;
     userInfo: UserInfo;
 }
 
 
+export interface TodayStatusItemBase {
+    state: boolean;
+    name?: string;
+}
+
+
+export interface RawTodayStatusItem extends TodayStatusItemBase {
+    startTime: Nullable<string>;
+    endTime: Nullable<string>;
+}
+
+export interface TodayStatusItem extends TodayStatusItemBase {
+    startTime: Nullable<Date>;
+    endTime: Nullable<Date>;
+}
+
+/** @interface RawTodayStatusResult
+ *
+ * @summary 未经处理的今日状态响应参数接口
+ *
+ * @property {RawTodayStatusItem[]} status 今日状态列表
+ * */
+export interface RawTodayStatusResult {
+    status: RawTodayStatusItem[];
+}
+
+
+/** @interface TodayStatusResult
+ *
+ * @summary 经过js格式处理的今日状态响应参数接口
+ *
+ * @property {TodayStatusItem[]} status 今日状态列表
+ * */
 export interface TodayStatusResult {
-    status: {
-        state: boolean;
-        startTime: string | false;
-        endTime: string | false;
-        name?: string;
-    }[];
+    status: TodayStatusItem[];
+}
+
+
+/** @interface AttendanceRateResult
+ *
+ * @summary 考勤率响应参数接口
+ *
+ * @property {number} personalRate 个人考勤率
+ * @property {number} deptAvgRate 部门平均考勤率
+ * */
+export interface AttendanceRateResult {
+    personalRate: number;
+    deptAvgRate: number;
 }
 

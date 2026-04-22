@@ -39,10 +39,10 @@
      * @author edocsitahw
      * @version 1.1
      * @date 2026/04/17 11:04
-     * @desc
+     * @desc 主页部门考勤快捷入口组件
      * @copyright CC BY-NC-SA
      * */
-import DgShortcut from "@/views/home/shortcut/DgShortcut.vue";
+    import DgShortcut from "@/views/home/shortcut/DgShortcut.vue";
 </script>
 
 <style lang="sass" scoped></style>

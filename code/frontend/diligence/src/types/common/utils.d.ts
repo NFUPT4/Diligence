@@ -12,7 +12,7 @@
  * @author edocsitahw
  * @version 1.1
  * @date 2026/04/03 13:52
- * @desc
+ * @desc 定义一些通用类型
  * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
  * */
 

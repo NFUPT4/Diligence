@@ -12,18 +12,37 @@
  * @author edocsitahw
  * @version 1.1
  * @date 2026/04/17 15:33
- * @desc
+ * @desc 用户考勤相关api封装文件
  * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
  * */
+import type { AttendanceRateResult, RawTodayStatusResult, TodayStatusResult } from "@/types/common";
 import { http } from "@/utils/service";
-import type { TodayStatusResult } from "@/types/common";
-
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace attendanceApi {
-
+    /**
+     * @summary 获取用户今日打卡状态
+     *
+     * @returns {HttpRequest<null> | TodayStatusResult} 打卡状态结果或错误信息
+     * */
     export async function getTodayStatus(): Promise<TodayStatusResult> {
-        return await http.post('/clock/today-status');
+        const response = await http.post<RawTodayStatusResult>("/clock/today-status");
+
+        return {
+            status: response.status.map(item => ({
+                ...item,
+                startTime: item.startTime ? new Date(item.startTime) : null,
+                endTime: item.endTime ? new Date(item.endTime) : null
+            }))
+        };
     }
 
+    /**
+     * @summary 获取用户的本月考勤率
+     *
+     * @returns {HttpRequest<null> | AttendanceRateResult} 考勤率结果或错误信息
+     * */
+    export async function getAttendanceRate(): Promise<AttendanceRateResult> {
+        return await http.get<AttendanceRateResult>("/home/attendance-rate");
+    }
 }

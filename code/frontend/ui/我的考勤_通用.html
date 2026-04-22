@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>勤致 · 我的考勤</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+            padding: 24px 32px;
+        }
+
+        /* 整体布局容器 */
+        .attendance-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 头部导航 */
+        .page-header {
+            margin-bottom: 28px;
+        }
+        .page-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: #5b6e8c;
+            margin-top: 6px;
+        }
+
+        /* 两栏布局 */
+        .two-column-layout {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 28px;
+        }
+
+        /* 左侧区域 (打卡记录 + 日历) */
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        /* 右侧区域 (打卡 + 申请) */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        /* 通用卡片样式 */
+        .card {
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02);
+            border: 1px solid #ecfdf5;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+        .card-header {
+            padding: 20px 24px 12px 24px;
+            border-bottom: 1px solid #f0f2f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .card-body {
+            padding: 20px 24px 24px;
+        }
+
+        /* 打卡卡片 (右侧) */
+        .clock-card {
+            background: linear-gradient(145deg, #ffffff, #fefaf5);
+        }
+        .location-info {
+            background: #f8fafc;
+            border-radius: 24px;
+            padding: 16px;
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .clock-btn {
+            background: #2d6a4f;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 6px 14px rgba(45, 106, 79, 0.2);
+        }
+        .clock-status {
+            text-align: center;
+            margin-top: 14px;
+            font-size: 0.75rem;
+            color: #2d6a4f;
+        }
+
+        /* 申请卡片 */
+        .apply-form .form-row {
+            margin-bottom: 18px;
+        }
+        .apply-form select, .apply-form input, .apply-form textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 24px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            transition: 0.2s;
+        }
+        .apply-form select:focus, .apply-form input:focus, .apply-form textarea:focus {
+            border-color: #2d6a4f;
+        }
+        .submit-btn {
+            background: #2d6a4f;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: 600;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+        .recent-applications {
+            margin-top: 20px;
+            border-top: 1px solid #f0f2f5;
+            padding-top: 16px;
+        }
+        .app-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        /* 日历样式 */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .month-nav button {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            margin: 0 8px;
+            cursor: pointer;
+            color: #2d6a4f;
+        }
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+            color: #5b6e8c;
+        }
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+        .cal-day {
+            aspect-ratio: 1 / 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: #f9fafb;
+            transition: 0.1s;
+            cursor: pointer;
+        }
+        .cal-day.today {
+            background: #e9f5ef;
+            border: 1px solid #2d6a4f;
+            color: #2d6a4f;
+        }
+        .cal-day.has-record {
+            background: #e9f5ef;
+            color: #1f5e3f;
+        }
+        .cal-day.absent {
+            background: #fff0f0;
+            color: #c53030;
+        }
+        .cal-day.late {
+            background: #fff3e3;
+            color: #b45309;
+        }
+        .cal-day span.status-dot {
+            font-size: 0.6rem;
+            margin-top: 2px;
+        }
+        /* 列表视图 */
+        .record-list {
+            margin-top: 20px;
+        }
+        .list-header, .list-item {
+            display: grid;
+            grid-template-columns: 100px 1fr 1fr 100px;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f2f5;
+            font-size: 0.85rem;
+        }
+        .list-header {
+            font-weight: 600;
+            color: #5b6e8c;
+        }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        .badge-normal { background: #e9f5ef; color: #2d6a4f; }
+        .badge-late { background: #fff3e3; color: #b45309; }
+        .badge-absent { background: #ffe6e5; color: #c53030; }
+
+        @media (max-width: 1000px) {
+            body { padding: 20px; }
+            .two-column-layout { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            .list-header, .list-item { grid-template-columns: 70px 1fr 1fr 70px; }
+        }
+    </style>
+</head>
+<body>
+<div class="attendance-container">
+    <div class="page-header">
+        <h1>我的考勤</h1>
+        <div class="breadcrumb"><i class="fas fa-home"></i> 首页 / 我的考勤</div>
+    </div>
+
+    <div class="two-column-layout">
+        <!-- 左侧：考勤记录 (日历+列表) -->
+        <div class="left-panel">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-calendar-alt"></i> 考勤日历</h3>
+                    <div class="month-nav">
+                        <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                        <span id="currentMonthYear" style="font-weight:500;">2026年4月</span>
+                        <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="weekdays">
+                        <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+                    </div>
+                    <div id="calendarDays" class="calendar-days"></div>
+                    <div style="margin-top: 20px; display: flex; gap: 16px; justify-content: center; font-size:0.7rem;">
+                        <span><i class="fas fa-circle" style="color:#e9f5ef;"></i> 正常</span>
+                        <span><i class="fas fa-circle" style="color:#fff3e3;"></i> 迟到</span>
+                        <span><i class="fas fa-circle" style="color:#ffe6e5;"></i> 缺卡/缺勤</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-list-ul"></i> 打卡记录明细</h3>
+                    <span style="font-size:0.75rem;">近30天</span>
+                </div>
+                <div class="card-body">
+                    <div class="list-header">
+                        <span>日期</span><span>上班打卡</span><span>下班打卡</span><span>状态</span>
+                    </div>
+                    <div id="recordList" class="record-list">
+                        <!-- 动态js渲染 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：打卡 + 申请 -->
+        <div class="right-panel">
+            <!-- 打卡卡片 -->
+            <div class="card clock-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-map-pin"></i> 智能打卡</h3>
+                    <span class="badge" style="background:#e9f5ef;">GPS验证</span>
+                </div>
+                <div class="card-body">
+                    <div class="location-info">
+                        <i class="fas fa-location-dot" style="font-size: 1.6rem; color:#2d6a4f;"></i>
+                        <div>
+                            <strong>当前定位</strong><br>
+                            <span style="font-size:0.8rem;">广东省深圳市南山区科技中一路 · 勤致大厦A座</span>
+                            <div style="font-size:0.7rem; color:#2d6a4f;">✓ 距离打卡点 42m (有效)</div>
+                        </div>
+                    </div>
+                    <button class="clock-btn" id="clockBtn">
+                        <i class="fas fa-fingerprint"></i> 上班打卡 · 09:00前
+                    </button>
+                    <div class="clock-status" id="clockStatusMsg">今日上班未打卡，请尽快打卡</div>
+                </div>
+            </div>
+
+            <!-- 考勤申请卡片 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-file-signature"></i> 提交考勤申请</h3>
+                </div>
+                <div class="card-body apply-form">
+                    <div class="form-row">
+                        <select id="appType">
+                            <option value="0">请假</option>
+                            <option value="1">加班</option>
+                            <option value="2">外勤</option>
+                            <option value="3">补卡</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <input type="datetime-local" id="startTime" placeholder="开始时间">
+                    </div>
+                    <div class="form-row">
+                        <input type="datetime-local" id="endTime" placeholder="结束时间">
+                    </div>
+                    <div class="form-row">
+                        <textarea rows="2" id="reason" placeholder="事由 (10-500字)"></textarea>
+                    </div>
+                    <button class="submit-btn" id="submitAppBtn"><i class="fas fa-paper-plane"></i> 提交申请</button>
+                    
+                    <div class="recent-applications">
+                        <div style="font-weight:500; margin-bottom:8px;">最近申请记录</div>
+                        <div id="recentAppList">
+                            <div class="app-item"><span>2026-04-10 请假</span><span class="badge" style="background:#ffe6e5;">已通过</span></div>
+                            <div class="app-item"><span>2026-04-05 加班</span><span class="badge" style="background:#fff3e3;">待审批</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 模拟数据：打卡记录（用于日历和列表）
+    // 实际应从后端获取，此处演示静态样例
+    const mockRecords = {
+        "2026-04-01": { morning: "09:02", evening: "18:10", status: "normal" },
+        "2026-04-02": { morning: "09:15", evening: "18:05", status: "late" },
+        "2026-04-03": { morning: "08:58", evening: "18:20", status: "normal" },
+        "2026-04-07": { morning: "09:30", evening: "18:00", status: "late" },
+        "2026-04-08": { morning: "09:05", evening: "17:55", status: "normal" },
+        "2026-04-09": { morning: "09:00", evening: "18:15", status: "normal" },
+        "2026-04-10": { morning: "08:50", evening: "18:30", status: "normal" },
+        "2026-04-14": { morning: "09:02", evening: null, status: "absent_evening" } // 缺下班
+    };
+    // 获取某天状态
+    function getDayStatus(dateStr) {
+        let rec = mockRecords[dateStr];
+        if (!rec) return "absent";
+        if (rec.status === "late") return "late";
+        if (rec.status === "absent_evening") return "absent";
+        return "normal";
+    }
+    // 获取打卡详情显示
+    function getRecordDetail(dateStr) {
+        let rec = mockRecords[dateStr];
+        if (!rec) return { morning: "--:--", evening: "--:--", statusText: "缺勤", badgeClass: "badge-absent" };
+        let statusText = "正常";
+        let badgeClass = "badge-normal";
+        if (rec.status === "late") { statusText = "迟到"; badgeClass = "badge-late"; }
+        else if (rec.status === "absent_evening") { statusText = "缺下班卡"; badgeClass = "badge-absent"; }
+        return { morning: rec.morning || "--:--", evening: rec.evening || "--:--", statusText, badgeClass };
+    }
+
+    // 渲染日历 (当前显示2026年4月固定，便于演示；但支持月份切换动态模拟)
+    let currentYear = 2026, currentMonth = 3; // 4月 (0-index 3)
+    const monthNames = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
+    
+    function renderCalendar() {
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        const startWeekday = firstDay.getDay(); // 0周日
+        const daysInMonth = new Date(currentYear, currentMonth+1, 0).getDate();
+        const calendarDiv = document.getElementById("calendarDays");
+        calendarDiv.innerHTML = "";
+        // 填充空白
+        for (let i = 0; i < startWeekday; i++) {
+            let empty = document.createElement("div");
+            empty.classList.add("cal-day");
+            empty.style.background = "transparent";
+            calendarDiv.appendChild(empty);
+        }
+        const today = new Date();
+        const isCurrentMonth = (today.getFullYear() === currentYear && today.getMonth() === currentMonth);
+        for (let d = 1; d <= daysInMonth; d++) {
+            let dateStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            let dayDiv = document.createElement("div");
+            dayDiv.classList.add("cal-day");
+            let status = getDayStatus(dateStr);
+            if (status === "normal") dayDiv.classList.add("has-record");
+            else if (status === "late") dayDiv.classList.add("late");
+            else if (status === "absent") dayDiv.classList.add("absent");
+            if (isCurrentMonth && d === today.getDate()) dayDiv.classList.add("today");
+            dayDiv.innerHTML = `<span>${d}</span>${status !== "absent" ? `<span class="status-dot">●</span>` : ""}`;
+            dayDiv.title = `${dateStr} ${status==="normal"?"正常":status==="late"?"迟到":"缺卡"}`;
+            calendarDiv.appendChild(dayDiv);
+        }
+        document.getElementById("currentMonthYear").innerText = `${currentYear}年${monthNames[currentMonth]}`;
+    }
+
+    // 渲染打卡记录列表（展示最近7天）
+    function renderRecordList() {
+        const listContainer = document.getElementById("recordList");
+        let dates = Object.keys(mockRecords).sort().reverse().slice(0, 7);
+        // 补充一些空白日期保证显示
+        let html = "";
+        for (let date of dates) {
+            let detail = getRecordDetail(date);
+            html += `<div class="list-item">
+                        <span>${date.slice(5)}</span>
+                        <span>${detail.morning}</span>
+                        <span>${detail.evening}</span>
+                        <span><span class="badge ${detail.badgeClass}">${detail.statusText}</span></span>
+                     </div>`;
+        }
+        if (html === "") html = "<div style='padding:20px; text-align:center;'>暂无打卡记录</div>";
+        listContainer.innerHTML = html;
+    }
+
+    // 模拟打卡交互
+    document.getElementById("clockBtn").addEventListener("click", () => {
+        const now = new Date();
+        const hour = now.getHours();
+        let type = hour < 12 ? "上班打卡" : "下班打卡";
+        alert(`✅ 打卡成功！\n时间：${now.toLocaleString()}\n类型：${type}\n位置验证通过，GPS有效。`);
+        document.getElementById("clockStatusMsg").innerHTML = `今日${type === "上班打卡" ? "上班已打卡" : "下班已打卡"}，考勤正常。`;
+        // 真实场景会刷新数据，这里简单演示
+    });
+
+    // 提交申请
+    document.getElementById("submitAppBtn").addEventListener("click", () => {
+        let type = document.getElementById("appType").options[document.getElementById("appType").selectedIndex].text;
+        let start = document.getElementById("startTime").value;
+        let end = document.getElementById("endTime").value;
+        let reason = document.getElementById("reason").value;
+        if (!start || !end) {
+            alert("请填写完整的起止时间");
+            return;
+        }
+        if (!reason || reason.length < 2) {
+            alert("事由请至少填写2个字");
+            return;
+        }
+        alert(`申请已提交 (${type})\n时段：${start} 至 ${end}\n事由：${reason}\n等待上级审批。`);
+        // 清空表单
+        document.getElementById("reason").value = "";
+        document.getElementById("startTime").value = "";
+        document.getElementById("endTime").value = "";
+        // 模拟新增最近申请记录
+        const recentDiv = document.getElementById("recentAppList");
+        let newApp = document.createElement("div");
+        newApp.className = "app-item";
+        newApp.innerHTML = `<span>${new Date().toISOString().slice(0,10)} ${type}</span><span class="badge" style="background:#fff3e3;">待审批</span>`;
+        recentDiv.prepend(newApp);
+        if (recentDiv.children.length > 4) recentDiv.removeChild(recentDiv.lastChild);
+    });
+
+    // 月份切换
+    document.getElementById("prevMonth").addEventListener("click", () => {
+        if (currentMonth === 0) { currentMonth = 11; currentYear--; }
+        else currentMonth--;
+        renderCalendar();
+    });
+    document.getElementById("nextMonth").addEventListener("click", () => {
+        if (currentMonth === 11) { currentMonth = 0; currentYear++; }
+        else currentMonth++;
+        renderCalendar();
+    });
+
+    // 初始化页面
+    renderCalendar();
+    renderRecordList();
+</script>
+</body>
+</html>

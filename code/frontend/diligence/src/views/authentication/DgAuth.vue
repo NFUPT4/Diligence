@@ -13,7 +13,7 @@
             <!-- 表单 -->
             <div class="da-main-left">
                 <div class="da-main-left-container">
-                    <h2 class="da-main-left-title">{{ $t("auth.template.user-login") }}</h2>
+                    <h2 class="da-main-left-title">{{ $t(LOCAL("user-login")) }}</h2>
                 </div>
 
                 <el-form
@@ -29,7 +29,7 @@
                         prop="empNo"
                         label="工号">
                         <el-input
-                            :placeholder="$t('auth.template.input-emp')"
+                            :placeholder="$t(LOCAL('input-emp'))"
                             v-model="formRawInfo.empNo" />
                     </el-form-item>
 
@@ -39,7 +39,7 @@
                         label="密码">
                         <el-input
                             type="password"
-                            :placeholder="$t('auth.template.input-pwd')"
+                            :placeholder="$t(LOCAL('input-pwd'))"
                             show-password
                             v-model="formRawInfo.password" />
                     </el-form-item>
@@ -49,16 +49,20 @@
                         <div style="display: flex; width: 100%; justify-content: space-between">
                             <!-- 记住登录 -->
                             <el-checkbox-group v-model="formRawInfo.remember">
-                                <el-checkbox label="remember">{{ $t("auth.template.remember-me") }}</el-checkbox>
+                                <el-checkbox
+                                    label="remember"
+                                    value="0"
+                                    >{{ $t(LOCAL("remember-me")) }}</el-checkbox
+                                >
                             </el-checkbox-group>
                             <!-- 切换登录方式 -->
                             <el-button
-                                type="text"
-                                @click="loginMethod = loginMethod === 'empNo' ? 'qrcode' : 'empNo'">
+                                @click="loginMethod = loginMethod === 'empNo' ? 'qrcode' : 'empNo'"
+                                text>
                                 {{
                                     loginMethod === "qrcode"
-                                        ? $t("auth.template.account-pwd-login")
-                                        : $t("auth.template.qrcode-login")
+                                        ? $t(LOCAL("account-pwd-login"))
+                                        : $t(LOCAL("qrcode-login"))
                                 }}
                             </el-button>
                         </div>
@@ -72,7 +76,7 @@
                             round
                             size="large"
                             style="width: 100% !important"
-                            ><i class="fas fa-arrow-right-to-bracket" />{{ $t("auth.template.btn-login") }}</el-button
+                            ><i class="fas fa-arrow-right-to-bracket" />{{ $t(LOCAL("btn-login")) }}</el-button
                         >
                     </el-form-item>
                 </el-form>
@@ -80,7 +84,7 @@
 
             <!-- 分割线 -->
             <div class="da-main-devider">
-                <span class="da-main-devider-text">{{ $t("auth.template.account-login") }}</span></div
+                <span class="da-main-devider-text">{{ $t(LOCAL("account-login")) }}</span></div
             >
 
             <!-- 展示区 -->
@@ -112,41 +116,46 @@
 
 <script lang="ts" setup>
     /**
-     *
      * @file DgAuth.vue
      * @author edocsitahw
      * @version 1.1
      * @date 2026/04/03 16:20
-     * @desc
+     * @desc 登录页面
      * @copyright CC BY-NC-SA
      * */
+    import { useQRCode } from "@vueuse/integrations/useQRCode";
+    import type { Nullable, Optional } from "@/types/common";
+    import { useAuthStore } from "@/stores/auth.store";
     import { ref, reactive, computed } from "vue";
     import type { Ref, Reactive } from "vue";
-    import { hash } from "@/utils";
-    import { useAuthStore } from "@/stores/auth.store";
-    import type { Nullable, Optional } from "@/types/common";
     import { ElMessage } from "element-plus";
-    import { useQRCode } from "@vueuse/integrations/useQRCode";
-    import { useI18n } from "vue-i18n";
     import router from "@/router/router";
+    import { useI18n } from "vue-i18n";
+    import { hash } from "@/utils";
 
     /* state */
     const authStore = useAuthStore();
+    const LOCAL = (key: string, type: string = "template") => `auth.${type}.${key}`;
+    const { t } = useI18n();
 
+    // 未经处理的表单数据
     const formRawInfo: Reactive<{
         empNo: string;
         password: string;
         remember: string[];
     }> = reactive({
-        remember: authStore.remember ? ["remember"] : [],
+        remember: authStore.remember ? ["0"] : [],
         empNo: "",
         password: ""
     });
 
+    // 表单引用
     const formRef: Ref<Nullable<HTMLFormElement>> = ref(null);
-    const loginMethod: Ref<"empNo" | "qrcode"> = ref("empNo");
-    const { t } = useI18n();
 
+    // 登录方式
+    const loginMethod: Ref<"empNo" | "qrcode"> = ref("empNo");  // TODO: enum化
+
+    // 二维码
     const qrcode = useQRCode(
         computed(() => window.location.href),
         {
@@ -155,49 +164,61 @@
     );
 
     /* computed */
+
+    // 表单规则
     const rules = computed(() => ({
         empNo: [
-            { required: true, message: t("auth.template.input-emp"), trigger: "blur" },
+            { required: true, message: t(LOCAL("input-emp")), trigger: "blur" },
             { validator: validateEmpNo, trigger: "blur" }
         ],
         password: [
-            { required: true, message: t("auth.template.input-pwd"), trigger: "blur" },
+            { required: true, message: t(LOCAL("input-pwd")), trigger: "blur" },
             { validator: validatePassword, trigger: "blur" }
         ]
     }));
 
     /* methods */
+
+    // 登录回调
     const handleSubmit = async (formElem: Optional<Nullable<HTMLFormElement>>) => {
-        if ((authStore.remember && authStore.authenticated) || authStore.authenticated) await router.push("/");
+        // 已认证，直接跳转到主页
+        if (authStore.authenticated) await router.push("/");
 
         authStore.setRemember(formRawInfo.remember.length > 0);
 
         if (!formElem) return;
 
+        // 表单验证
         formElem.validate(async (valid: boolean) => {
             if (valid)
                 await authStore
                     .login({
                         empNo: formRawInfo.empNo,
-                        passwordHash: await hash(formRawInfo.password),
-                        remember: formRawInfo.remember.length > 0
+                        passwordHash: await hash(formRawInfo.password) // 加密密码，避免明文传输
                     })
-                    .then(() => router.push("/"))
-                    .catch(() => ElMessage({ message: t("auth.template.login-failed-check-emp-pwd"), type: "error" }));
+                    .then(() => router.push("/")) // 登录成功，跳转到主页
+                    .catch(() => ElMessage({ message: t(LOCAL("login-failed-check-emp-pwd")), type: "error" })); // 登录失败，提示错误信息
         });
     };
 
+    // 工号验证
     const validateEmpNo = (rule: never, value: string, callback: (error?: Error) => void) => {
-        if (!value) callback(new Error(t("auth.template.input-emp")));
-        else if (!/^[a-zA-Z0-9]+$/.test(value)) callback(new Error(t("auth.template.emp-include-letter-and-number")));
+        // 空值
+        if (!value) callback(new Error(t(LOCAL("input-emp"))));
+        // 非法字符
+        else if (!/^[a-zA-Z0-9]+$/.test(value)) callback(new Error(t(LOCAL("emp-include-letter-and-number"))));
         else callback();
     };
 
+    // 密码验证
     const validatePassword = (rule: never, value: string, callback: (error?: Error) => void) => {
-        if (!value) callback(new Error(t("auth.template.input-pwd")));
-        else if (value.length < 6) callback(new Error(t("pwd-less-than-6-characters")));
+        // 空值
+        if (!value) callback(new Error(t(LOCAL("input-pwd"))));
+        // 长度过短
+        else if (value.length < 6) callback(new Error(t(LOCAL("pwd-less-than-6-characters"))));
+        // 非法字符
         else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value))
-            callback(new Error(t("pwd-include-b-l-letter-number-at-least")));
+            callback(new Error(t(LOCAL("pwd-include-b-l-letter-number-at-least"))));
         else callback();
     };
 </script>
@@ -230,6 +251,7 @@
                 height: 100%
                 flex-direction: column-reverse
 
+            // 表单区
             &-left
                 display: flex
                 flex-direction: column
@@ -308,6 +330,7 @@
                         top: 50%
                         right: 0
 
+            // 展示区
             &-right
                 transition: all 0.3s ease-in-out
 

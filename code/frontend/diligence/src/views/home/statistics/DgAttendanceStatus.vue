@@ -14,26 +14,60 @@
                 style="margin-right: 4px"
                 class="far fa-calendar-check" />
 
-            {{ $t("home.attendance-status.template.title") }}
+            {{ $t(LOCAL("title")) }}
         </template>
 
         <template #value>
-            {{ $t("home.attendance-status.template.value") }} {{ clockInfo.complete }}/{{ clockInfo.total }}
+            {{ $t(LOCAL("value")) }}
+            {{ checkInStat.complete === checkInStat.total ? "✅" : `${checkInStat.complete}/${checkInStat.total}` }}
         </template>
 
         <template #sub>
-            {{ noteText }}
+            <!-- 有打卡任务 -->
+            <div v-if="todayStatus?.status.length">
+                <!-- 错过打卡时间 -->
+                <i18n-t
+                    v-if="checkInStat.miss"
+                    :keypath="LOCAL('miss-task')"
+                    tag="span">
+                    <template #count>
+                        {{ checkInStat.miss }}
+                    </template>
+                </i18n-t>
 
-            <i18n-t keypath="home.attendance-status.template.deadline" tag="span">
+                <!-- 临近打卡截至或下次打卡开始 -->
+                <i18n-t
+                    v-else-if="recentClockInfo?.idx! >= 0"
+                    :keypath="recentClockInfo!.inSegment ? LOCAL('deadline') : LOCAL('approaching')"
+                    tag="span">
+                    <template #name>
+                        {{
+                            recentClock?.name ||
+                            $t(
+                                LOCAL(
+                                    recentClockInfo!.inSegment
+                                        ? "default-name-this"
+                                        : "default-name-next"
+                                )
+                            )
+                        }}
+                    </template>
 
-                <template #name>
+                    <template #time>
+                        {{ formatTime(recentClockInfo!.gap) }}
+                    </template>
+                </i18n-t>
 
-                    {{  }}
+                <!-- 完成打卡 -->
+                <span v-else>
+                    {{ $t(LOCAL("finish")) }}
+                </span>
+            </div>
 
-                </template>
-
-            </i18n-t>
-
+            <!-- 无打卡任务 -->
+            <span v-else>
+                {{ $t(LOCAL("no-task")) }}
+            </span>
         </template>
     </dg-state-card>
 </template>
@@ -44,65 +78,31 @@
      * @author edocsitahw
      * @version 1.1
      * @date 2026/04/16 19:17
-     * @desc
+     * @desc 主页考勤状态组件
      * @copyright CC BY-NC-SA
      * */
     import DgStateCard from "@/views/home/statistics/DgStateCard.vue";
-    import { attendanceApi } from "@/api/attendance";
-    import useAuthStore from "@/stores/auth.store";
+    import { useClockStore } from "@/stores/clock.store";
+    import { calcTimeDiff } from "@/utils";
+    import { storeToRefs } from "pinia";
     import { useI18n } from "vue-i18n";
-    import type { Nullable, TodayStatusResult } from "@/types/common";
-    import { computed, type ComputedRef, watchEffect, ref, type Ref } from "vue";
 
     /* state */
-    const _todayStatus: Ref<Nullable<TodayStatusResult>> = ref(null);
-
-    const authStore = useAuthStore();
+    const LOCAL = (key: string, type: string = "template") => `home.attendance-status.${type}.${key}`;
+    const { recentClockInfo, checkInStat, todayStatus, recentClock } = storeToRefs(useClockStore());
     const { t } = useI18n();
 
-    /* computed */
-    const todayStatus: ComputedRef<TodayStatusResult> = computed(() => _todayStatus.value!);
+    /* methods */
 
-    const recentClockInfo = computed(() => {
-        if (!todayStatus.value) return null;
+    // 格式化时间戳
+    const formatTime = (stamp: number) => {
+        const diffInfo = calcTimeDiff(stamp);
 
-        const now = new Date();
-        let info = { idx: -1, gap: 0 };
-
-        for (let i = todayStatus.value.status.length - 1; i >= 0; i--) {
-            const curr = todayStatus.value.status[i];
-
-            if (curr.state)
-                return { idx: i, gap: now.getTime() - curr }
-        }
-    });
-
-    const clockInfo = computed(() => {
-        if (!todayStatus.value) return { miss: 0, complete: 0, total: 0 };
-
-        const now = new Date();
-
-        let miss = 0;
-        let complete = 0;
-
-        for (const item of todayStatus.value.status) {
-            if (item.state) complete++;
-            else if (item.endTime && new Date(item.endTime) < now) miss++;
-        }
-
-        return { miss, complete, total: todayStatus.value.status.length };
-    });
-
-    const noteText: ComputedRef<string> = computed(() => {
-        if (!todayStatus.value) return "";
-
-
-    });
-
-    /* watch */
-    watchEffect(async () => {
-        if (authStore.authenticated) _todayStatus.value = await attendanceApi.getTodayStatus();
-    });
+        return Object.entries(diffInfo).reduce(
+            (acc: string, [key, value]: [string, number]) => (value > 0 ? `${acc}${value}${t(`common.${key}`)}` : acc),
+            ""
+        );
+    };
 </script>
 
 <style lang="sass" scoped></style>
