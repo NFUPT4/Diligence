@@ -123,6 +123,8 @@
      * @desc 登录页面
      * @copyright CC BY-NC-SA
      * */
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     import { useQRCode } from "@vueuse/integrations/useQRCode";
     import type { Nullable, Optional } from "@/types/common";
     import { useAuthStore } from "@/stores/auth.store";

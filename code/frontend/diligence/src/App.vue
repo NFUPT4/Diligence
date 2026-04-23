@@ -134,14 +134,13 @@
      * 8. **考勤规则配置页**
      * 9. **组织架构维护页**
      * */
-    import { defineComponent } from "vue";
     import { useThemeStore } from "@/stores/theme.store";
+    import { defineComponent } from "vue";
     import router from "@/router/router";
 
+
     onload = () => {
-        {
-            router.push("/");
-        }
+        router.push("/");
     };
 
     export default defineComponent({
