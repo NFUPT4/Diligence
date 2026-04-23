@@ -41,16 +41,31 @@
      * @desc 主页考勤趋势组件
      * @copyright CC BY-NC-SA
      * */
+    import { GridComponent, TooltipComponent, LegendComponent } from "echarts/components";
+    import { LabelLayout, LegacyGridContainLabel } from "echarts/features";
     import DgPanel from "@/views/home/panel/DgPanel.vue";
+    import { CanvasRenderer } from "echarts/renderers";
+    import { LineChart } from "echarts/charts";
+    import * as echarts from "echarts/core";
+    import { ref, onUnmounted } from "vue";
     import { homeApi } from "@/api/home";
-    import * as echarts from "echarts";
-    import { ref } from "vue";
+
+    echarts.use([
+        GridComponent,
+        TooltipComponent,
+        LegendComponent,
+        LineChart,
+        CanvasRenderer,
+        LabelLayout,
+        LegacyGridContainLabel
+    ]);
 
     /* state */
 
     // 图表容器引用
     const LOCAL = (key: string, type: string = "template") => `home.trend.${type}.${key}`;
     const chartRef = ref<HTMLElement>();
+    let resizeHandler: () => void;
 
     homeApi.getMonthlyTrend().then(res => {
         if (chartRef.value) {
@@ -61,10 +76,10 @@
 
             chart.setOption({
                 grid: {
-                    left: "5%",        // 距离左侧边距（可调小）
-                    right: "5%",       // 距离右侧边距
-                    bottom: 20,        // 距离底部边距
-                    top: 20,           // 距离顶部边距（像素或百分比）
+                    left: "5%", // 距离左侧边距（可调小）
+                    right: "5%", // 距离右侧边距
+                    bottom: 20, // 距离底部边距
+                    top: 20, // 距离顶部边距（像素或百分比）
                     containLabel: true // 防止坐标轴标签被裁剪
                 },
                 xAxis: {
@@ -83,13 +98,18 @@
                 ]
             });
 
-            window.addEventListener("resize", () => {
+            resizeHandler = () => {
                 if (chartRef.value)
                     chart.resize({ width: chartRef.value.clientWidth, height: chartRef.value.clientHeight });
-            });
+            };
+
+            window.addEventListener("resize", resizeHandler);
         }
     });
 
+    onUnmounted(() => {
+        window.removeEventListener("resize", resizeHandler);
+    });
 </script>
 
 <style lang="sass" scoped>
