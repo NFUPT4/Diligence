@@ -13,9 +13,8 @@ import { createI18nInstance } from "@/locales/i18n";
 
 import App from './App.vue';
 import router from './router/router';
-import ElementPlus from "element-plus";
 
 import "element-plus/dist/index.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
-createApp(App).use(createPinia()).use(await createI18nInstance()).use(router).use(ElementPlus).mount('#app')
+createApp(App).use(createPinia()).use(await createI18nInstance()).use(router).mount('#app')
