@@ -9,14 +9,18 @@
 
 <template>
     <div class="dg-home-shortcut dhs">
+
+        <!-- 图标 -->
         <div class="dhs-icon">
             <slot name="icon" />
         </div>
 
+        <!-- 标题 -->
         <h4 class="dhs-title">
             <slot name="title" />
         </h4>
 
+        <!-- 内容 -->
         <small class="dhs-desc">
             <slot name="desc" />
         </small>
@@ -29,7 +33,7 @@
      * @author edocsitahw
      * @version 1.1
      * @date 2026/04/17 10:41
-     * @desc
+     * @desc 主页快捷方式框架
      * @copyright CC BY-NC-SA
      * */
 </script>
@@ -45,6 +49,7 @@
         min-width: 120px
 
         & :deep()
+            //
 
         &:hover
             transform: translateY(-2px)

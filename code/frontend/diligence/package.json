@@ -16,18 +16,22 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@amap/amap-jsapi-loader": "^1.0.1",
     "@fortawesome/fontawesome-free": "^7.2.0",
+    "@vueuse/core": "^14.2.1",
     "@vueuse/integrations": "^14.2.1",
     "axios": "^1.14.0",
+    "echarts": "^6.0.0",
     "element-plus": "^2.13.7",
     "pinia": "^3.0.4",
     "qrcode": "^1.5.4",
-    "vue": "^3.5.31",
+    "vue": "3.6.0-beta.9",
     "vue-i18n": "^11.3.2",
     "vue-router": "^5.0.4"
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.4",
+    "@types/amap-js-api": "^1.4.16",
     "@types/jsdom": "^28.0.1",
     "@types/node": "^24.12.0",
     "@vitejs/plugin-vue": "^6.0.5",

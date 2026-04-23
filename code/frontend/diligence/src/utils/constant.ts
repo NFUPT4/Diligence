@@ -12,7 +12,7 @@
  * @author edocsitahw
  * @version 1.1
  * @date 2026/04/03 13:39
- * @desc
+ * @desc 常量定义
  * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
  * */
 import type { LocalStorageKey } from "@/types/common";
@@ -37,3 +37,17 @@ export const DG_REMEMBER_KEY: LocalStorageKey<"remember"> = "DG_REMEMBER_KEY";
 
 
 export const DG_THEME_KEY: LocalStorageKey<"theme"> = "DG_THEME_KEY";
+
+
+/** @constant COORD_API_KEY
+ *
+ * @summary 高德地图api key
+ * */
+export const COORD_API_KEY = "6eff739ecbb65caf594f618a8c43931d";
+
+
+/** @constant COORD_SECURITIES_KEY
+ *
+ * @summary 高德地图api 安全密钥
+ * */
+export const COORD_SECURITIES_KEY = "4138bdedbce0a4004674ad7b1f4acf31";

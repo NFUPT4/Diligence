@@ -61,11 +61,10 @@
                         >{{ userStore.info.name }} · {{ userStore.info.deptName }}</h4
                     >
 
-                    <!-- TODO: 将角色枚举值映射到角色名称 -->
                     <p
                         class="dh-side-user-info-role"
                         style="margin: 0; white-space: nowrap"
-                        >{{ userStore.info.role }}</p
+                        >{{ $t(`enum.role.${userStore.info.role}`) }}</p
                     >
                 </div>
             </div>
@@ -82,7 +81,12 @@
                     </template>
                 </i18n-t>
 
-                <el-breadcrumb separator="/"> </el-breadcrumb>
+                <el-breadcrumb class="dh-main-header-breadcrumb" separator="/">
+                    <el-breadcrumb-item :to="{ path: '/' }">
+                        <i class="fas fa-home" />
+                        {{ $t('common.link.home') }}
+                    </el-breadcrumb-item>
+                </el-breadcrumb>
             </header>
 
             <!-- grid内容 -->
@@ -136,23 +140,25 @@
      * @author edocsitahw
      * @version 1.1
      * @date 2026/04/03 12:51
-     * @desc
+     * @desc 主页
      * @copyright CC BY-NC-SA
      * */
-    import DgLogo from "@/components/DgLogo.vue";
-    import { useUserStore } from "@/stores/user.store";
+    import DgShortcutOrgnization from "@/views/home/shortcut/DgShortcutOrganization.vue";
     import DgAttendanceStatus from "@/views/home/statistics/DgAttendanceStatus.vue";
-    import DgAttendanceRate from "@/views/home/statistics/DgAttendanceRate.vue";
     import DgPendingApproval from "@/views/home/statistics/DgPendingApproval.vue";
-    import DgReviews from "@/views/home/panel/DgReviews.vue";
-    import DgApproval from "@/views/home/panel/DgApproval.vue";
     import DgShortcutApproval from "@/views/home/shortcut/DgShortcutApproval.vue";
+    import DgAttendanceRate from "@/views/home/statistics/DgAttendanceRate.vue";
     import DgShortcutRecord from "@/views/home/shortcut/DgShortcutRecord.vue";
     import DgShortcutCharts from "@/views/home/shortcut/DgShortcutCharts.vue";
-    import DgShortcutOrgnization from "@/views/home/shortcut/DgShortcutOrganization.vue";
-    import DgTrend from "@/views/home/panel/DgTrend.vue";
+    import DgApproval from "@/views/home/panel/DgApproval.vue";
+    import DgReviews from "@/views/home/panel/DgReviews.vue";
     import DgNotice from "@/views/home/panel/DgNotice.vue";
+    import DgTrend from "@/views/home/panel/DgTrend.vue";
+    import DgLogo from "@/components/DgLogo.vue";
 
+    import { useUserStore } from "@/stores/user.store";
+
+    /* state */
     const userStore = useUserStore();
 </script>
 
@@ -264,7 +270,8 @@
 
                     &-name
                         @include mobile()
-                            font-size: 0.7rem
+                            font-weight: 500
+                            font-size: 0.95rem
 
                     &:hover
                         background: #f1f5f9
@@ -338,7 +345,7 @@
                     font-weight: 600
                     color: #0f172a
 
-                .breadcrumb  // TODO
+                &-breadcrumb
                     font-size: 0.85rem
                     color: var(--text-muted)
                     margin-top: 6px

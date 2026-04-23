@@ -1,4 +1,11 @@
 {
+    "enum": {
+        "role": {
+            "0": "员工",
+            "1": "管理员",
+            "2": "人事"
+        }
+    },
     "common": {
         "sys-name": "“致勤”-企业考勤系统",
         "name": "致勤",
@@ -9,7 +16,11 @@
             "my-attendance": "我的考勤",
             "data-view": "数据查看",
             "system-management": "系统管理"
-        }
+        },
+        "day": "天",
+        "hour": "小时",
+        "minute": "分钟",
+        "second": "秒"
     },
     "auth": {
         "template": {
@@ -29,38 +40,65 @@
     },
     "home": {
         "template": {
-            "welcome": "欢迎回来，{username}\uD83D\uDC4B"
+            "welcome": "欢迎回来，{username} 👋"
         },
-
         "attendance-status": {
             "template": {
                 "title": "今日考勤状态",
                 "value": "已完成",
-                "start-work": "上班"
+                "note": "今日考勤提醒",
+                "deadline": "距离{name}结束还有{time}",
+                "approaching": "距离{name}开始还有{time}",
+                "not-started": "暂未开始",
+                "completed": "已完成",
+                "missed": "已错过",
+                "default-name-next": "下次打卡",
+                "default-name-this": "本次打卡",
+                "no-task": "今日无打卡任务，祝您生活愉快！",
+                "miss-task": "今日错过{count}次打卡任务，请及时补卡！",
+                "finish": "今日打卡已完成，祝您下班愉快！"
             }
         },
         "attendance-rate": {
             "template": {
                 "title": "本月考勤率",
-                "sub": "部门平均"
+                "hight-than": "高于部门平均值",
+                "low-than": "低于部门平均值",
+                "excellent": "优秀",
+                "good": "良好",
+                "improve": "待提高",
+                "loading": "加载中..."
             }
         },
         "pending-approval": {
             "template": {
                 "title": "待处理审批",
-                "sub": "需及时处理"
+                "sub": "{count} 条待处理"
             }
         },
         "reviews": {
             "template": {
                 "title": "智能打卡",
-                "badge": "GPS验证"
+                "badge": "GPS验证",
+                "current-location": "当前定位",
+                "loading": "获取位置中...",
+                "clock-immediately": "立即打卡",
+                "clock-name": "{name}打卡",
+                "clock-period": "考勤时段: {start} - {end}",
+                "finish": "已完成今日所有打卡任务\uD83E\uDD73",
+                "no-task": "今日无打卡任务\uD83E\uDD73",
+                "miss-task": "今日错过了{count}次打卡，请及时补卡！"
             }
         },
         "approval": {
             "template": {
                 "title": "待审批申请",
-                "badge": "条待处理"
+                "badge": "{count} 条待处理",
+                "empty": "暂无待审批申请",
+                "applicant": "申请人",
+                "type": "类型",
+                "time": "申请时间",
+                "approve": "审批"
             }
         },
         "shortcut-approval": {
@@ -89,12 +127,14 @@
         },
         "trend": {
             "template": {
-                "title": "月度考勤趋势"
+                "title": "月度考勤趋势",
+                "summary": "本月出勤率趋势"
             }
         },
         "notice": {
             "template": {
-                "title": "系统公告"
+                "title": "系统公告",
+                "empty": "暂无公告"
             }
         }
     }

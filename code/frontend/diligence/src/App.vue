@@ -134,14 +134,13 @@
      * 8. **考勤规则配置页**
      * 9. **组织架构维护页**
      * */
-    import { defineComponent } from "vue";
     import { useThemeStore } from "@/stores/theme.store";
+    import { defineComponent } from "vue";
     import router from "@/router/router";
 
+
     onload = () => {
-        {
-            router.push("/");
-        }
+        router.push("/");
     };
 
     export default defineComponent({
@@ -160,10 +159,15 @@
     @use "@/style/theme" as *
 
     html, body, #app
+        font-family: 'Inter', sans-serif
         padding: 0
         margin: 0
         width: 100%
         height: 100%
+
+    h1, h2, h3, h4, h5, h6, p
+        margin: 0
+        padding: 0
 
     a
         text-decoration: none

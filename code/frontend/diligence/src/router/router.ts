@@ -8,9 +8,9 @@
  */
 
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "@/views/home/DgHome.vue";
 import { useAuthStore } from "@/stores/auth.store";
 import { useUserStore } from "@/stores/user.store";
+import Home from "@/views/home/DgHome.vue";
 
 
 const router = createRouter({
