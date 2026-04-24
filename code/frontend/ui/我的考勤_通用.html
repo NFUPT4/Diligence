@@ -77,6 +77,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
         }
         .card-header h3 {
             font-size: 1.2rem;
@@ -86,89 +88,34 @@
             padding: 20px 24px 24px;
         }
 
-        /* 打卡卡片 (右侧) */
-        .clock-card {
-            background: linear-gradient(145deg, #ffffff, #fefaf5);
-        }
-        .location-info {
-            background: #f8fafc;
-            border-radius: 24px;
-            padding: 16px;
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        .clock-btn {
-            background: #2d6a4f;
-            border: none;
-            width: 100%;
-            padding: 14px;
-            border-radius: 60px;
-            font-weight: 700;
-            font-size: 1rem;
-            color: white;
+        /* 日历头部右侧容器 */
+        .header-right-group {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 6px 14px rgba(45, 106, 79, 0.2);
+            gap: 16px;
+            flex-wrap: wrap;
         }
-        .clock-status {
-            text-align: center;
-            margin-top: 14px;
-            font-size: 0.75rem;
-            color: #2d6a4f;
-        }
-
-        /* 申请卡片 */
-        .apply-form .form-row {
-            margin-bottom: 18px;
-        }
-        .apply-form select, .apply-form input, .apply-form textarea {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 24px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.9rem;
-            outline: none;
-            transition: 0.2s;
-        }
-        .apply-form select:focus, .apply-form input:focus, .apply-form textarea:focus {
-            border-color: #2d6a4f;
-        }
-        .submit-btn {
+        /* 个人考勤详情按钮 */
+        .detail-btn {
             background: #2d6a4f;
             color: white;
             border: none;
-            width: 100%;
-            padding: 12px;
-            border-radius: 40px;
-            font-weight: 600;
-            margin-top: 8px;
+            padding: 8px 16px;
+            border-radius: 24px;
+            font-size: 0.85rem;
+            font-weight: 500;
             cursor: pointer;
-        }
-        .recent-applications {
-            margin-top: 20px;
-            border-top: 1px solid #f0f2f5;
-            padding-top: 16px;
-        }
-        .app-item {
             display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f2f5;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+        .detail-btn:hover {
+            background: #1f5e3f;
+            box-shadow: 0 4px 10px rgba(45, 106, 79, 0.2);
         }
 
-        /* 日历样式 */
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+        /* 月份导航 */
         .month-nav button {
             background: none;
             border: none;
@@ -252,12 +199,140 @@
         .badge-late { background: #fff3e3; color: #b45309; }
         .badge-absent { background: #ffe6e5; color: #c53030; }
 
+        /* 打卡卡片 (右侧) */
+        .clock-card {
+            background: linear-gradient(145deg, #ffffff, #fefaf5);
+        }
+        .location-info {
+            background: #f8fafc;
+            border-radius: 24px;
+            padding: 16px;
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .clock-btn {
+            background: #2d6a4f;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 6px 14px rgba(45, 106, 79, 0.2);
+        }
+        .clock-status {
+            text-align: center;
+            margin-top: 14px;
+            font-size: 0.75rem;
+            color: #2d6a4f;
+        }
+
+        /* 申请卡片 */
+        .apply-form .form-row {
+            margin-bottom: 18px;
+        }
+        .apply-form select, .apply-form input, .apply-form textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 24px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            transition: 0.2s;
+        }
+        .apply-form select:focus, .apply-form input:focus, .apply-form textarea:focus {
+            border-color: #2d6a4f;
+        }
+        .submit-btn {
+            background: #2d6a4f;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 16px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .submit-btn:hover {
+            background: #1f5e3f;
+            box-shadow: 0 4px 12px rgba(45, 106, 79, 0.25);
+        }
+        .recent-applications {
+            border-top: 1px solid #f0f2f5;
+            padding-top: 16px;
+        }
+        .app-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        /* 弹窗样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .modal-box {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        .modal-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #1e293b;
+        }
+        .modal-text {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 40px;
+        }
+        .modal-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 10px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            display: block;
+            margin-left: auto;
+        }
+
+        /* 响应式适配 */
         @media (max-width: 1000px) {
             body { padding: 20px; }
             .two-column-layout { grid-template-columns: 1fr; }
         }
         @media (max-width: 600px) {
             .list-header, .list-item { grid-template-columns: 70px 1fr 1fr 70px; }
+            .header-right-group { width: 100%; justify-content: space-between; }
+            .detail-btn { width: 100%; justify-content: center; }
         }
     </style>
 </head>
@@ -274,10 +349,17 @@
             <div class="card">
                 <div class="card-header">
                     <h3><i class="fas fa-calendar-alt"></i> 考勤日历</h3>
-                    <div class="month-nav">
-                        <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
-                        <span id="currentMonthYear" style="font-weight:500;">2026年4月</span>
-                        <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                    <!-- 新增：右侧按钮组 -->
+                    <div class="header-right-group">
+                        <div class="month-nav">
+                            <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                            <span id="currentMonthYear" style="font-weight:500;">2026年4月</span>
+                            <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                        <!-- 新增：个人考勤详情按钮 -->
+                        <button class="detail-btn" id="detailBtn">
+                            <i class="fas fa-user-clock"></i> 个人考勤详情
+                        </button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -336,33 +418,30 @@
             <!-- 考勤申请卡片 -->
             <div class="card">
                 <div class="card-header">
-                    <h3><i class="fas fa-file-signature"></i> 提交考勤申请</h3>
+                    <h3><i class="fas fa-file-signature"></i> 考勤申请</h3>
                 </div>
                 <div class="card-body apply-form">
-                    <div class="form-row">
-                        <select id="appType">
-                            <option value="0">请假</option>
-                            <option value="1">加班</option>
-                            <option value="2">外勤</option>
-                            <option value="3">补卡</option>
-                        </select>
-                    </div>
-                    <div class="form-row">
-                        <input type="datetime-local" id="startTime" placeholder="开始时间">
-                    </div>
-                    <div class="form-row">
-                        <input type="datetime-local" id="endTime" placeholder="结束时间">
-                    </div>
-                    <div class="form-row">
-                        <textarea rows="2" id="reason" placeholder="事由 (10-500字)"></textarea>
-                    </div>
-                    <button class="submit-btn" id="submitAppBtn"><i class="fas fa-paper-plane"></i> 提交申请</button>
+                    <!-- 提交申请按钮 -->
+                    <button class="submit-btn" id="goApplyPageBtn">
+                        <i class="fas fa-paper-plane"></i> 进入考勤申请
+                    </button>
+                    <!-- 新增：进入审批申请按钮 -->
+                    <button class="submit-btn" id="goApprovalPageBtn">
+                        <i class="fas fa-clipboard-check"></i> 进入审批申请
+                    </button>
                     
+                    <!-- 完整保留最近申请记录 -->
                     <div class="recent-applications">
                         <div style="font-weight:500; margin-bottom:8px;">最近申请记录</div>
                         <div id="recentAppList">
-                            <div class="app-item"><span>2026-04-10 请假</span><span class="badge" style="background:#ffe6e5;">已通过</span></div>
-                            <div class="app-item"><span>2026-04-05 加班</span><span class="badge" style="background:#fff3e3;">待审批</span></div>
+                            <div class="app-item">
+                                <span>2026-04-10 请假</span>
+                                <span class="badge" style="background:#ffe6e5;">已通过</span>
+                            </div>
+                            <div class="app-item">
+                                <span>2026-04-05 加班</span>
+                                <span class="badge" style="background:#fff3e3;">待审批</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -371,9 +450,35 @@
     </div>
 </div>
 
+<!-- 原有：考勤申请提示框 -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box">
+        <div class="modal-title">此页面显示</div>
+        <div class="modal-text">跳转至考勤申请页面（演示）</div>
+        <button class="modal-btn" id="modalConfirmBtn">确定</button>
+    </div>
+</div>
+
+<!-- 原有：个人考勤详情提示框 -->
+<div class="modal-overlay" id="detailModalOverlay">
+    <div class="modal-box">
+        <div class="modal-title">此页面显示</div>
+        <div class="modal-text">跳转至个人考勤查看（演示）</div>
+        <button class="modal-btn" id="detailModalConfirmBtn">确定</button>
+    </div>
+</div>
+
+<!-- 新增：审批申请提示框 -->
+<div class="modal-overlay" id="approvalModalOverlay">
+    <div class="modal-box">
+        <div class="modal-title">此页面显示</div>
+        <div class="modal-text">跳转到审批申请页面（演示）</div>
+        <button class="modal-btn" id="approvalModalConfirmBtn">确定</button>
+    </div>
+</div>
+
 <script>
     // 模拟数据：打卡记录（用于日历和列表）
-    // 实际应从后端获取，此处演示静态样例
     const mockRecords = {
         "2026-04-01": { morning: "09:02", evening: "18:10", status: "normal" },
         "2026-04-02": { morning: "09:15", evening: "18:05", status: "late" },
@@ -382,7 +487,7 @@
         "2026-04-08": { morning: "09:05", evening: "17:55", status: "normal" },
         "2026-04-09": { morning: "09:00", evening: "18:15", status: "normal" },
         "2026-04-10": { morning: "08:50", evening: "18:30", status: "normal" },
-        "2026-04-14": { morning: "09:02", evening: null, status: "absent_evening" } // 缺下班
+        "2026-04-14": { morning: "09:02", evening: null, status: "absent_evening" }
     };
     // 获取某天状态
     function getDayStatus(dateStr) {
@@ -403,13 +508,13 @@
         return { morning: rec.morning || "--:--", evening: rec.evening || "--:--", statusText, badgeClass };
     }
 
-    // 渲染日历 (当前显示2026年4月固定，便于演示；但支持月份切换动态模拟)
-    let currentYear = 2026, currentMonth = 3; // 4月 (0-index 3)
+    // 渲染日历
+    let currentYear = 2026, currentMonth = 3;
     const monthNames = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
     
     function renderCalendar() {
         const firstDay = new Date(currentYear, currentMonth, 1);
-        const startWeekday = firstDay.getDay(); // 0周日
+        const startWeekday = firstDay.getDay();
         const daysInMonth = new Date(currentYear, currentMonth+1, 0).getDate();
         const calendarDiv = document.getElementById("calendarDays");
         calendarDiv.innerHTML = "";
@@ -438,11 +543,10 @@
         document.getElementById("currentMonthYear").innerText = `${currentYear}年${monthNames[currentMonth]}`;
     }
 
-    // 渲染打卡记录列表（展示最近7天）
+    // 渲染打卡记录列表
     function renderRecordList() {
         const listContainer = document.getElementById("recordList");
         let dates = Object.keys(mockRecords).sort().reverse().slice(0, 7);
-        // 补充一些空白日期保证显示
         let html = "";
         for (let date of dates) {
             let detail = getRecordDetail(date);
@@ -464,35 +568,39 @@
         let type = hour < 12 ? "上班打卡" : "下班打卡";
         alert(`✅ 打卡成功！\n时间：${now.toLocaleString()}\n类型：${type}\n位置验证通过，GPS有效。`);
         document.getElementById("clockStatusMsg").innerHTML = `今日${type === "上班打卡" ? "上班已打卡" : "下班已打卡"}，考勤正常。`;
-        // 真实场景会刷新数据，这里简单演示
     });
 
-    // 提交申请
-    document.getElementById("submitAppBtn").addEventListener("click", () => {
-        let type = document.getElementById("appType").options[document.getElementById("appType").selectedIndex].text;
-        let start = document.getElementById("startTime").value;
-        let end = document.getElementById("endTime").value;
-        let reason = document.getElementById("reason").value;
-        if (!start || !end) {
-            alert("请填写完整的起止时间");
-            return;
-        }
-        if (!reason || reason.length < 2) {
-            alert("事由请至少填写2个字");
-            return;
-        }
-        alert(`申请已提交 (${type})\n时段：${start} 至 ${end}\n事由：${reason}\n等待上级审批。`);
-        // 清空表单
-        document.getElementById("reason").value = "";
-        document.getElementById("startTime").value = "";
-        document.getElementById("endTime").value = "";
-        // 模拟新增最近申请记录
-        const recentDiv = document.getElementById("recentAppList");
-        let newApp = document.createElement("div");
-        newApp.className = "app-item";
-        newApp.innerHTML = `<span>${new Date().toISOString().slice(0,10)} ${type}</span><span class="badge" style="background:#fff3e3;">待审批</span>`;
-        recentDiv.prepend(newApp);
-        if (recentDiv.children.length > 4) recentDiv.removeChild(recentDiv.lastChild);
+    // 原有：考勤申请按钮交互
+    const modalOverlay = document.getElementById("modalOverlay");
+    const modalConfirmBtn = document.getElementById("modalConfirmBtn");
+
+    document.getElementById("goApplyPageBtn").addEventListener("click", () => {
+        modalOverlay.style.display = "flex";
+    });
+    modalConfirmBtn.addEventListener("click", () => {
+        modalOverlay.style.display = "none";
+    });
+
+    // 原有：个人考勤详情按钮交互
+    const detailModalOverlay = document.getElementById("detailModalOverlay");
+    const detailModalConfirmBtn = document.getElementById("detailModalConfirmBtn");
+
+    document.getElementById("detailBtn").addEventListener("click", () => {
+        detailModalOverlay.style.display = "flex";
+    });
+    detailModalConfirmBtn.addEventListener("click", () => {
+        detailModalOverlay.style.display = "none";
+    });
+
+    // 新增：审批申请按钮交互
+    const approvalModalOverlay = document.getElementById("approvalModalOverlay");
+    const approvalModalConfirmBtn = document.getElementById("approvalModalConfirmBtn");
+
+    document.getElementById("goApprovalPageBtn").addEventListener("click", () => {
+        approvalModalOverlay.style.display = "flex";
+    });
+    approvalModalConfirmBtn.addEventListener("click", () => {
+        approvalModalOverlay.style.display = "none";
     });
 
     // 月份切换
