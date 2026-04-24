@@ -155,7 +155,7 @@
     const formRef: Ref<Nullable<HTMLFormElement>> = ref(null);
 
     // 登录方式
-    const loginMethod: Ref<"empNo" | "qrcode"> = ref("empNo");  // TODO: enum化
+    const loginMethod: Ref<"empNo" | "qrcode"> = ref("empNo"); // TODO: enum化
 
     // 二维码
     const qrcode = useQRCode(
@@ -186,7 +186,7 @@
         // 已认证，直接跳转到主页
         if (authStore.authenticated) await router.push("/");
 
-        authStore.setRemember(formRawInfo.remember.length > 0);
+        authStore.remember = formRawInfo.remember.length > 0;
 
         if (!formElem) return;
 
