@@ -4,8 +4,11 @@ CREATE DATABASE IF NOT EXISTS attendance_system
 DEFAULT CHARACTER SET utf8mb4 
 DEFAULT COLLATE utf8mb4_general_ci;
 
+
 -- 使用数据库
-USE attendance_system;
+USE diligence;
+
+
 -- 删除所有已存在的表
 DROP TABLE IF EXISTS `approval_record`;
 DROP TABLE IF EXISTS `application`;
@@ -17,6 +20,7 @@ DROP TABLE IF EXISTS `department`;
 DROP TABLE IF EXISTS `position`;
 DROP TABLE IF EXISTS `attendance_rule`;
 DROP TABLE IF EXISTS `location`;
+
 
 -- =====================================================
 -- 1. 部门表
@@ -35,6 +39,7 @@ CREATE TABLE `department` (
     KEY `idx_leader_id` (`dept_leader_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='部门表';
 
+
 -- =====================================================
 -- 2. 岗位表
 -- =====================================================
@@ -47,6 +52,7 @@ CREATE TABLE `position` (
     PRIMARY KEY (`position_id`),
     UNIQUE KEY `uk_position_name` (`position_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='岗位表';
+
 
 -- =====================================================
 -- 3. 考勤规则表
@@ -68,6 +74,7 @@ CREATE TABLE `attendance_rule` (
     PRIMARY KEY (`rule_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='考勤规则表';
 
+
 -- =====================================================
 -- 4. 打卡地点表
 -- =====================================================
@@ -84,6 +91,7 @@ CREATE TABLE `location` (
     PRIMARY KEY (`loc_id`),
     KEY `idx_longitude_latitude` (`longitude`, `latitude`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='打卡地点表';
+
 
 -- =====================================================
 -- 5. 考勤组表
@@ -104,6 +112,7 @@ CREATE TABLE `attendance_group` (
     CONSTRAINT `fk_group_dept` FOREIGN KEY (`dept_id`) REFERENCES `department` (`dept_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='考勤组表';
 
+
 -- =====================================================
 -- 6. 考勤组地点关联表
 -- =====================================================
@@ -117,6 +126,7 @@ CREATE TABLE `group_loc` (
     CONSTRAINT `fk_gl_group` FOREIGN KEY (`group_id`) REFERENCES `attendance_group` (`group_id`) ON DELETE CASCADE,
     CONSTRAINT `fk_gl_location` FOREIGN KEY (`loc_id`) REFERENCES `location` (`loc_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='考勤组地点关联表';
+
 
 -- =====================================================
 -- 7. 员工表
@@ -148,6 +158,7 @@ CREATE TABLE `employee` (
     CONSTRAINT `fk_employee_group` FOREIGN KEY (`group_id`) REFERENCES `attendance_group` (`group_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='员工表';
 
+
 -- =====================================================
 -- 8. 打卡记录表
 -- =====================================================
@@ -170,6 +181,7 @@ CREATE TABLE `clock_record` (
     KEY `idx_clock_time` (`clock_time`),
     CONSTRAINT `fk_clock_employee` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`employee_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='打卡记录表';
+
 
 -- =====================================================
 -- 9. 申请表
@@ -196,6 +208,7 @@ CREATE TABLE `application` (
     CONSTRAINT `fk_app_approver` FOREIGN KEY (`current_approver`) REFERENCES `employee` (`employee_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='申请表';
 
+
 -- =====================================================
 -- 10. 审批记录表
 -- =====================================================
@@ -216,8 +229,10 @@ CREATE TABLE `approval_record` (
     CONSTRAINT `fk_approval_employee` FOREIGN KEY (`approver_id`) REFERENCES `employee` (`employee_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='审批记录表';
 
+
 -- 重新启用外键检查
 SET FOREIGN_KEY_CHECKS = 1;
+
 
 -- 验证：显示所有表
 SHOW TABLES;

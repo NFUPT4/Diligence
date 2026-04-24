@@ -1,0 +1,64 @@
+# ==========================================
+# Spring Boot 核心配置
+# ==========================================
+spring:
+    profiles:
+        active: dev
+    application:
+        name: Diligence                # 应用名称，用于监控和日志
+
+    # 数据源配置
+    datasource:
+        url: jdbc:mysql://localhost:3306/diligence   # JDBC 连接地址
+        username: root                               # 数据库用户名
+        password:                                    # 数据库密码
+        driver-class-name: com.mysql.cj.jdbc.Driver  # MySQL JDBC 驱动
+        hikari:
+            maximum-pool-size: 10      # 连接池最大连接数
+            minimum-idle: 5            # 最小空闲连接数
+            connection-timeout: 30000  # 等待连接超时（毫秒）
+
+    # JPA 配置
+    jpa:
+        hibernate:
+            ddl-auto: update          # 自动更新表结构（开发用，生产建议 validate）
+        show-sql: true                # 控制台输出 SQL
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.MySQLDialect  # 数据库方言
+                format_sql: true                             # 格式化 SQL 输出
+
+    # Web 静态资源配置
+    web:
+        resources:
+            static-locations: classpath:/static/   # 静态资源路径
+            add-mappings: true                     # 启用默认资源映射
+            cache:
+                period: 0                          # 静态资源缓存时间（秒），0 表示禁用缓存
+
+    # Spring MVC 配置
+    mvc:
+        throw-exception-if-no-handler-found: true # 无处理器时抛出异常（配合全局异常处理）
+
+# 服务器配置
+server:
+    port: 8080                             # 监听端口
+    servlet:
+        context-path: /                    # 上下文路径
+        session:
+            timeout: 30m                   # Session 超时时间（单位：m 分钟）
+            cookie:
+                http-only: true            # Cookie 仅用于 HTTP 请求，阻止 JS 访问
+                secure: false              # 非 HTTPS 环境下不强制 secure 属性
+
+# 自定义应用配置
+app:
+    jwt:
+        secret: "g9ZWHtxL6tAQri8sBtVHFI9066SbVM9SpRJQlp3LbAs="  # JWT 签名密钥（Base64 编码）
+        expiration: 86400000                                    # Token 有效期 24 小时（毫秒）
+
+# 日志级别
+logging:
+    level:
+        org.edocsitahw.spa: INFO
+        org.springframework.security: DEBUG  # 安全相关日志详细输出
