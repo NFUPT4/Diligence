@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>勤致 · 组织架构维护</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+            padding: 24px 20px;
+        }
+
+        .org-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 头部 */
+        .page-header {
+            margin-bottom: 28px;
+        }
+        .page-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: #5b6e8c;
+            margin-top: 6px;
+        }
+
+        /* 两栏布局 */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 28px;
+        }
+
+        /* 卡片通用 */
+        .card {
+            background: white;
+            border-radius: 32px;
+            border: 1px solid #ecfdf5;
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid #f0f2f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .card-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background: #2d6a4f;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+        }
+        .btn-outline {
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-body {
+            padding: 20px 24px 24px;
+        }
+
+        /* 部门树形结构 */
+        .tree-container {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .tree-node {
+            margin-left: 20px;
+            padding: 8px 0;
+            position: relative;
+        }
+        .tree-node-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+        .tree-node-header:hover {
+            background: #f1f5f9;
+        }
+        .tree-node-header .toggle-icon {
+            width: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .tree-node-header .dept-name {
+            flex: 1;
+            font-weight: 500;
+        }
+        .tree-node-header .dept-actions i {
+            margin-left: 8px;
+            color: #5b6e8c;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .tree-node-header .dept-actions i:hover {
+            color: #2d6a4f;
+        }
+        .tree-children {
+            margin-left: 28px;
+        }
+        .root-node > .tree-node-header {
+            font-weight: 600;
+            background: #f8fafc;
+            border-radius: 20px;
+        }
+
+        /* 岗位表格 */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        th, td {
+            padding: 12px 8px;
+            text-align: left;
+            border-bottom: 1px solid #f0f2f5;
+        }
+        th {
+            font-weight: 600;
+            color: #5b6e8c;
+        }
+        .action-icons i {
+            font-size: 1rem;
+            margin: 0 4px;
+            cursor: pointer;
+            color: #5b6e8c;
+        }
+        .action-icons i:hover {
+            color: #2d6a4f;
+        }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        .badge-enabled { background: #e9f5ef; color: #2d6a4f; }
+        .badge-disabled { background: #ffe6e5; color: #c53030; }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            max-width: 480px;
+            width: 90%;
+            border-radius: 32px;
+            padding: 28px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        .close-modal {
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 24px;
+            font-size: 0.85rem;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .btn-cancel {
+            background: #f1f5f9;
+            border: none;
+            flex: 1;
+            padding: 10px;
+            border-radius: 40px;
+        }
+        .btn-save {
+            background: #2d6a4f;
+            color: white;
+            border: none;
+            flex: 1;
+            padding: 10px;
+            border-radius: 40px;
+        }
+
+        @media (max-width: 900px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="org-container">
+    <div class="page-header">
+        <h1>组织架构维护</h1>
+        <div class="breadcrumb"><i class="fas fa-home"></i> 首页 / 系统管理 / 组织架构</div>
+    </div>
+
+    <div class="two-columns">
+        <!-- 左侧：部门树形结构 -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-sitemap"></i> 部门结构</h3>
+                <div>
+                    <button id="addRootDeptBtn" class="btn-outline" style="margin-right: 8px;"><i class="fas fa-plus"></i> 根部门</button>
+                    <button id="refreshTreeBtn" class="btn-outline"><i class="fas fa-sync-alt"></i> 刷新</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="deptTree" class="tree-container">
+                    <!-- 动态渲染部门树 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：岗位列表 -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-briefcase"></i> 岗位列表</h3>
+                <button id="addPositionBtn" class="btn-primary"><i class="fas fa-plus"></i> 新增岗位</button>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>岗位名称</th><th>所属部门</th><th>状态</th><th>操作</th></tr>
+                        </thead>
+                        <tbody id="positionTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 通用模态框 -->
+<div id="genericModal" class="modal">
+    <div class="modal-content" id="modalDynamicContent"></div>
+</div>
+
+<script>
+    // ==================== 模拟数据 ====================
+    // 部门数据（树形结构）
+    let departments = [
+        { id: 1, name: "勤致科技有限公司", parentId: null, leaderId: 1, status: 1 },
+        { id: 2, name: "技术研发部", parentId: 1, leaderId: 2, status: 1 },
+        { id: 3, name: "产品部", parentId: 1, leaderId: 3, status: 1 },
+        { id: 4, name: "销售部", parentId: 1, leaderId: 4, status: 1 },
+        { id: 5, name: "人力资源部", parentId: 1, leaderId: 5, status: 1 },
+        { id: 6, name: "后端开发组", parentId: 2, leaderId: null, status: 1 },
+        { id: 7, name: "前端开发组", parentId: 2, leaderId: null, status: 1 }
+    ];
+    // 岗位数据
+    let positions = [
+        { id: 1, name: "技术总监", deptId: 2, status: 1 },
+        { id: 2, name: "Java工程师", deptId: 2, status: 1 },
+        { id: 3, name: "前端工程师", deptId: 2, status: 1 },
+        { id: 4, name: "产品经理", deptId: 3, status: 1 },
+        { id: 5, name: "UI设计师", deptId: 3, status: 1 },
+        { id: 6, name: "销售专员", deptId: 4, status: 1 },
+        { id: 7, name: "HRBP", deptId: 5, status: 1 }
+    ];
+    // 员工池（用于选择部门负责人）
+    let employees = [
+        { id: 1, name: "张明远", deptId: 2 },
+        { id: 2, name: "李思敏", deptId: 2 },
+        { id: 3, name: "陈敏", deptId: 3 },
+        { id: 4, name: "刘强", deptId: 4 },
+        { id: 5, name: "杨静", deptId: 5 }
+    ];
+    let nextDeptId = 8;
+    let nextPositionId = 8;
+
+    // 辅助函数：获取部门名称
+    function getDeptName(id) {
+        let dept = departments.find(d => d.id === id);
+        return dept ? dept.name : '无';
+    }
+    // 获取部门负责人名称
+    function getLeaderName(leaderId) {
+        if (!leaderId) return '未设置';
+        let emp = employees.find(e => e.id === leaderId);
+        return emp ? emp.name : '未知';
+    }
+
+    // 构建部门树
+    function buildDeptTree() {
+        let map = new Map();
+        let roots = [];
+        departments.forEach(dept => {
+            map.set(dept.id, { ...dept, children: [] });
+        });
+        departments.forEach(dept => {
+            let node = map.get(dept.id);
+            if (dept.parentId === null) {
+                roots.push(node);
+            } else {
+                let parent = map.get(dept.parentId);
+                if (parent) parent.children.push(node);
+            }
+        });
+        return roots;
+    }
+
+    // 递归渲染部门树
+    function renderDeptTree(container, nodes, level = 0) {
+        if (!nodes.length) {
+            container.innerHTML = '<div style="padding: 20px; text-align:center;">暂无部门数据</div>';
+            return;
+        }
+        let html = '';
+        nodes.forEach(node => {
+            let hasChildren = node.children && node.children.length > 0;
+            let arrow = hasChildren ? '<i class="fas fa-chevron-down toggle-icon"></i>' : '<span class="toggle-icon" style="width:20px;"></span>';
+            html += `
+                <div class="tree-node" data-id="${node.id}">
+                    <div class="tree-node-header">
+                        <span class="toggle-icon" data-id="${node.id}">${arrow}</span>
+                        <span class="dept-name">${node.name}</span>
+                        <span class="dept-actions">
+                            <i class="fas fa-user-tie" title="设置负责人" data-action="setLeader" data-id="${node.id}"></i>
+                            <i class="fas fa-plus" title="添加子部门" data-action="addChild" data-id="${node.id}"></i>
+                            <i class="fas fa-edit" title="编辑" data-action="editDept" data-id="${node.id}"></i>
+                            <i class="fas fa-trash-alt" title="删除" data-action="deleteDept" data-id="${node.id}"></i>
+                        </span>
+                    </div>
+                    <div class="tree-children" style="display: ${hasChildren ? 'block' : 'none'};">
+                        ${hasChildren ? renderDeptTreeChildren(node.children) : ''}
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+        bindTreeEvents();
+    }
+
+    function renderDeptTreeChildren(children) {
+        let html = '';
+        children.forEach(child => {
+            let hasGrand = child.children && child.children.length > 0;
+            let arrow = hasGrand ? '<i class="fas fa-chevron-down toggle-icon"></i>' : '<span class="toggle-icon" style="width:20px;"></span>';
+            html += `
+                <div class="tree-node" data-id="${child.id}">
+                    <div class="tree-node-header">
+                        <span class="toggle-icon" data-id="${child.id}">${arrow}</span>
+                        <span class="dept-name">${child.name}</span>
+                        <span class="dept-actions">
+                            <i class="fas fa-user-tie" title="设置负责人" data-action="setLeader" data-id="${child.id}"></i>
+                            <i class="fas fa-plus" title="添加子部门" data-action="addChild" data-id="${child.id}"></i>
+                            <i class="fas fa-edit" title="编辑" data-action="editDept" data-id="${child.id}"></i>
+                            <i class="fas fa-trash-alt" title="删除" data-action="deleteDept" data-id="${child.id}"></i>
+                        </span>
+                    </div>
+                    <div class="tree-children" style="display: ${hasGrand ? 'block' : 'none'};">
+                        ${hasGrand ? renderDeptTreeChildren(child.children) : ''}
+                    </div>
+                </div>
+            `;
+        });
+        return html;
+    }
+
+    function bindTreeEvents() {
+        // 折叠/展开
+        document.querySelectorAll('.tree-node-header .toggle-icon').forEach(icon => {
+            icon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                let nodeDiv = icon.closest('.tree-node');
+                let childrenDiv = nodeDiv.querySelector('.tree-children');
+                if (childrenDiv) {
+                    let isVisible = childrenDiv.style.display !== 'none';
+                    childrenDiv.style.display = isVisible ? 'none' : 'block';
+                    icon.innerHTML = isVisible ? '<i class="fas fa-chevron-right toggle-icon"></i>' : '<i class="fas fa-chevron-down toggle-icon"></i>';
+                }
+            });
+        });
+        // 部门操作按钮
+        document.querySelectorAll('.dept-actions i').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                let action = btn.dataset.action;
+                let deptId = parseInt(btn.dataset.id);
+                if (action === 'addChild') openAddChildDeptModal(deptId);
+                else if (action === 'editDept') openEditDeptModal(deptId);
+                else if (action === 'deleteDept') deleteDept(deptId);
+                else if (action === 'setLeader') openSetLeaderModal(deptId);
+            });
+        });
+    }
+
+    // 刷新部门树
+    function refreshTree() {
+        const treeRoot = buildDeptTree();
+        const container = document.getElementById('deptTree');
+        renderDeptTree(container, treeRoot);
+    }
+
+    // 删除部门（需检查是否有子部门或员工）
+    function deleteDept(id) {
+        let dept = departments.find(d => d.id === id);
+        if (!dept) return;
+        let hasChildren = departments.some(d => d.parentId === id);
+        let hasEmployees = employees.some(e => e.deptId === id);
+        if (hasChildren) { alert('该部门下存在子部门，无法删除'); return; }
+        if (hasEmployees) { alert('该部门下存在员工，请先转移或删除员工'); return; }
+        if (confirm(`确定删除部门“${dept.name}”吗？`)) {
+            departments = departments.filter(d => d.id !== id);
+            // 同时删除该部门下的岗位
+            positions = positions.filter(p => p.deptId !== id);
+            refreshTree();
+            renderPositions();
+        }
+    }
+
+    // 新增根部门/子部门弹窗
+    function openAddChildDeptModal(parentId = null) {
+        let parentDept = parentId ? departments.find(d => d.id === parentId) : null;
+        let title = parentId ? `在“${parentDept.name}”下添加子部门` : '新增根部门';
+        let formHtml = `
+            <div class="form-group"><label>部门名称</label><input type="text" id="deptName" placeholder="请输入部门名称" required></div>
+            <div class="form-group"><label>部门状态</label><select id="deptStatus"><option value="1">启用</option><option value="0">禁用</option></select></div>
+        `;
+        showModal(title, formHtml, () => {
+            let name = document.getElementById('deptName').value.trim();
+            let status = parseInt(document.getElementById('deptStatus').value);
+            if (!name) { alert('部门名称不能为空'); return; }
+            let newId = nextDeptId++;
+            departments.push({ id: newId, name, parentId: parentId, leaderId: null, status });
+            refreshTree();
+            renderPositions();
+        });
+    }
+    function openEditDeptModal(id) {
+        let dept = departments.find(d => d.id === id);
+        if (!dept) return;
+        let formHtml = `
+            <div class="form-group"><label>部门名称</label><input type="text" id="deptName" value="${dept.name}" required></div>
+            <div class="form-group"><label>部门状态</label><select id="deptStatus"><option value="1" ${dept.status===1?'selected':''}>启用</option><option value="0" ${dept.status===0?'selected':''}>禁用</option></select></div>
+        `;
+        showModal('编辑部门', formHtml, () => {
+            let name = document.getElementById('deptName').value.trim();
+            let status = parseInt(document.getElementById('deptStatus').value);
+            if (!name) { alert('部门名称不能为空'); return; }
+            dept.name = name;
+            dept.status = status;
+            refreshTree();
+            renderPositions();
+        });
+    }
+    // 设置部门负责人
+    function openSetLeaderModal(deptId) {
+        let dept = departments.find(d => d.id === deptId);
+        let currentLeaderId = dept.leaderId;
+        let empOptions = employees.map(emp => `<option value="${emp.id}" ${currentLeaderId === emp.id ? 'selected' : ''}>${emp.name}</option>`).join('');
+        let formHtml = `
+            <div class="form-group"><label>选择部门负责人</label><select id="leaderId"><option value="">无</option>${empOptions}</select></div>
+        `;
+        showModal(`设置“${dept.name}”负责人`, formHtml, () => {
+            let leaderId = document.getElementById('leaderId').value;
+            dept.leaderId = leaderId ? parseInt(leaderId) : null;
+            refreshTree();
+        });
+    }
+
+    // 岗位管理
+    function renderPositions() {
+        let tbody = document.getElementById('positionTableBody');
+        tbody.innerHTML = positions.map(pos => {
+            let deptName = getDeptName(pos.deptId);
+            return `
+                <tr>
+                    <td>${pos.name}</td><td>${deptName}</td>
+                    <td><span class="badge ${pos.status===1?'badge-enabled':'badge-disabled'}">${pos.status===1?'启用':'禁用'}</span></td>
+                    <td class="action-icons">
+                        <i class="fas fa-edit" data-type="position" data-id="${pos.id}"></i>
+                        <i class="fas fa-trash-alt" data-type="position" data-id="${pos.id}"></i>
+                        <i class="fas ${pos.status===1?'fa-ban':'fa-check-circle'}" data-type="position-toggle" data-id="${pos.id}"></i>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        // 绑定岗位操作
+        document.querySelectorAll('#positionTableBody .action-icons i').forEach(icon => {
+            icon.addEventListener('click', (e) => {
+                let id = parseInt(icon.dataset.id);
+                let type = icon.dataset.type;
+                if (type === 'position') openEditPositionModal(id);
+                else if (type === 'position-toggle') togglePositionStatus(id);
+                else if (type === 'position' && icon.classList.contains('fa-trash-alt')) deletePosition(id);
+            });
+        });
+    }
+    function openAddPositionModal() {
+        let deptOptions = departments.filter(d => d.status === 1).map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+        let formHtml = `
+            <div class="form-group"><label>岗位名称</label><input type="text" id="posName" required></div>
+            <div class="form-group"><label>所属部门</label><select id="posDeptId">${deptOptions}</select></div>
+            <div class="form-group"><label>状态</label><select id="posStatus"><option value="1">启用</option><option value="0">禁用</option></select></div>
+        `;
+        showModal('新增岗位', formHtml, () => {
+            let name = document.getElementById('posName').value.trim();
+            let deptId = parseInt(document.getElementById('posDeptId').value);
+            let status = parseInt(document.getElementById('posStatus').value);
+            if (!name) { alert('岗位名称不能为空'); return; }
+            positions.push({ id: nextPositionId++, name, deptId, status });
+            renderPositions();
+        });
+    }
+    function openEditPositionModal(id) {
+        let pos = positions.find(p => p.id === id);
+        if (!pos) return;
+        let deptOptions = departments.filter(d => d.status === 1).map(d => `<option value="${d.id}" ${pos.deptId === d.id ? 'selected' : ''}>${d.name}</option>`).join('');
+        let formHtml = `
+            <div class="form-group"><label>岗位名称</label><input type="text" id="posName" value="${pos.name}" required></div>
+            <div class="form-group"><label>所属部门</label><select id="posDeptId">${deptOptions}</select></div>
+            <div class="form-group"><label>状态</label><select id="posStatus"><option value="1" ${pos.status===1?'selected':''}>启用</option><option value="0" ${pos.status===0?'selected':''}>禁用</option></select></div>
+        `;
+        showModal('编辑岗位', formHtml, () => {
+            let name = document.getElementById('posName').value.trim();
+            let deptId = parseInt(document.getElementById('posDeptId').value);
+            let status = parseInt(document.getElementById('posStatus').value);
+            if (!name) { alert('岗位名称不能为空'); return; }
+            pos.name = name;
+            pos.deptId = deptId;
+            pos.status = status;
+            renderPositions();
+        });
+    }
+    function deletePosition(id) {
+        if (confirm('确定删除该岗位吗？')) {
+            positions = positions.filter(p => p.id !== id);
+            renderPositions();
+        }
+    }
+    function togglePositionStatus(id) {
+        let pos = positions.find(p => p.id === id);
+        if (pos) {
+            pos.status = pos.status === 1 ? 0 : 1;
+            renderPositions();
+        }
+    }
+
+    // 模态框通用
+    function showModal(title, contentHtml, onSave) {
+        const modal = document.getElementById('genericModal');
+        const contentDiv = document.getElementById('modalDynamicContent');
+        contentDiv.innerHTML = `
+            <div class="modal-header"><span>${title}</span><span class="close-modal">&times;</span></div>
+            <form id="modalForm">${contentHtml}<div class="modal-buttons"><button type="button" class="btn-cancel" id="modalCancel">取消</button><button type="submit" class="btn-save">保存</button></div></form>
+        `;
+        modal.style.display = 'flex';
+        document.querySelector('.close-modal').addEventListener('click', () => modal.style.display = 'none');
+        document.getElementById('modalCancel').addEventListener('click', () => modal.style.display = 'none');
+        document.getElementById('modalForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            onSave();
+            modal.style.display = 'none';
+        });
+    }
+
+    // 事件绑定
+    document.getElementById('addRootDeptBtn').addEventListener('click', () => openAddChildDeptModal(null));
+    document.getElementById('refreshTreeBtn').addEventListener('click', () => refreshTree());
+    document.getElementById('addPositionBtn').addEventListener('click', () => openAddPositionModal());
+
+    // 初始化
+    refreshTree();
+    renderPositions();
+</script>
+</body>
+</html>

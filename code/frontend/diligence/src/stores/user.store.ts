@@ -12,11 +12,12 @@
  * @author edocsitahw
  * @version 1.1
  * @date 2026/04/14 22:35
- * @desc
+ * @desc 用户信息相关的状态管理
  * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
  * */
-import { defineStore } from "pinia";
 import type { Nullable, UserInfo } from "@/types/common";
+import { defineStore } from "pinia";
+
 
 export const useUserStore = defineStore("user", {
     state() {

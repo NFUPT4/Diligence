@@ -12,13 +12,14 @@
  * @author edocsitahw
  * @version 1.1
  * @date 2026/04/03 13:32
- * @desc
+ * @desc 封装axios请求方法
  * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
  * */
-import type { AxiosInstance, AxiosRequestConfig , AxiosResponse} from "axios";
-import axios from "axios";
-import { DG_TOKEN_KEY } from "@/utils/constant";
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import type { Nullable, HttpResponse } from "@/types/common";
+import { DG_TOKEN_KEY } from "@/utils/constant";
+import axios from "axios";
+
 
 /**
  * @desc axios实例，用于请求后端接口
@@ -35,7 +36,7 @@ const service: AxiosInstance = axios.create({
 
 // 请求拦截器
 service.interceptors.request.use(
-    config => {
+    (config: InternalAxiosRequestConfig) => {
         const token: Nullable<string> = localStorage.getItem(DG_TOKEN_KEY);
 
         if (token && config.headers) config.headers.Authorization = `Bearer ${token}`;

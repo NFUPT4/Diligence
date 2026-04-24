@@ -14,33 +14,55 @@
                 style="margin-right: 4px"
                 class="fas fa-chart-line" />
 
-            {{ $t("home.attendance-rate.template.title") }}
+            {{ $t(LOCAL("title")) }}
         </template>
 
-        <template #value>
-            {{}}
-        </template>
+        <template #value> {{ attendanceRate?.personalRate }} % </template>
 
-        <template #sub> {{}} {{ $t('home.attendance-rate.template.sub') }} · {{}} </template>
+        <template #sub>
+            {{
+                attendanceRate
+                    ? $t(
+                        LOCAL(
+                            attendanceRate.personalRate >= attendanceRate.deptAvgRate ? "hight-than" : "low-than"
+                        )
+                    )
+                    : ""
+            }}
+            · {{ $t(LOCAL(rateDegree)) }}
+        </template>
     </dg-state-card>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
     /**
      * @file DgAttendanceRate.vue
      * @author edocsitahw
      * @version 1.1
      * @date 2026/04/16 20:09
-     * @desc
+     * @desc 主页考勤率组件
      * @copyright CC BY-NC-SA
      * */
-    import { ref, reactive, computed, watch } from "vue";
-    import type { Ref, Reactive, PropType } from "vue";
-    import { defineComponent } from "vue";
     import DgStateCard from "@/views/home/statistics/DgStateCard.vue";
+    import { attendanceApi } from "@/api/attendance";
+    import { useAsyncState } from "@vueuse/core";
+    import { computed } from "vue";
 
-    export default defineComponent({
-        components: { DgStateCard }
+    /* state */
+    const { state: attendanceRate } = useAsyncState(attendanceApi.getAttendanceRate, null, { immediate: true });
+    const LOCAL = (key: string, type: string = "template") => `home.attendance-rate.${type}.${key}`;
+
+    /* computed */
+
+    // 考勤率等级对应键
+    const rateDegree = computed(() => {
+        if (!attendanceRate.value) return "loading";
+
+        const rate = attendanceRate.value.personalRate / attendanceRate.value.deptAvgRate;
+
+        if (rate >= 1.2) return "excellent";
+        else if (rate >= 1) return "good";
+        else return "improve";
     });
 </script>
 

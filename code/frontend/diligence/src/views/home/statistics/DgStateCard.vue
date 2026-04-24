@@ -29,12 +29,13 @@
      * @author edocsitahw
      * @version 1.1
      * @date 2026/04/16 19:23
-     * @desc
+     * @desc 主页状态小卡片组件框架
      * @copyright CC BY-NC-SA
      * */
 </script>
 
 <style lang="sass" scoped>
+    @use "@/style/global" as *
 
     .dsc
         flex: 1
@@ -42,6 +43,7 @@
         min-width: 140px
 
         & :deep()
+            //
 
         &-title
             font-size: 0.8rem
@@ -50,9 +52,14 @@
             margin-bottom: 12px
 
         &-value
-            font-size: 1.8rem
             font-weight: 700
             color: var(--text-dark)
+
+            @include pc()
+                font-size: 2.4rem
+
+            @include mobile()
+                font-size: 1.8rem
 
         &-sub
             font-size: 0.7rem

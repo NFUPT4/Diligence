@@ -10,11 +10,15 @@
 <template>
     <div class="dg-panel dp">
         <div class="dp-header">
+
+            <!-- 标题 -->
             <slot name="title" />
 
+            <!-- 角标 -->
             <slot name="badge" />
         </div>
 
+        <!-- 内容 -->
         <slot />
     </div>
 </template>
@@ -25,7 +29,7 @@
      * @author edocsitahw
      * @version 1.1
      * @date 2026/04/16 20:30
-     * @desc
+     * @desc 主页大卡片框架
      * @copyright CC BY-NC-SA
      * */
 </script>
@@ -39,13 +43,13 @@
         @include mobile()
             grid-column: 1 / -1
 
-        & :slotted([class*="title"])
+        & :slotted([class*="title"])  // 下传title
             font-weight: 600
             font-size: 1.2rem
 
-        & :slotted([class*="badge"])
-            background: #ffedd5
-            color: #b45309
+        & :slotted([class*="badge"])  // 下传badge
+            background: var(--badge-bg)
+            color: var(--badge-text)
             padding: 4px 12px
             border-radius: 40px
             font-size: 0.7rem
@@ -60,4 +64,5 @@
             padding-bottom: 12px
 
         & :deep()
+            //
 </style>

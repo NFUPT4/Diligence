@@ -8,9 +8,9 @@
  */
 
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "@/views/home/DgHome.vue";
 import { useAuthStore } from "@/stores/auth.store";
 import { useUserStore } from "@/stores/user.store";
+import DgAuth from "@/views/authentication/DgAuth.vue";
 
 
 const router = createRouter({
@@ -19,13 +19,13 @@ const router = createRouter({
         {
             path: "/",
             name: "home",
-            component: Home,
+            component: () => import(/* webpackPrefetch: true */ "@/views/home/DgHome.vue"),
             meta: { requiresAuth: true }
         },
         {
             path: "/auth",
             name: "auth",
-            component: () => import("@/views/authentication/DgAuth.vue"),
+            component: DgAuth,
             meta: { requiresAuth: false }
         }
     ]

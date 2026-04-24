@@ -12,7 +12,7 @@
  * @author edocsitahw
  * @version 1.1
  * @date 2026/04/03 13:41
- * @desc
+ * @desc 常量类型定义文件
  * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
  * */
 
