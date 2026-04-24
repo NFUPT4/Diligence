@@ -17,6 +17,7 @@ package org.nfupt4.diligence.controller;
  * @license CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/)
  */
 
+import org.nfupt4.diligence.controller.dto.request.RequestWrapper;
 import org.nfupt4.diligence.controller.dto.response.LoginResult;
 import org.nfupt4.diligence.controller.dto.request.LoginData;
 import org.springframework.web.bind.annotation.*;
@@ -57,8 +58,10 @@ public class AuthController {
      * @return 统一响应，内含登录结果
      */
     @PostMapping("/login")
-    public HttpResponse<LoginResult> login(@Valid @RequestBody LoginData request) {
-        LoginResult result = authService.login(request);
+    public HttpResponse<LoginResult> login(@Valid @RequestBody RequestWrapper<LoginData> request) {
+        LoginData loginData = request.getData();
+
+        LoginResult result = authService.login(loginData);
 
         return HttpResponse.success(result);
     }

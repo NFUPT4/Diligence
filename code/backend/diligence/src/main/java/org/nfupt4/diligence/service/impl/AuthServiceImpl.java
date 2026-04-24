@@ -17,6 +17,7 @@ package org.nfupt4.diligence.service.impl;
  * @license CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/)
  */
 
+import org.nfupt4.diligence.service.dto.UserInfo;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.nfupt4.diligence.controller.dto.response.LoginResult;
@@ -79,15 +80,20 @@ public class AuthServiceImpl implements AuthService {
         // 4. 生成 JWT
         String token = jwtUtil.generateToken(employee.getEmployeeId(), employee.getEmpNo());
 
-        // 5. 构建返回结果
-        return LoginResult.builder()
-                .token(token)
+        // 5. 构建 UserInfo
+        UserInfo userInfo = UserInfo.builder()
                 .employeeId(employee.getEmployeeId())
                 .empNo(employee.getEmpNo())
                 .name(employee.getName())
-                .role(employee.getRole().getCode())    // 角色编码
+                .role(employee.getRole().getCode())  // 假设枚举有 getCode() 返回 Integer
                 .deptId(employee.getDepartment() != null ? employee.getDepartment().getDeptId() : null)
                 .deptName(employee.getDepartment() != null ? employee.getDepartment().getDeptName() : null)
+                .build();
+
+        // 6. 构建返回
+        return LoginResult.builder()
+                .token(token)
+                .userInfo(userInfo)
                 .build();
     }
 

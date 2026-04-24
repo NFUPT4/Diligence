@@ -2,6 +2,8 @@
 # Spring Boot 核心配置
 # ==========================================
 spring:
+    profiles:
+        active: dev
     application:
         name: Diligence                # 应用名称，用于监控和日志
 
