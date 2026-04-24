@@ -17,20 +17,13 @@
  * */
 import { DG_TOKEN_KEY, DG_REMEMBER_KEY } from "@/utils/constant";
 import { useUserStore } from "@/stores/user.store";
-import { timeStampToTime } from "@/utils";
+import { computed, ref, type Ref } from "vue";
 import { authApi } from "@/api/auth";
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
 
 
 export const useAuthStore = defineStore("auth", () => {
     /* state */
-
-    // 令牌
-    const token = ref<string>(localStorage.getItem(DG_TOKEN_KEY) || "");
-    // 是否记住用户
-    const remember = ref<boolean>(localStorage.getItem(DG_REMEMBER_KEY) === "true");
-
     const userStore = useUserStore();
 
     /* computed */
@@ -38,29 +31,27 @@ export const useAuthStore = defineStore("auth", () => {
     // 是否已认证
     const authenticated = computed(() => token.value.length > 0);
 
+    // 是否记住用户（视图）
+    const remember = computed({
+        get: () => localStorage.getItem(DG_REMEMBER_KEY) === "true",
+        set: (v: boolean) => localStorage.setItem(DG_REMEMBER_KEY, v.toString())
+    });
+
+    /* state */
+
+    // 响应式令牌
+    const token: Ref<string> = ref((remember.value ? localStorage : sessionStorage).getItem(DG_TOKEN_KEY) || "");
+
     /* methods */
-
-    // 设置令牌
-    const setToken = (t: string) => {
-        token.value = t;
-
-        localStorage.setItem(DG_TOKEN_KEY, token.value);
-    };
-
-    // 设置是否记住用户
-    const setRemember = (r: boolean) => {
-        remember.value = r;
-
-        localStorage.setItem(DG_REMEMBER_KEY, remember.value.toString());
-    }
 
     // 登录
     const login = async (...data: Parameters<typeof authApi.login>) => {
         return authApi.login(...data).then(resp => {
-            if (remember.value)
-                setToken(resp.token);
+            token.value = resp.token;
 
-            userStore._info = resp.userInfo;
+            (remember.value ? localStorage : sessionStorage).setItem(DG_TOKEN_KEY, resp.token);
+
+            userStore.userInfo = resp.userInfo;
 
             return resp;
         });
@@ -69,10 +60,8 @@ export const useAuthStore = defineStore("auth", () => {
     return {
         token,
         authenticated,
-        setToken,
         login,
-        remember,
-        setRemember
+        remember
     };
 });
 

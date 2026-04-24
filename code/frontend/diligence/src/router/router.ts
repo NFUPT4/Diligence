@@ -39,7 +39,7 @@ router.beforeEach((to, from) => {
     // 需要认证的路由
     if (to.meta.requiresAuth) {
         // 已登录
-        if (authStore.authenticated && userStore._info)
+        if (authStore.authenticated && userStore.userInfo)
             return true;
 
         else

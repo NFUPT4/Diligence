@@ -15,22 +15,31 @@
  * @desc 用户信息相关的状态管理
  * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
  * */
+import { computed, ref, type Ref, type WritableComputedRef } from "vue";
 import type { Nullable, UserInfo } from "@/types/common";
 import { defineStore } from "pinia";
 
 
-export const useUserStore = defineStore("user", {
-    state() {
-        return {
-            _info: null as Nullable<UserInfo>
-        };
-    },
+export const useUserStore = defineStore("user", () => {
 
-    getters: {
-        info(): UserInfo {
-            return this._info!;
-        }
-    },
+    /* state */
 
-    actions: {}
+    // 用户信息
+    const innerUserInfo: Ref<Nullable<UserInfo>> = ref(null);
+
+    /* computed */
+
+    const userInfo = computed({
+        get: () => {
+            if (innerUserInfo.value)
+                return innerUserInfo.value;
+
+            return null;
+        },
+        set: (value: UserInfo) => innerUserInfo. value= value
+    }) as WritableComputedRef<UserInfo, UserInfo>;
+
+    return {
+        userInfo
+    };
 });

@@ -58,13 +58,13 @@
                     <h4
                         class="dh-side-user-info-name"
                         style="margin: 0; white-space: nowrap"
-                        >{{ userStore.info.name }} · {{ userStore.info.deptName }}</h4
+                        >{{ userInfo.name }} · {{ userInfo.deptName }}</h4
                     >
 
                     <p
                         class="dh-side-user-info-role"
                         style="margin: 0; white-space: nowrap"
-                        >{{ $t(`enum.role.${userStore.info.role}`) }}</p
+                        >{{ $t(`enum.role.${userInfo.role}`) }}</p
                     >
                 </div>
             </div>
@@ -77,14 +77,16 @@
                     keypath="home.template.welcome"
                     tag="h1">
                     <template #username>
-                        {{ userStore.info.name }}
+                        {{ userInfo.name }}
                     </template>
                 </i18n-t>
 
-                <el-breadcrumb class="dh-main-header-breadcrumb" separator="/">
+                <el-breadcrumb
+                    class="dh-main-header-breadcrumb"
+                    separator="/">
                     <el-breadcrumb-item :to="{ path: '/' }">
                         <i class="fas fa-home" />
-                        {{ $t('common.link.home') }}
+                        {{ $t("common.link.home") }}
                     </el-breadcrumb-item>
                 </el-breadcrumb>
             </header>
@@ -157,9 +159,10 @@
     import DgLogo from "@/components/DgLogo.vue";
 
     import { useUserStore } from "@/stores/user.store";
+    import { storeToRefs } from "pinia";
 
     /* state */
-    const userStore = useUserStore();
+    const { userInfo } = storeToRefs(useUserStore());
 </script>
 
 <style lang="sass" scoped>
