@@ -5,19 +5,18 @@
 // purposes is prohibited without the organization's permission. If you have any questions or require
 // permission, please contact NFUPT4 https://gitee.com/nfupt4.
 
-package org.nfupt4.diligence.controller.dto.response;
+package org.nfupt4.diligence.service.dto;
 
 /*
- * <p>登录成功后返回的数据对象，包含 Token 和用户简要信息。</p>
+ * <p>用户信息数据传输对象，用于业务层间传递用户的简要信息。</p>
  *
- * @file LoginResult.java
+ * @file UserInfo.java
  * @author NFUPT4
  * @version 0.0.1-SNAPSHOT
  * @since 2026-04-24
  * @license CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/)
  */
 
-import org.nfupt4.diligence.service.dto.UserInfo;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Builder;
@@ -25,18 +24,32 @@ import lombok.Data;
 
 
 /**
- * 登录响应 DTO。
+ * 用户信息 DTO。
  *
- * <p>{@code @Builder}：Lombok 生成建造者模式代码，用于优雅构造对象。</p>
+ * <p>包含员工基本标识、所属部门及角色编码，通常从实体转换而来。</p>
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginResult {
+public class UserInfo {
 
-    private String token;
+    /** 员工 ID */
+    private Long employeeId;
 
-    private UserInfo userInfo;
+    /** 工号 */
+    private String empNo;
+
+    /** 姓名 */
+    private String name;
+
+    /** 角色编码：0-普通员工，1-部门主管，2-管理员 */
+    private Integer role;
+
+    /** 部门 ID */
+    private Long deptId;
+
+    /** 部门名称 */
+    private String deptName;
 
 }

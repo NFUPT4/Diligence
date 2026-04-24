@@ -84,7 +84,14 @@ export default defineConfig(({ command }): UserConfig => {
             build: {
                 outDir: "../../backend/diligence/src/main/resources/static", // Spring Boot 静态资源目录
                 emptyOutDir: true,
-                assetsDir: "static"
+                assetsDir: "",
+                rolldownOptions: {
+                    output: {
+                        assetFileNames: "assets/[name]-[hash][extname]",
+                        chunkFileNames: "assets/[name]-[hash].js",
+                        entryFileNames: "assets/[name]-[hash].js"
+                    }
+                }
             }
         };
 
