@@ -7,8 +7,6 @@
     </profile>
   </component>
   <component name="VcsDirectoryMappings">
-    <mapping directory="$PROJECT_DIR$/../../../../../SPA" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../../../../../WaypointCompass" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../../.." vcs="Git" />
   </component>
 </project>

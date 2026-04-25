@@ -70,16 +70,17 @@ components:
             type: object
             required:
                 - empNo
-                - password
+                - passwordHash
             properties:
                 empNo:
                     type: string
                     description: 员工工号
                     example: "EXP20260001"
-                password:
+                passwordHash:
                     type: string
-                    description: 密码的哈希值
+                    description: 密码的哈希值，需后端加盐后重哈希存储
                     example: "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92"
+
         LoginResponse:
             type: object
             properties:
@@ -582,7 +583,12 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/LoginRequest'
+                            type: object
+                            required:
+                                - data
+                            properties:
+                                data:
+                                    $ref: '#/components/schemas/LoginRequest'
             responses:
                 '200':
                     description: 登录成功
@@ -625,7 +631,12 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/ClockRequest'
+                            type: object
+                            required:
+                                - data
+                            properties:
+                                data:
+                                    $ref: '#/components/schemas/ClockRequest'
             responses:
                 '200':
                     description: 打卡成功
@@ -716,7 +727,12 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/ApplicationSubmitRequest'
+                            type: object
+                            required:
+                                - data
+                            properties:
+                                data:
+                                    $ref: '#/components/schemas/ApplicationSubmitRequest'
             responses:
                 '200':
                     description: 提交成功
@@ -830,7 +846,12 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/ApprovalRequest'
+                            type: object
+                            required:
+                                - data
+                            properties:
+                                data:
+                                    $ref: '#/components/schemas/ApprovalRequest'
             responses:
                 '200':
                     description: 审批成功
@@ -933,7 +954,12 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/ExportRequest'
+                            type: object
+                            required:
+                                - data
+                            properties:
+                                data:
+                                    $ref: '#/components/schemas/ExportRequest'
             responses:
                 '200':
                     description: 导出成功，返回文件流
@@ -996,7 +1022,12 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/EmployeeCreateRequest'
+                            type: object
+                            required:
+                                - data
+                            properties:
+                                data:
+                                    $ref: '#/components/schemas/EmployeeCreateRequest'
             responses:
                 '200':
                     description: 新增成功
@@ -1043,7 +1074,12 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/EmployeeUpdateRequest'
+                            type: object
+                            required:
+                                - data
+                            properties:
+                                data:
+                                    $ref: '#/components/schemas/EmployeeUpdateRequest'
             responses:
                 '200':
                     description: 修改成功
@@ -1082,10 +1118,17 @@ paths:
                     application/json:
                         schema:
                             type: object
+                            required:
+                                - data
                             properties:
-                                status:
-                                    type: integer
-                                    description: 0-禁用，1-启用
+                                data:
+                                    type: object
+                                    required:
+                                        - status
+                                    properties:
+                                        status:
+                                            type: integer
+                                            description: 0-禁用，1-启用
             responses:
                 '200':
                     description: 操作成功
@@ -1129,7 +1172,12 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/LocationRequest'
+                            type: object
+                            required:
+                                - data
+                            properties:
+                                data:
+                                    $ref: '#/components/schemas/LocationRequest'
             responses:
                 '200':
                     description: 成功
@@ -1152,7 +1200,12 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/LocationRequest'
+                            type: object
+                            required:
+                                - data
+                            properties:
+                                data:
+                                    $ref: '#/components/schemas/LocationRequest'
         delete:
             tags:
                 - 考勤规则配置
@@ -1187,7 +1240,12 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/AttendanceRuleRequest'
+                            type: object
+                            required:
+                                - data
+                            properties:
+                                data:
+                                    $ref: '#/components/schemas/AttendanceRuleRequest'
 
     /admin/rules/{ruleId}:
         put:
@@ -1207,7 +1265,12 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/AttendanceRuleRequest'
+                            type: object
+                            required:
+                                - data
+                            properties:
+                                data:
+                                    $ref: '#/components/schemas/AttendanceRuleRequest'
         delete:
             tags:
                 - 考勤规则配置
@@ -1242,7 +1305,12 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/AttendanceGroupRequest'
+                            type: object
+                            required:
+                                - data
+                            properties:
+                                data:
+                                    $ref: '#/components/schemas/AttendanceGroupRequest'
 
     /admin/groups/{groupId}:
         put:
@@ -1262,7 +1330,12 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/AttendanceGroupRequest'
+                            type: object
+                            required:
+                                - data
+                            properties:
+                                data:
+                                    $ref: '#/components/schemas/AttendanceGroupRequest'
         delete:
             tags:
                 - 考勤规则配置
@@ -1295,11 +1368,18 @@ paths:
                     application/json:
                         schema:
                             type: object
+                            required:
+                                - data
                             properties:
-                                employeeIds:
-                                    type: array
-                                    items:
-                                        type: integer
+                                data:
+                                    type: object
+                                    required:
+                                        - employeeIds
+                                    properties:
+                                        employeeIds:
+                                            type: array
+                                            items:
+                                                type: integer
 
     # ==================== 组织架构维护 ====================
     /admin/departments/tree:
@@ -1336,7 +1416,12 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/DepartmentRequest'
+                            type: object
+                            required:
+                                - data
+                            properties:
+                                data:
+                                    $ref: '#/components/schemas/DepartmentRequest'
 
     /admin/departments/{deptId}:
         put:
@@ -1356,7 +1441,12 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/DepartmentRequest'
+                            type: object
+                            required:
+                                - data
+                            properties:
+                                data:
+                                    $ref: '#/components/schemas/DepartmentRequest'
         delete:
             tags:
                 - 组织架构维护
@@ -1396,7 +1486,12 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/PositionRequest'
+                            type: object
+                            required:
+                                - data
+                            properties:
+                                data:
+                                    $ref: '#/components/schemas/PositionRequest'
 
     /admin/positions/{positionId}:
         put:
@@ -1416,7 +1511,12 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/PositionRequest'
+                            type: object
+                            required:
+                                - data
+                            properties:
+                                data:
+                                    $ref: '#/components/schemas/PositionRequest'
         delete:
             tags:
                 - 组织架构维护
