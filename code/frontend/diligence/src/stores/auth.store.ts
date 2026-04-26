@@ -57,11 +57,22 @@ export const useAuthStore = defineStore("auth", () => {
         });
     };
 
+    // 登出
+    const logout = () => {
+        token.value = "";
+
+        // 清除token
+        (remember.value ? localStorage : sessionStorage).removeItem(DG_TOKEN_KEY);
+
+        userStore.reset();
+    };
+
     return {
         token,
         authenticated,
         login,
-        remember
+        remember,
+        logout
     };
 });
 

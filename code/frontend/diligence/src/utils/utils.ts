@@ -18,7 +18,6 @@
 
 import type { Optional } from "@/types/common";
 
-
 /**
  * @summary 生成字符串哈希
  *
@@ -113,12 +112,12 @@ export function genRandomDatePairs(start: Date, end: Date, n: number): Array<{ s
     return result;
 }
 
-
-type TimeDiffResult = { day: number, hour: number, minute: number, second: number };
+type TimeDiffResult = { day: number; hour: number; minute: number; second: number };
 export function calcTimeDiff(stamp: number): TimeDiffResult;
 export function calcTimeDiff(startTime: Date, endTime: Date): TimeDiffResult;
 export function calcTimeDiff(stampOrStartTime: number | Date, endTime?: Date): TimeDiffResult {
-    const diff = typeof stampOrStartTime === "number" ? stampOrStartTime : stampOrStartTime.getTime() - endTime!.getTime();
+    const diff =
+        typeof stampOrStartTime === "number" ? stampOrStartTime : stampOrStartTime.getTime() - endTime!.getTime();
 
     return {
         day: Math.floor(diff / (1000 * 60 * 60 * 24)),
@@ -128,3 +127,42 @@ export function calcTimeDiff(stampOrStartTime: number | Date, endTime?: Date): T
     };
 }
 
+
+// eslint-disable-next-line
+export interface IFunctionId {}
+
+type FunctionId = keyof IFunctionId;
+
+const FUCN_UNIQUE_ID_MAP = new Map<FunctionId, number>();
+
+/**
+ * @summary 获取函数的唯一标识符
+ * @desc 获取函数的唯一标识符，如果函数没有标识符，则自动生成一个。
+ *
+ * @typeParam T 要获取唯一标识符的函数类型
+ *
+ * @param {T} fn 要获取唯一标识符的函数
+ * @param {IFunctionId} id 标识符的类型
+ *
+ * @return {symbol} 唯一标识符
+ * */
+export function getFunctionUniqueId<T extends object>(
+    fn: T extends (...args: infer P) => infer R ? (...args: P) => R : T,
+    id: IFunctionId
+): symbol {
+    const def = (count: number) => {
+        Object.defineProperty(fn, id, {
+            value: Symbol(`${id}_${count}`),
+            enumerable: false,
+            configurable: false,
+            writable: false
+        });
+        FUCN_UNIQUE_ID_MAP.set(id, count + 1);
+    };
+
+    if (!fn.hasOwnProperty(id))
+        if (FUCN_UNIQUE_ID_MAP.has(id)) def(FUCN_UNIQUE_ID_MAP.get(id)!);
+        else def(0);
+
+    return (fn as typeof fn & { [id]: symbol })[id]!;
+}
