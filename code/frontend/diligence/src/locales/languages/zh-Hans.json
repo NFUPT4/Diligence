@@ -8,7 +8,7 @@
     },
     "common": {
         "sys-name": "“致勤”-企业考勤系统",
-        "name": "致勤",
+        "name": "勤致",
         "brief": "勤能致远",
         "description": "",
         "link": {
@@ -20,7 +20,9 @@
         "day": "天",
         "hour": "小时",
         "minute": "分钟",
-        "second": "秒"
+        "second": "秒",
+        "logout": "退出登录",
+        "cancel": "取消"
     },
     "auth": {
         "template": {

@@ -15,9 +15,18 @@
  * @desc 常量类型定义文件
  * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
  * */
+import type { SnakeCase } from "./utils";
+
 
 /**
  * @summary 本地存储键值对的类型定义
  * @desc 用于统一本地存储键的格式，具体格式为：`DG_${T}_KEY`，其中 `${T}` 为具体的键值对名称。
  * */
 export type LocalStorageKey<T extends string> = `DG_${Uppercase<T>}_KEY`;
+
+
+/**
+ * @summary 项目中使用的属性类型定义
+ * @desc 用于统一项目中使用的属性名称的格式，具体格式为：`__dg__${T}__`，其中 `${T}` 为具体的属性名称。
+ * */
+export type DgAttribute<T extends string> = `__dg_${SnakeCase<T>}__`;
