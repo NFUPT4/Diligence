@@ -7,11 +7,11 @@
  * permission, please contact NFUPT4 https://gitee.com/nfupt4.
  */
 
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth.store";
 import { useUserStore } from "@/stores/user.store";
 import DgAuth from "@/views/authentication/DgAuth.vue";
-
+import { userApi } from "@/api";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,29 +27,44 @@ const router = createRouter({
             name: "auth",
             component: DgAuth,
             meta: { requiresAuth: false }
+        },
+        {
+            path: "/clock",
+            name: "clock",
+            component: () => import(/* webpackPrefetch: true */ "@/views/clock/DgClock.vue"),
+            meta: { requiresAuth: true }
         }
     ]
 });
 
-
-router.beforeEach((to, from) => {
+router.beforeEach(async (to, from) => {
     const authStore = useAuthStore();
     const userStore = useUserStore();
 
     // 需要认证的路由
     if (to.meta.requiresAuth) {
         // 已登录
-        if (authStore.authenticated && userStore.userInfo)
-            return true;
+        if (authStore.authenticated) {
+            if (!userStore.userInfo)
+                return await userApi
+                    .fetchUserInfo()
+                    .then(resp => {
+                        userStore.userInfo = resp;
 
-        else
-            return "/auth";
+                        return true;
+                    })
+                    .catch(err => {
+                        console.error(err);
+
+                        return '/auth';
+                    });
+
+            return true;
+        } else return "/auth";
     }
 
     // 游客访问路由
-    else
-        return true;
+    else return true;
 });
-
 
 export default router;

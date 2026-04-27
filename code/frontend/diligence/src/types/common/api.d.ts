@@ -89,6 +89,7 @@ export interface LoginResult {
 
 
 export interface TodayStatusItemBase {
+    locationId: number;
     state: boolean;
     name?: string;
 }
@@ -138,3 +139,26 @@ export interface AttendanceRateResult {
     deptAvgRate: number;
 }
 
+
+export type FetchUserInfoResult = UserInfo;
+
+
+export interface LocationInfo {
+    id: number;
+    longitude: number;
+    latitude: number;
+    radius: number;
+    name: string;
+    address: string;
+}
+
+
+export type LocationInfoResult = LocationInfo;
+
+
+export interface ClockData {
+    longitude: number;
+    latitude: number;
+    locationId: number;
+    time: string;
+}

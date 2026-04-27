@@ -16,9 +16,9 @@
  * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
  * */
 import type { Nullable, TodayStatusItem } from "@/types/common";
-import { attendanceApi } from "@/api/attendance";
 import { type ComputedRef, computed } from "vue";
 import { useAsyncState } from "@vueuse/core";
+import { attendanceApi } from "@/api";
 import { defineStore } from 'pinia';
 
 
@@ -90,3 +90,5 @@ export const useClockStore = defineStore('clock', () => {
     };
 });
 
+
+export default useClockStore;

@@ -127,7 +127,7 @@
     // @ts-expect-error
     import { useQRCode } from "@vueuse/integrations/useQRCode";
     import type { Nullable, Optional } from "@/types/common";
-    import { useAuthStore } from "@/stores/auth.store";
+    import useAuthStore from "@/stores/auth.store";
     import { ref, reactive, computed } from "vue";
     import type { Ref, Reactive } from "vue";
     import { ElMessage } from "element-plus";

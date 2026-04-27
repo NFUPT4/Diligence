@@ -17,12 +17,18 @@
             "data-view": "数据查看",
             "system-management": "系统管理"
         },
+        "year": "年",
+        "month": "月",
+        "day-ri": "日",
         "day": "天",
         "hour": "小时",
         "minute": "分钟",
         "second": "秒",
-        "logout": "退出登录",
-        "cancel": "取消"
+        "cancel": "取消",
+        "positive-confirm": "确定",
+        "back-to": "返回{name}",
+        "longitude": "经度",
+        "latitude": "纬度"
     },
     "auth": {
         "template": {
@@ -38,6 +44,17 @@
             "emp-include-letter-and-number": "员工号只能包含字母和数字",
             "pwd-less-than-6-characters": "密码长度不能少于6位",
             "pwd-include-b-l-letter-number-at-least": "密码至少包含大小写字母和数字"
+        }
+    },
+    "clock": {
+        "template": {
+            "location-pos": "打卡位置验证",
+            "loading-pos": "正在获取位置信息...",
+            "distance": "距离打卡点{distance}米（有效范围 ≤ {range}米）",
+            "clock-in": "{name}打卡",
+            "no-task": "今日无打卡任务，祝您生活愉快！",
+            "miss-task": "今日错过{count}次打卡任务，请及时补卡！",
+            "finish": "今日打卡已完成，祝您下班愉快！"
         }
     },
     "home": {

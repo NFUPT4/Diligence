@@ -51,7 +51,7 @@
      * */
     import DgPanel from "@/views/home/panel/DgPanel.vue";
     import { useAsyncState } from "@vueuse/core";
-    import { homeApi } from "@/api/home";
+    import { homeApi } from "@/api";
 
     /* state */
     const LOCAL = (key: string, type: string = "template") => `home.notice.${type}.${key}`;
