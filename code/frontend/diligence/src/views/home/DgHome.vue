@@ -191,6 +191,7 @@
     import { storeToRefs } from "pinia";
     import router from "@/router/router";
     import { ref } from "vue";
+    import DgClock from "@/views/clock/DgClock.vue";
 
     /* state */
     const { userInfo } = storeToRefs(useUserStore());
