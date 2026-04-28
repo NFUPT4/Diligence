@@ -34,7 +34,7 @@
             </div>
 
             <!-- 加载中 -->
-            <div v-else-if="todayStatusLoading"> <i class="fas fa-spinner fa-pulse" /> {{ $t(LOCAL("loading-data")) }} </div>
+            <div class="dhr-main-loading" v-else-if="todayStatusLoading || !recentClock || !distance || !location"> <i class="fas fa-spinner fa-pulse" /> {{ $t(LOCAL("loading-data")) }} </div>
 
             <main v-else class="dhr-main">
                 <!-- 实时信息 -->
@@ -52,109 +52,106 @@
                     </div>
                 </div>
 
-                <!-- 有即将到来或截止的打卡 -->
-                <template v-if="recentClock && distance && location">
+                <!-- 位置信息 -->
+                <div class="dhr-main-location">
+                    <div class="dhr-main-location-title">
+                        <i
+                            class="fas fa-location-dot"
+                            style="color: var(--primary-color); font-size: 1.6rem" />
+
+                        <h3 style="font-size: 1rem; font-weight: 600">{{ $t(LOCAL("location-pos")) }}</h3>
+                    </div>
+
                     <!-- 位置信息 -->
-                    <div class="dhr-main-location">
-                        <div class="dhr-main-location-title">
-                            <i
-                                class="fas fa-location-dot"
-                                style="color: var(--primary-color); font-size: 1.6rem" />
+                    <div class="dhr-main-location-info">
+                        <template v-if="loading">
+                            <i class="fas fa-spinner fa-pulse" /> {{ $t(LOCAL("loading-pos")) }}
+                        </template>
 
-                            <h3 style="font-size: 1rem; font-weight: 600">{{ $t(LOCAL("location-pos")) }}</h3>
-                        </div>
-
-                        <!-- 位置信息 -->
-                        <div class="dhr-main-location-info">
-                            <template v-if="loading">
-                                <i class="fas fa-spinner fa-pulse" /> {{ $t(LOCAL("loading-pos")) }}
-                            </template>
-
-                            <template v-else-if="!position || errorMsgKey">
-                                <i class="fas fa-exclamation-triangle" />{{
-                                    $t(LOCAL(errorMsgKey || "location-failed"))
-                                }}
-                            </template>
-
-                            <template v-else>
-                                <i class="fas fa-map-pin" />
-
-                                {{ address }}
-                            </template>
-                        </div>
-
-                        <!-- 距离信息 -->
-                        <i18n-t
-                            class="dhr-main-location-distance"
-                            :class="{ invaild: !distanceValid }"
-                            :keypath="LOCAL('distance')"
-                            tag="div">
-                            <template #distance>{{ distance?.toFixed(2) || "---" }}</template>
-
-                            <template #range>{{ location?.radius.toFixed(2) || "---" }}</template>
-                        </i18n-t>
-
-                        <!-- 错误指南 -->
-                        <div
-                            class="dhr-main-location-guide"
-                            :class="{ invaild: !distanceValid }">
-                            {{
-                                $t(
-                                    LOCAL(
-                                        distance && location
-                                            ? distanceValid
-                                                ? "pos-valid"
-                                                : "pos-invalid"
-                                            : errorMsgKey
-                                              ? "request-permission"
-                                              : "location-failed"
-                                    )
-                                )
+                        <template v-else-if="!position || errorMsgKey">
+                            <i class="fas fa-exclamation-triangle" />{{
+                                $t(LOCAL(errorMsgKey || "location-failed"))
                             }}
-                        </div>
+                        </template>
+
+                        <template v-else>
+                            <i class="fas fa-map-pin" />
+
+                            {{ address }}
+                        </template>
                     </div>
 
-                    <!-- 打卡按钮 -->
-                    <button
-                        class="dhr-main-btn"
-                        :disabled="!distanceValid"
-                        @click="handleClock">
-                        <i class="fas fa-fingerprint" />
+                    <!-- 距离信息 -->
+                    <i18n-t
+                        class="dhr-main-location-distance"
+                        :class="{ invaild: !distanceValid }"
+                        :keypath="LOCAL('distance')"
+                        tag="div">
+                        <template #distance>{{ distance?.toFixed(2) || "---" }}</template>
 
-                        <i18n-t
-                            :keypath="LOCAL(distanceValid ? 'clock-in' : 'clock-disabled')"
-                            tag="span">
-                            <template #name>
-                                {{ recentClock?.name || "" }}
-                            </template>
-                        </i18n-t>
-                    </button>
+                        <template #range>{{ location?.radius.toFixed(2) || "---" }}</template>
+                    </i18n-t>
 
-                    <!-- 今日打卡记录 -->
+                    <!-- 错误指南 -->
                     <div
-                        class="dhr-main-status"
-                        v-if="todayStatus?.status">
-                        <div><i class="far fa-calendar-check" /> {{ $t(LOCAL("today-records")) }}</div>
-                        <div class="dhr-main-status-list">
-                            <div
-                                class="dhr-main-status-item"
-                                v-for="(task, index) of todayStatus.status"
-                                :key="index">
-                                <i
-                                    class="dhr-main-status-item-dot"
-                                    :class="{
-                                        [task.state
-                                            ? 'sucess'
-                                            : task.startTime && task.startTime > now
-                                              ? 'wait'
-                                              : 'miss']: true
-                                    }" />
+                        class="dhr-main-location-guide"
+                        :class="{ invaild: !distanceValid }">
+                        {{
+                            $t(
+                                LOCAL(
+                                    distance && location
+                                        ? distanceValid
+                                            ? "pos-valid"
+                                            : "pos-invalid"
+                                        : errorMsgKey
+                                          ? "request-permission"
+                                          : "location-failed"
+                                )
+                            )
+                        }}
+                    </div>
+                </div>
 
-                                {{ task.name || formatClockTime(task) }}
-                            </div>
+                <!-- 打卡按钮 -->
+                <button
+                    class="dhr-main-btn"
+                    :disabled="!distanceValid"
+                    @click="handleClock">
+                    <i class="fas fa-fingerprint" />
+
+                    <i18n-t
+                        :keypath="LOCAL(distanceValid ? 'clock-in' : 'clock-disabled')"
+                        tag="span">
+                        <template #name>
+                            {{ recentClock?.name || "" }}
+                        </template>
+                    </i18n-t>
+                </button>
+
+                <!-- 今日打卡记录 -->
+                <div
+                    class="dhr-main-status"
+                    v-if="todayStatus?.status">
+                    <div><i class="far fa-calendar-check" /> {{ $t(LOCAL("today-records")) }}</div>
+                    <div class="dhr-main-status-list">
+                        <div
+                            class="dhr-main-status-item"
+                            v-for="(task, index) of todayStatus.status"
+                            :key="index">
+                            <i
+                                class="dhr-main-status-item-dot"
+                                :class="{
+                                    [task.state
+                                        ? 'sucess'
+                                        : (task.endTime && task.endTime < now)
+                                          ? 'miss'
+                                          : 'wait']: true
+                                }" />
+
+                            {{ task.name || formatClockTime(task) }}
                         </div>
                     </div>
-                </template>
+                </div>
             </main>
         </template>
     </dg-panel>
@@ -457,7 +454,7 @@
                         &.miss
                             background: var(--clock-status-miss)
 
-            &-noclock
+            &-noclock, &-loading
                 background: var(--clock-bg)
                 border-radius: 24px
                 padding: 16px

@@ -60,8 +60,11 @@ export const useLocationStore = defineStore("location", () => {
 
     /* watch */
     watch(
-        () => position.value?.coords,
-        () => addressExecute()
+        () => position.value,
+        (newVal) => {
+            if (newVal)
+                addressExecute();
+        }
     );
 
     return {

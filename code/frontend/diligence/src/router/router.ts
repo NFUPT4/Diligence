@@ -27,12 +27,6 @@ const router = createRouter({
             name: "auth",
             component: DgAuth,
             meta: { requiresAuth: false }
-        },
-        {
-            path: "/clock",
-            name: "clock",
-            component: () => import(/* webpackPrefetch: true */ "@/views/clock/DgClock.vue"),
-            meta: { requiresAuth: true }
         }
     ]
 });
