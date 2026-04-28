@@ -18,7 +18,7 @@
 import { DG_TOKEN_KEY, DG_REMEMBER_KEY } from "@/utils/constant";
 import { useUserStore } from "@/stores/user.store";
 import { computed, ref, type Ref } from "vue";
-import { authApi } from "@/api/auth";
+import { authApi } from "@/api";
 import { defineStore } from "pinia";
 
 

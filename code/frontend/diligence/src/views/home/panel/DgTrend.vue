@@ -48,7 +48,7 @@
     import { LineChart } from "echarts/charts";
     import * as echarts from "echarts/core";
     import { ref, onUnmounted } from "vue";
-    import { homeApi } from "@/api/home";
+    import { homeApi } from "@/api";
 
     echarts.use([
         GridComponent,

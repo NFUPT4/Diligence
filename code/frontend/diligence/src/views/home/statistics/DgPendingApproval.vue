@@ -43,7 +43,7 @@
      * */
     import DgStateCard from "@/views/home/statistics/DgStateCard.vue";
     import { useAsyncState } from "@vueuse/core";
-    import { homeApi } from "@/api/home";
+    import { homeApi } from "@/api";
 
     /* state */
     const { state: pendingCount } = useAsyncState(homeApi.getPendingApprovalCount, null, { immediate: true });

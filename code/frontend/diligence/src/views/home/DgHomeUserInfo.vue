@@ -52,8 +52,8 @@
      * @desc 主页用户信息组件
      * @copyright CC BY-NC-SA
      * */
-    import { ref, defineProps, defineEmits, type PropType } from "vue";
     import useUserStore from "@/stores/user.store";
+    import { ref, type PropType } from "vue";
     import { storeToRefs } from "pinia";
 
     /* emit */

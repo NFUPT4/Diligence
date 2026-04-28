@@ -44,7 +44,7 @@
      * @copyright CC BY-NC-SA
      * */
     import DgStateCard from "@/views/home/statistics/DgStateCard.vue";
-    import { attendanceApi } from "@/api/attendance";
+    import { attendanceApi } from "@/api";
     import { useAsyncState } from "@vueuse/core";
     import { computed } from "vue";
 

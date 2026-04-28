@@ -166,3 +166,28 @@ export function getFunctionUniqueId<T extends object>(
 
     return (fn as typeof fn & { [id]: symbol })[id]!;
 }
+
+
+/**
+ * @summary 计算两经纬度之间的距离
+ * @desc 计算两经纬度之间的距离，单位：米
+ *
+ * @param {number} lng1 第一个经度
+ * @param {number} lat1 第一个纬度
+ * @param {number} lng2 第二个经度
+ * @param {number} lat2 第二个纬度
+ *
+ * @return {number} 距离，单位：米
+ * */
+export function haversine(lng1: number, lat1: number, lng2: number, lat2: number) {
+    const radius = 6371e3;  // 地球平均半径，单位：米
+
+    const radLat1 = Math.PI * lat1 / 180;
+    const radLat2 = Math.PI * lat2 / 180;
+    const deltaLat = Math.PI * (lat2 - lat1) / 180;
+    const deltaLng = Math.PI * (lng2 - lng1) / 180;
+
+    const a = Math.pow(Math.sin(deltaLat / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(deltaLng / 2), 2);
+
+    return 2 * radius * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}

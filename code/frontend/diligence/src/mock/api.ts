@@ -16,17 +16,24 @@
  * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
  * */
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import { MockServerBase, route as mockRoute } from "@/mock/common";
 import type {
     AttendanceRateResult,
-    HttpRequest,
-    LoginData,
-    LoginResult,
-    Nullable,
+    FetchUserInfoResult,
+    LocationInfoResult,
     TodayStatusResult,
+    LocationInfo,
+    HttpRequest,
+    LoginResult,
+    ClockData,
+    LoginData,
+    Nullable,
     UserInfo
 } from "@/types/common";
-import { randomBoolean, randomChoice, genRandomDatePairs } from "@/utils";
+import { genRandomDatePairs } from "@/utils";
 
 type AxiosRequest<T = unknown> = HttpRequest<{
     data: T;
@@ -77,6 +84,7 @@ class MockServer extends MockServerBase {
     private userList: DbUserInfo[] = [];
 
     private readonly datePairs: ReturnType<typeof genRandomDatePairs> = [];
+    private readonly locations: LocationInfo[] = [];
 
     private readonly startDate = new Date(Date.now());
     private readonly endDate = new Date(Date.now());
@@ -95,9 +103,16 @@ class MockServer extends MockServerBase {
         });
 
         this.startDate.setHours(6,30);
-        this.endDate.setHours(23);
+        this.endDate.setHours(23, 59);
 
         this.datePairs = genRandomDatePairs(this.startDate, this.endDate, Math.floor(Math.random() * 4) + 1);
+        this.locations = Array.from({ length: this.datePairs.length }).map((_, i) => ({
+            id: i + 1,
+            longitude: Math.random() * 180,
+            latitude: Math.random() * 90,
+            radius: Math.random() * 900 + 100,
+            name: `位置${i + 1}`,
+        }));
     }
 
     /**
@@ -133,6 +148,19 @@ class MockServer extends MockServerBase {
         return { code: 401, msg: "用户名或密码错误", data: null };
     }
 
+    @route("/user/info", "POST")
+    fetchUserInfo(request: AxiosRequest<null>): HttpRequest<null> | FetchUserInfoResult {
+        const info = MockServer.parseToken(request);
+
+        if (!info) return { code: 401, msg: "请先登录", data: null };
+
+        const { uid, empNo } = info;
+
+        const userInfo = this.userList.find(ui => ui.empNo === empNo);
+
+        return userInfo || { code: 404, msg: "用户不存在", data: null };
+    }
+
     /**
      * @summary 获取用户今日打卡状态
      * @desc 先检查token，然后随机生成打卡状态。
@@ -147,15 +175,32 @@ class MockServer extends MockServerBase {
 
         if (!info) return { code: 401, msg: "请先登录", data: null };
 
-        const { uid, empNo } = info;
-
         return {
             status: this.datePairs.map(pair => ({
-                state: randomBoolean(),
+                locationId: Math.floor(Math.random() * this.locations.length) + 1,
+                state: false, // randomBoolean(),
                 startTime: pair.start.toISOString(),
                 endTime: pair.end.toISOString()
             }))
         };
+    }
+
+    @route("/clock/location", "POST")
+    getLocation(request: AxiosRequest<number>): HttpRequest<null> | LocationInfoResult {
+        const info = MockServer.parseToken(request);
+
+        if (!info) return { code: 401, msg: "请先登录", data: null };
+
+        const location = this.locations[request.body.data - 1];
+
+        return location || { code: 404, msg: "位置不存在", data: null };
+    }
+
+    @route("/clock/record", "POST")
+    checkIn(request: AxiosRequest<ClockData>): HttpRequest<null> | HttpRequest<boolean> {
+        const info = MockServer.parseToken(request);
+
+        return info ? true : { code: 401, msg: "请先登录", data: null };
     }
 
     /**

@@ -19,7 +19,7 @@
 
         <template #value>
             {{ $t(LOCAL("value")) }}
-            {{ checkInStat.complete === checkInStat.total ? "✅" : `${checkInStat.complete}/${checkInStat.total}` }}
+            {{ checkInStat && checkInStat.complete === checkInStat.total ? "✅" : `${checkInStat?.complete ?? '--'}/${checkInStat?.total ?? '--'}` }}
         </template>
 
         <template #sub>
@@ -27,7 +27,7 @@
             <div v-if="todayStatus?.status.length">
                 <!-- 错过打卡时间 -->
                 <i18n-t
-                    v-if="checkInStat.miss"
+                    v-if="checkInStat?.miss"
                     :keypath="LOCAL('miss-task')"
                     tag="span">
                     <template #count>
