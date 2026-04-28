@@ -103,7 +103,7 @@
                 <!-- 打卡按钮 -->
                 <button
                     class="dc-main-btn"
-                    :disabled="distanceValid || true"
+                    :disabled="!distanceValid"
                     @click="handleClock">
                     <i class="fas fa-fingerprint" />
 
@@ -264,7 +264,7 @@
     });
 
     // 距离是否有效且合理
-    const distanceValid = computed(() => distance.value && location.value && distance.value <= location.value.radius);
+    const distanceValid = computed(() => distance.value !== null && location.value && distance.value <= location.value.radius);
 
     // 地址相关部分是否在加载
     const loading = computed(() => positionLoading.value || locationLoading.value || addressLoading.value);

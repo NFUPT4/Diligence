@@ -51,13 +51,13 @@
     import { homeApi } from "@/api";
 
     echarts.use([
-        GridComponent,
+        LegacyGridContainLabel,
         TooltipComponent,
         LegendComponent,
-        LineChart,
         CanvasRenderer,
+        GridComponent,
         LabelLayout,
-        LegacyGridContainLabel
+        LineChart,
     ]);
 
     /* state */
