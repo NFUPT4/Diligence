@@ -29,6 +29,8 @@ import { computed } from "vue";
 
 export const useCoordStore = defineStore("coord", () => {
     /* state */
+
+
     const { state: AMap /* 高德地图实例 */ } = useAsyncState(
         async () =>
             await AMapLoader.load({

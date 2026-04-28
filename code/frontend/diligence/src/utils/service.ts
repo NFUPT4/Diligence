@@ -56,7 +56,15 @@ service.interceptors.response.use(
 
         return Promise.reject(new Error(result.message || "Error"));
     },
-    error => Promise.reject(error)
+    error => {
+        if (error.response?.status === 401) {
+            localStorage.removeItem(DG_TOKEN_KEY);
+
+            window.location.href = "/auth";
+        }
+
+        return Promise.reject(error);
+    }
 );
 
 /** @namespace http
