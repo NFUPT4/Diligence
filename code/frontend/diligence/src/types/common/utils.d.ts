@@ -29,3 +29,16 @@ export type Nullable<T> = T | null;
  * @remarks 与Nullable不同，Optional可以用于定义可选参数，即参数可以不传，但必须声明类型
  * */
 export type Optional<T> = T | undefined;
+
+
+type _SnakeCase<T extends string> = T extends `${infer Head}${infer Tail}`
+    ? Head extends Uppercase<Head>
+        ? `_${Lowercase<Head>}${_SnakeCase<Tail>}`
+        : `${Head}${_SnakeCase<Tail>}`
+    : T;
+
+/**
+ * @summary 定义一个将命名类型转换为下划线命名的类型
+ * @desc 用于将命名类型转换为下划线命名的类型
+ * */
+export type SnakeCase<T extends string> = _SnakeCase<T> extends `_${infer Rest}` ? Rest : never;

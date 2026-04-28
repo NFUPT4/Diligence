@@ -136,12 +136,7 @@
      * */
     import { useThemeStore } from "@/stores/theme.store";
     import { defineComponent } from "vue";
-    import router from "@/router/router";
 
-
-    onload = () => {
-        router.push("/");
-    };
 
     export default defineComponent({
         name: "App",

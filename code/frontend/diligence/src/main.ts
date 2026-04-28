@@ -7,14 +7,28 @@
  * permission, please contact NFUPT4 https://gitee.com/nfupt4.
  */
 
-import { createApp } from 'vue';
-import { createPinia } from 'pinia';
+import { createPinia, type PiniaPluginContext } from "pinia";
 import { createI18nInstance } from "@/locales/i18n";
+import { createApp } from 'vue';
 
 import App from './App.vue';
 import router from './router/router';
+import useEventStore from "@/stores/event.store";
+import useSizeStore from "@/stores/size.store";
 
 import "element-plus/dist/index.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
-createApp(App).use(createPinia()).use(await createI18nInstance()).use(router).mount('#app')
+const pinia = createPinia();
+
+pinia.use(function ({ store }: PiniaPluginContext) {
+    if (store.$id === "event") {
+        const eventStore = store as ReturnType<typeof useEventStore>;
+
+        eventStore.init(() => {
+            useSizeStore().init();
+        });
+    }
+});
+
+createApp(App).use(pinia).use(await createI18nInstance()).use(router).mount('#app')

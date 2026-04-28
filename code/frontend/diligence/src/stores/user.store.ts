@@ -39,7 +39,18 @@ export const useUserStore = defineStore("user", () => {
         set: (value: UserInfo) => innerUserInfo. value= value
     }) as WritableComputedRef<UserInfo, UserInfo>;
 
+    /* methods */
+
+    // 重置用户信息
+    const reset = () => {
+        innerUserInfo.value = null;
+    };
+
     return {
-        userInfo
+        userInfo,
+        reset
     };
 });
+
+
+export default useUserStore;

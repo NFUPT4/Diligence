@@ -49,46 +49,41 @@
             </div>
 
             <!-- 侧边栏用户信息 -->
-            <div class="dh-side-user">
-                <div class="dh-side-user-avatar">
-                    <i class="fas fa-user-circle" />
-                </div>
-
-                <div class="dh-side-user-info">
-                    <h4
-                        class="dh-side-user-info-name"
-                        style="margin: 0; white-space: nowrap"
-                        >{{ userInfo.name }} · {{ userInfo.deptName }}</h4
-                    >
-
-                    <p
-                        class="dh-side-user-info-role"
-                        style="margin: 0; white-space: nowrap"
-                        >{{ $t(`enum.role.${userInfo.role}`) }}</p
-                    >
-                </div>
-            </div>
+            <dg-home-user-info
+                class="dh-side-userinfo"
+                :logout="logout" />
         </aside>
 
         <!-- 主体内容 -->
         <main class="dh-main">
             <header class="dh-main-header">
-                <i18n-t
-                    keypath="home.template.welcome"
-                    tag="h1">
-                    <template #username>
-                        {{ userInfo.name }}
-                    </template>
-                </i18n-t>
+                <div class="dh-main-header-left">
+                    <h1 class="dh-main-header-left-title">{{ $t("common.name") }}</h1>
 
-                <el-breadcrumb
-                    class="dh-main-header-breadcrumb"
-                    separator="/">
-                    <el-breadcrumb-item :to="{ path: '/' }">
-                        <i class="fas fa-home" />
-                        {{ $t("common.link.home") }}
-                    </el-breadcrumb-item>
-                </el-breadcrumb>
+                    <i18n-t
+                        keypath="home.template.welcome"
+                        tag="h1"
+                        class="dh-main-header-left-subtitle">
+                        <template #username>
+                            {{ userInfo.name }}
+                        </template>
+                    </i18n-t>
+
+                    <el-breadcrumb
+                        class="dh-main-header-left-breadcrumb"
+                        separator="/">
+                        <el-breadcrumb-item :to="{ path: '/' }">
+                            <i class="fas fa-home" />
+                            {{ $t("common.link.home") }}
+                        </el-breadcrumb-item>
+                    </el-breadcrumb>
+                </div>
+
+                <div class="dh-main-header-right">
+                    <dg-home-user-info
+                        @click="openDrawer = true"
+                        class="dh-main-header-right-userinfo" />
+                </div>
             </header>
 
             <!-- grid内容 -->
@@ -133,6 +128,38 @@
                 <dg-notice class="dh-main-content-panel" />
             </div>
         </main>
+
+        <!-- 底部抽屉（移动端登出） -->
+        <el-drawer
+            v-model="openDrawer"
+            direction="btt"
+            :with-header="false">
+            <div class="dh-drawer">
+                <dg-home-user-info class="dh-drawer-userinfo" />
+
+                <el-divider />
+
+                <div class="dh-drawer-btns">
+                    <el-button
+                        type="danger"
+                        round
+                        size="large"
+                        @click="logout">
+                        {{ $t("common.logout") }}
+                        <i class="fas fa-sign-out-alt" />
+                    </el-button>
+
+                    <el-button
+                        type="info"
+                        round
+                        size="large"
+                        @click="openDrawer = false">
+                        {{ $t("common.cancel") }}
+                        <i class="fas fa-times" />
+                    </el-button>
+                </div>
+            </div>
+        </el-drawer>
     </div>
 </template>
 
@@ -152,17 +179,35 @@
     import DgAttendanceRate from "@/views/home/statistics/DgAttendanceRate.vue";
     import DgShortcutRecord from "@/views/home/shortcut/DgShortcutRecord.vue";
     import DgShortcutCharts from "@/views/home/shortcut/DgShortcutCharts.vue";
+    import DgHomeUserInfo from "@/views/home/DgHomeUserInfo.vue";
     import DgApproval from "@/views/home/panel/DgApproval.vue";
     import DgReviews from "@/views/home/panel/DgReviews.vue";
     import DgNotice from "@/views/home/panel/DgNotice.vue";
     import DgTrend from "@/views/home/panel/DgTrend.vue";
     import DgLogo from "@/components/DgLogo.vue";
 
-    import { useUserStore } from "@/stores/user.store";
+    import useAuthStore from "@/stores/auth.store";
+    import useUserStore from "@/stores/user.store";
     import { storeToRefs } from "pinia";
+    import router from "@/router/router";
+    import { ref } from "vue";
 
     /* state */
     const { userInfo } = storeToRefs(useUserStore());
+
+    const authStore = useAuthStore();
+
+    // 抽屉状态
+    const openDrawer = ref(false);
+
+    /* methods */
+
+    // 登出
+    const logout = () => {
+        authStore.logout();
+
+        router.push("/auth");
+    };
 </script>
 
 <style lang="sass" scoped>
@@ -287,38 +332,9 @@
                         i
                             color: var(--primary-color)
 
-            &-user
-                margin: 20px 16px 24px
-                padding: 16px
-                background: rgba(255, 255, 255, 0.9)
-                backdrop-filter: blur(4px)
-                border-radius: 24px
-                border: 1px solid var(--border-light)
-                display: flex
-                align-items: center
-                gap: 12px
-
+            &-userinfo
                 @include mobile()
                     display: none
-
-                &-avatar
-                    width: 44px
-                    height: 44px
-                    background: var(--primary-lighter)
-                    border-radius: 28px
-                    display: flex
-                    align-items: center
-                    justify-content: center
-                    font-size: 1.5rem
-                    color: var(--primary-color)
-
-                &-info
-                    &-name
-                        font-size: 0.9rem
-                        font-weight: 600
-                    &-role
-                        font-size: 0.7rem
-                        color: var(--text-muted)
 
         // ----- 主内容区 -----
         &-main
@@ -342,16 +358,45 @@
 
             &-header
                 margin-bottom: 28px
+                display: flex
+                justify-content: space-between
 
-                h1
-                    font-size: 1.8rem
-                    font-weight: 600
-                    color: #0f172a
+                &-left
 
-                &-breadcrumb
-                    font-size: 0.85rem
-                    color: var(--text-muted)
-                    margin-top: 6px
+                    @mixin title-style
+                        font-size: 1.8rem
+                        font-weight: 600
+                        color: #0f172a
+
+                    &-title
+                        @include pc()
+                            display: none
+
+                        @include mobile()
+                            @include title-style
+
+                            color: var(--primary-color)
+
+                    &-subtitle
+                        @include pc()
+                            @include title-style
+
+                        @include mobile()
+                            font-size: 0.8rem
+                            color: #5b6e8c
+                            margin-top: 4px
+
+                    &-breadcrumb
+                        font-size: 0.85rem
+                        color: var(--text-muted)
+                        margin-top: 6px
+
+                        @include mobile()
+                            display: none
+
+                &-right
+                    @include pc()
+                        display: none
 
             &-content
                 display: grid
@@ -387,4 +432,24 @@
 
                     @include mobile()
                         grid-column: 1 / -1
+
+        &-drawer
+            height: 100%
+            display: flex
+            flex-direction: column
+
+            &-userinfo
+                :deep([class*="info"])
+                    display: block
+
+            &-btns
+                flex: 1
+                display: flex
+                flex-direction: column
+                justify-content: space-around
+                align-items: center
+
+                :deep(.el-button)
+                    width: 100%
+                    margin-left: 0
 </style>

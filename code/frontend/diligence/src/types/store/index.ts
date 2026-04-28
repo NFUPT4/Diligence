@@ -8,23 +8,14 @@
  */
 
 /**
- * @file auth.ts
+ * @file index.ts
  * @author edocsitahw
  * @version 1.1
- * @date 2026/04/14 11:25
- * @desc 用户登录api封装文件
- * @copyrigh-t CC BY-NC-SA 2026. All rights reserved.
+ * @date 2026/04/26 19:08
+ * @desc 专用于声明Vue不同功能模块，如Pinia，Mock，Axios或组件等之间跨模块共享的类型
+ * @copyright CC BY-NC-SA 2026. All rights reserved.
  * */
 
-import { http } from "@/utils/service";
-import type { LoginData, LoginResult } from "@/types/common";
 
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
-export namespace authApi {
-
-    export async function login(data: LoginData) {
-        return await http.post<LoginResult>("/auth/login", { data });
-    }
-
-}
+export type MediaTypes = "phone" | "tablet" | "desktop";

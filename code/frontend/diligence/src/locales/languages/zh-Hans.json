@@ -8,7 +8,7 @@
     },
     "common": {
         "sys-name": "“致勤”-企业考勤系统",
-        "name": "致勤",
+        "name": "勤致",
         "brief": "勤能致远",
         "description": "",
         "link": {
@@ -17,10 +17,18 @@
             "data-view": "数据查看",
             "system-management": "系统管理"
         },
+        "year": "年",
+        "month": "月",
+        "day-ri": "日",
         "day": "天",
         "hour": "小时",
         "minute": "分钟",
-        "second": "秒"
+        "second": "秒",
+        "cancel": "取消",
+        "positive-confirm": "确定",
+        "back-to": "返回{name}",
+        "longitude": "经度",
+        "latitude": "纬度"
     },
     "auth": {
         "template": {
@@ -36,6 +44,34 @@
             "emp-include-letter-and-number": "员工号只能包含字母和数字",
             "pwd-less-than-6-characters": "密码长度不能少于6位",
             "pwd-include-b-l-letter-number-at-least": "密码至少包含大小写字母和数字"
+        }
+    },
+    "clock": {
+        "template": {
+            "location-pos": "打卡位置验证",
+            "loading-pos": "正在获取位置信息...",
+            "distance": "距离打卡点{distance}米（有效范围 ≤ {range}米）",
+            "clock-in": "{name}打卡",
+            "no-task": "今日无打卡任务，祝您生活愉快！",
+            "miss-task": "今日错过{count}次打卡任务，请及时补卡！",
+            "finish": "今日打卡已完成，祝您下班愉快！",
+            "pos-valid": "✓ 位置有效，可打卡",
+            "pos-invalid": "✗ 超出打卡范围，请移动到公司附近",
+            "clock-disabled": "暂时无法打卡",
+            "location-failed": "定位失败",
+            "user-refused": "用户拒绝授权位置信息",
+            "position-unavailable": "位置信息不可用",
+            "location-timeout": "定位超时",
+            "request-permission": "请授权位置权限后刷新页面",
+            "unsupported-browser": "浏览器不支持定位",
+            "modern-browser": "请使用现代浏览器",
+            "clock-unabled": "无法打卡",
+            "loading-data": "加载数据中...",
+            "today-records": "今日打卡记录"
+        },
+        "script": {
+            "success": "打卡成功！",
+            "failed": "打卡失败，请检查后重试！"
         }
     },
     "home": {

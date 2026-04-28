@@ -135,6 +135,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            position: relative;               /* 新增：为绝对定位退出按钮提供参照 */
         }
 
         .user-avatar {
@@ -150,6 +151,10 @@
             font-size: 1.2rem;
         }
 
+        .user-info {
+            flex: 1;                         /* 新增：让文字信息占据剩余空间，退出图标靠右 */
+        }
+
         .user-info h4 {
             font-size: 0.9rem;
             font-weight: 600;
@@ -158,6 +163,21 @@
         .user-info p {
             font-size: 0.7rem;
             color: #5b6e8c;
+        }
+
+        /* 退出登录按钮样式 */
+        .logout-icon {
+            font-size: 1.2rem;
+            color: #7c8ba0;
+            cursor: pointer;
+            transition: color 0.2s;
+            padding: 4px;
+            border-radius: 12px;
+        }
+
+        .logout-icon:hover {
+            color: #b91c1c;
+            background: #fee2e2;
         }
 
         /* ========= 右侧主内容 ========= */
@@ -460,6 +480,8 @@
                 <h4>张明远 · 产品部</h4>
                 <p>普通员工 · 在线</p>
             </div>
+            <!-- 新增退出登录图标 -->
+            <i class="fas fa-sign-out-alt logout-icon" title="退出登录" onclick="handleLogout()"></i>
         </div>
     </aside>
 
@@ -636,6 +658,14 @@
     </main>
 </div>
 
-<!-- 极简说明：UI设计遵循“勤致”概要及界面原型，突出GPS验证打卡、待审批、考勤统计、权限菜单、可视化卡片。所有图标和布局体现现代考勤系统高效简洁风格 -->
+<script>
+    // 退出登录的二次确认
+    function handleLogout() {
+        if (confirm('确认退出当前账号？')) {
+            alert('您已安全退出登录。');
+            // 实际项目中可在此处执行跳转到登录页等操作，例如：window.location.href = '/login';
+        }
+    }
+</script>
 </body>
 </html>

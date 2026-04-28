@@ -74,6 +74,12 @@
             font-size: 1.4rem;
             color: #2d6a4f;
             box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            cursor: pointer;          /* 新增：表明可点击 */
+            transition: background 0.2s;
+        }
+
+        .avatar:active {
+            background: #d0e5db;      /* 按下反馈 */
         }
 
         /* 统计卡片区 (横向滚动或网格，移动端采用grid一行三个紧凑) */
@@ -315,6 +321,103 @@
         .stats-row::-webkit-scrollbar {
             display: none;
         }
+
+        /* ---------- 弹出面板/遮罩样式 (新增) ---------- */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 100;
+            display: none;
+            align-items: flex-end;          /* 面板从底部弹出 */
+            justify-content: center;
+        }
+
+        .overlay.show {
+            display: flex;
+        }
+
+        .profile-sheet {
+            background: white;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 28px 28px 0 0;
+            padding: 24px 24px 36px;
+            box-shadow: 0 -8px 30px rgba(0,0,0,0.1);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .sheet-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eef2f0;
+        }
+
+        .sheet-avatar {
+            background: #e9f5ef;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #2d6a4f;
+        }
+
+        .sheet-user h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .sheet-user p {
+            font-size: 0.8rem;
+            color: #5b6e8c;
+        }
+
+        .logout-btn-sheet {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            background: #fff1f0;
+            color: #b91c1c;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .logout-btn-sheet:active {
+            background: #ffe0e0;
+        }
+
+        .cancel-sheet {
+            width: 100%;
+            margin-top: 12px;
+            padding: 14px;
+            border: none;
+            background: #f1f5f9;
+            color: #334155;
+            font-weight: 500;
+            border-radius: 60px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -325,13 +428,14 @@
         <span><i class="fas fa-signal"></i> <i class="fas fa-battery-full"></i></span>
     </div>
 
-    <!-- 头部欢迎区 + 头像 -->
+    <!-- 头部欢迎区 + 头像（可点击） -->
     <div class="header">
         <div class="welcome">
             <h2>勤致</h2>
             <p>下午好，张明远 🌟</p>
         </div>
-        <div class="avatar">
+        <!-- 给头像增加 id，绑定事件 -->
+        <div class="avatar" id="avatarBtn">
             <i class="fas fa-user-astronaut"></i>
         </div>
     </div>
@@ -376,7 +480,7 @@
         </div>
     </div>
 
-    <!-- 待审批申请区块 (部门负责人角色可见，此处展示示例) -->
+    <!-- 待审批申请区块 -->
     <div class="card" style="padding-bottom: 12px;">
         <div class="card-header">
             <h3><i class="fas fa-clipboard-list"></i> 待审批申请</h3>
@@ -408,7 +512,7 @@
         <div class="text-small" style="text-align: right; margin-top: 6px;">查看全部 <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 快捷入口 (符合角色常用功能) -->
+    <!-- 快捷入口 -->
     <div class="quick-grid">
         <div class="quick-item">
             <div class="quick-icon"><i class="fas fa-calendar-plus"></i></div>
@@ -428,7 +532,7 @@
         </div>
     </div>
 
-    <!-- 考勤趋势 + 公告混合区域 -->
+    <!-- 考勤趋势 -->
     <div class="section-title">
         <span>📊 月度考勤趋势</span>
         <span class="text-small">出勤率稳定 ↑</span>
@@ -445,7 +549,7 @@
         </div>
     </div>
 
-    <!-- 系统公告栏 -->
+    <!-- 系统公告 -->
     <div class="card" style="margin-bottom: 20px;">
         <div class="card-header">
             <h3><i class="fas fa-bullhorn"></i> 系统公告</h3>
@@ -487,6 +591,60 @@
     </div>
 </div>
 
-<!-- 注：所有交互为静态演示，完全符合“勤致”考勤系统移动端首页设计规范，包含GPS验证打卡、待审批、考勤统计及快捷入口 -->
+<!-- 遮罩层 + 底部个人信息面板 (点击头像时弹出) -->
+<div class="overlay" id="profileOverlay">
+    <div class="profile-sheet">
+        <div class="sheet-header">
+            <div class="sheet-avatar">
+                <i class="fas fa-user-astronaut"></i>
+            </div>
+            <div class="sheet-user">
+                <h4>张明远</h4>
+                <p>产品部 · 普通员工</p>
+            </div>
+        </div>
+        <!-- 退出登录按钮，带二次确认 -->
+        <button class="logout-btn-sheet" id="logoutBtnSheet">
+            <i class="fas fa-sign-out-alt"></i> 退出登录
+        </button>
+        <button class="cancel-sheet" id="cancelBtnSheet">取消</button>
+    </div>
+</div>
+
+<script>
+    // 获取元素
+    const avatarBtn = document.getElementById('avatarBtn');
+    const overlay = document.getElementById('profileOverlay');
+    const logoutBtnSheet = document.getElementById('logoutBtnSheet');
+    const cancelBtnSheet = document.getElementById('cancelBtnSheet');
+
+    // 点击头像打开面板
+    avatarBtn.addEventListener('click', () => {
+        overlay.classList.add('show');
+    });
+
+    // 点击遮罩层或取消按钮关闭面板
+    function closePanel() {
+        overlay.classList.remove('show');
+    }
+
+    overlay.addEventListener('click', (e) => {
+        // 只有点击背景遮罩时才关闭，点击面板本身不关闭
+        if (e.target === overlay) {
+            closePanel();
+        }
+    });
+
+    cancelBtnSheet.addEventListener('click', closePanel);
+
+    // 退出登录逻辑：二次确认
+    logoutBtnSheet.addEventListener('click', () => {
+        if (confirm('确认退出当前账号？')) {
+            alert('您已安全退出登录。');
+            closePanel();            // 关闭面板
+            // 实际项目跳转: window.location.href = '/login';
+        }
+    });
+</script>
 </body>
 </html>
