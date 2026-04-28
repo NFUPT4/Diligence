@@ -54,7 +54,24 @@
             "clock-in": "{name}打卡",
             "no-task": "今日无打卡任务，祝您生活愉快！",
             "miss-task": "今日错过{count}次打卡任务，请及时补卡！",
-            "finish": "今日打卡已完成，祝您下班愉快！"
+            "finish": "今日打卡已完成，祝您下班愉快！",
+            "pos-valid": "✓ 位置有效，可打卡",
+            "pos-invalid": "✗ 超出打卡范围，请移动到公司附近",
+            "clock-disabled": "暂时无法打卡",
+            "location-failed": "定位失败",
+            "user-refused": "用户拒绝授权位置信息",
+            "position-unavailable": "位置信息不可用",
+            "location-timeout": "定位超时",
+            "request-permission": "请授权位置权限后刷新页面",
+            "unsupported-browser": "浏览器不支持定位",
+            "modern-browser": "请使用现代浏览器",
+            "clock-unabled": "无法打卡",
+            "loading-data": "加载数据中...",
+            "today-records": "今日打卡记录"
+        },
+        "script": {
+            "success": "打卡成功！",
+            "failed": "打卡失败，请检查后重试！"
         }
     },
     "home": {

@@ -26,7 +26,7 @@ export const useClockStore = defineStore('clock', () => {
     /* state */
 
     // 今日打卡状态结果
-    const { state: todayStatus } = useAsyncState(attendanceApi.getTodayStatus, null, { immediate: true });
+    const { state: todayStatus, isLoading: todayStatusLoading } = useAsyncState(attendanceApi.getTodayStatus, null, { immediate: true });
 
     /* computed */
 
@@ -63,12 +63,12 @@ export const useClockStore = defineStore('clock', () => {
     });
 
     // 打卡统计信息
-    const checkInStat: ComputedRef<{
+    const checkInStat: ComputedRef<Nullable<{
         miss: number; // 缺卡次数
         complete: number; // 完成次数
         total: number; // 总次数
-    }> = computed(() => {
-        if (!todayStatus.value) return { miss: 0, complete: 0, total: 0 };
+    }>> = computed(() => {
+        if (!todayStatus.value) return null;
 
         const now = new Date();
         let miss = 0,
@@ -86,7 +86,8 @@ export const useClockStore = defineStore('clock', () => {
         todayStatus,
         recentClockInfo,
         checkInStat,
-        recentClock
+        recentClock,
+        todayStatusLoading
     };
 });
 

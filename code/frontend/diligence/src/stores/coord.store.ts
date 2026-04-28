@@ -74,3 +74,6 @@ export const useCoordStore = defineStore("coord", () => {
         getAddress
     };
 });
+
+
+export default useCoordStore;

@@ -409,7 +409,8 @@
         const userLng = position.longitude;
         const userLat = position.latitude;
         const distance = calculateDistance(userLat, userLng, companyLocation.latitude, companyLocation.longitude);
-        const isValid = distance <= companyLocation.radius;
+        // const isValid = distance <= companyLocation.radius;
+        const isValid = true;
         distanceInfo.innerText = `距离打卡点 ${Math.round(distance)} 米 (有效范围 ≤ ${companyLocation.radius}米)`;
         if (isValid) {
             distanceInfo.style.backgroundColor = '#e9f5ef';

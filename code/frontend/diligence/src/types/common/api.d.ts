@@ -18,7 +18,6 @@
 
 import { Nullable } from "@/types/common/utils";
 
-
 /**
  * HTTP响应接口
  * @interface HttpResponse
@@ -62,7 +61,6 @@ export interface UserInfo {
     deptName: string;
 }
 
-
 /** @interface LoginData
  *
  * @summary 登录请求参数接口
@@ -87,23 +85,45 @@ export interface LoginResult {
     userInfo: UserInfo;
 }
 
-
 export interface TodayStatusItemBase {
     locationId: number;
     state: boolean;
     name?: string;
 }
 
-
-export interface RawTodayStatusItem extends TodayStatusItemBase {
-    startTime: Nullable<string>;
+interface RawTodayStatusItemStart extends TodayStatusItemBase {
+    startTime: string;
     endTime: Nullable<string>;
 }
 
-export interface TodayStatusItem extends TodayStatusItemBase {
-    startTime: Nullable<Date>;
+interface RawTodayStatusItemEnd extends TodayStatusItemBase {
+    startTime: Nullable<string>;
+    endTime: string;
+}
+
+interface RawTodayStatusItemAll extends RawTodayStatusItemStart {
+    startTime: string;
+    endTime: string;
+}
+
+export type RawTodayStatusItem = RawTodayStatusItemStart | RawTodayStatusItemEnd | RawTodayStatusItemAll;
+
+interface TodayStatusItemStart extends TodayStatusItemBase {
+    startTime: Date;
     endTime: Nullable<Date>;
 }
+
+interface TodayStatusItemEnd extends TodayStatusItemBase {
+    startTime: Nullable<Date>;
+    endTime: Date;
+}
+
+interface TodayStatusItemAll extends TodayStatusItemStart {
+    startTime: Date;
+    endTime: Date;
+}
+
+export type TodayStatusItem = TodayStatusItemStart | TodayStatusItemEnd | TodayStatusItemAll;
 
 /** @interface RawTodayStatusResult
  *
@@ -115,7 +135,6 @@ export interface RawTodayStatusResult {
     status: RawTodayStatusItem[];
 }
 
-
 /** @interface TodayStatusResult
  *
  * @summary 经过js格式处理的今日状态响应参数接口
@@ -125,7 +144,6 @@ export interface RawTodayStatusResult {
 export interface TodayStatusResult {
     status: TodayStatusItem[];
 }
-
 
 /** @interface AttendanceRateResult
  *
@@ -139,9 +157,7 @@ export interface AttendanceRateResult {
     deptAvgRate: number;
 }
 
-
 export type FetchUserInfoResult = UserInfo;
-
 
 export interface LocationInfo {
     id: number;
@@ -152,9 +168,7 @@ export interface LocationInfo {
     address: string;
 }
 
-
 export type LocationInfoResult = LocationInfo;
-
 
 export interface ClockData {
     longitude: number;

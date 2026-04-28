@@ -41,7 +41,7 @@
             </div>
 
             <!-- 有即将到来或截止的打卡 -->
-            <template v-if="recentClock">
+            <template v-if="recentClock && distance && location">
                 <!-- 位置信息 -->
                 <div class="dc-main-location">
                     <div class="dc-main-location-title">
@@ -54,55 +54,101 @@
 
                     <!-- 位置信息 -->
                     <div class="dc-main-location-info">
-                        <template v-if="isLoading">
+                        <template v-if="loading">
                             <i class="fas fa-spinner fa-pulse" /> {{ $t(LOCAL("loading-pos")) }}
                         </template>
 
-                        <template v-else-if="error || !position">
-                            {{ error }}
+                        <template v-else-if="error || !position || errorMsgKey">
+                            <i class="fas fa-exclamation-triangle" />{{ $t(LOCAL(errorMsgKey || "location-failed")) }}
                         </template>
 
                         <template v-else>
                             <i class="fas fa-map-pin" />
 
-                            {{ $t("common.longitude") }} {{ position.coords.longitude.toFixed(6) }}
-
-                            {{ $t("common.latitude") }} {{ position.coords.latitude.toFixed(6) }}
+                            {{ address }}
                         </template>
                     </div>
 
                     <!-- 距离信息 -->
                     <i18n-t
-                        class="dc-main-location-destance"
+                        class="dc-main-location-distance"
+                        :class="{ invaild: !distanceValid }"
                         :keypath="LOCAL('distance')"
                         tag="div">
                         <template #distance>{{ distance?.toFixed(2) || "---" }}</template>
 
                         <template #range>{{ location?.radius.toFixed(2) || "---" }}</template>
                     </i18n-t>
+
+                    <!-- 错误指南 -->
+                    <div
+                        class="dc-main-location-guide"
+                        :class="{ invaild: !distanceValid }">
+                        {{
+                            $t(
+                                LOCAL(
+                                    distance && location
+                                        ? distanceValid
+                                            ? "pos-valid"
+                                            : "pos-invalid"
+                                        : errorMsgKey
+                                          ? "request-permission"
+                                          : "location-failed"
+                                )
+                            )
+                        }}
+                    </div>
                 </div>
 
                 <!-- 打卡按钮 -->
                 <button
                     class="dc-main-btn"
+                    :disabled="distanceValid || true"
                     @click="handleClock">
                     <i class="fas fa-fingerprint" />
 
                     <i18n-t
-                        :keypath="LOCAL('clock-in')"
+                        :keypath="LOCAL(distanceValid ? 'clock-in' : 'clock-disabled')"
                         tag="span">
                         <template #name>
                             {{ recentClock?.name || "" }}
                         </template>
                     </i18n-t>
                 </button>
+
+                <!-- 今日打卡记录 -->
+                <div
+                    class="dc-main-status"
+                    v-if="todayStatus?.status">
+                    <div><i class="far fa-calendar-check" /> {{ $t(LOCAL("today-records")) }}</div>
+                    <div class="dc-main-status-list">
+                        <div
+                            class="dc-main-status-item"
+                            v-for="(task, index) of todayStatus.status"
+                            :key="index">
+                            <i
+                                class="dc-main-status-item-dot"
+                                :class="{
+                                    [task.state ? 'sucess' : task.startTime && task.startTime > now ? 'wait' : 'miss']:
+                                        true
+                                }" />
+
+                            {{ task.name || formatClockTime(task) }}
+                        </div>
+                    </div>
+                </div>
             </template>
+
+            <!-- 加载中 -->
+            <div v-else-if="todayStatusLoading || !checkInStat">
+                <i class="fas fa-spinner fa-pulse" /> {{ $t(LOCAL("loading-data")) }}
+            </div>
 
             <!-- 无打卡信息 -->
             <div
                 v-else
                 class="dc-main-noclock">
-                {{ $t(LOCAL(checkInStat.total ? "finish" : "no-clock")) }}
+                {{ $t(LOCAL(checkInStat.total ? "finish" : "no-task")) }}
             </div>
         </main>
     </div>
@@ -118,55 +164,93 @@
      * @copyright CC BY-NC-SA
      * */
     import { ref, computed, watch, onMounted, onUnmounted } from "vue";
+    import type { Nullable, TodayStatusItem } from "@/types/common";
     import useClockStore from "@/stores/clock.store";
+    import useCoordStore from "@/stores/coord.store";
     import { attendanceApi, clockApi } from "@/api";
     import { useAsyncState } from "@vueuse/core";
-    import { Nullable } from "@/types/common";
+    import { ElMessage } from "element-plus";
     import { storeToRefs } from "pinia";
     import { haversine } from "@/utils";
-
-    // TODO: 1. 在距离信息下方添加错误指南信息，2. 打卡按钮禁用逻辑，3. 今日打卡记录（以替代错过打卡）
+    import { useI18n } from "vue-i18n";
 
     /* state */
 
     const LOCAL = (key: string, type: string = "template") => `clock.${type}.${key}`;
 
+    const { t } = useI18n();
     const now = ref<Date>(new Date());
     let interval: Nullable<number> = null;
+    const coordStore = useCoordStore();
 
-    const { recentClock, checkInStat } = storeToRefs(useClockStore());
+    // 错误信息键
+    const errorMsgKey = ref<Nullable<string>>(null);
 
+    const { recentClock, checkInStat, todayStatusLoading, todayStatus } = storeToRefs(useClockStore());
+
+    // 坐标信息
     const {
         state: position,
-        isLoading,
+        isLoading: positionLoading,
         error
     } = useAsyncState(
         () => {
             return new Promise<GeolocationPosition>((resolve, reject) =>
                 navigator.geolocation.getCurrentPosition(resolve, reject)
-            );
+            ).catch(e => {
+                switch (e.code) {
+                    case 1:
+                        errorMsgKey.value = "user-refused";
+                        break;
+                    case 2:
+                        errorMsgKey.value = "position-unavailable";
+                        break;
+                    case 3:
+                        errorMsgKey.value = "location-timeout";
+                        break;
+                    default:
+                        errorMsgKey.value = "location-failed";
+                        break;
+                }
+            });
         },
         null,
         { immediate: true }
     );
 
-    const { state: location, execute } = useAsyncState(
+    // 打卡应在地点信息
+    const {
+        state: location,
+        isLoading: locationLoading,
+        execute: locationExecute
+    } = useAsyncState(
         async () => (recentClock.value ? attendanceApi.getLocation(recentClock.value.locationId) : null),
+        null,
+        { immediate: true }
+    );
+
+    // 当前地址信息
+    const {
+        state: address,
+        isLoading: addressLoading,
+        execute: addressExecute
+    } = useAsyncState(
+        async () => {
+            if (!position.value) return null;
+
+            // 通过高度获取逆地理编码
+            return await coordStore.getAddress(position.value.coords.longitude, position.value.coords.latitude);
+        },
         null,
         { immediate: true }
     );
 
     /* computed */
 
-    const timeInfo = computed(() => ({
-        year: now.value.getFullYear(),
-        month: (now.value.getMonth() + 1).toString().padStart(2, "0"),
-        day: now.value.getDate().toString().padStart(2, "0"),
-        hours: now.value.getHours().toString().padStart(2, "0"),
-        minutes: now.value.getMinutes().toString().padStart(2, "0"),
-        seconds: now.value.getSeconds().toString().padStart(2, "0")
-    }));
+    // 当前时间信息
+    const timeInfo = computed(() => processTime(now.value));
 
+    // 当前位置与打卡位置的距离
     const distance = computed<Nullable<number>>(() => {
         if (position.value && location.value)
             return haversine(
@@ -179,27 +263,64 @@
         return null;
     });
 
+    // 距离是否有效且合理
+    const distanceValid = computed(() => distance.value && location.value && distance.value <= location.value.radius);
+
+    // 地址相关部分是否在加载
+    const loading = computed(() => positionLoading.value || locationLoading.value || addressLoading.value);
+
     /* methods */
 
+    // 更新时间
     const updateTime = () => {
         now.value = new Date();
     };
 
+    // 打卡
     const handleClock = () => {
         if (!position.value || !recentClock.value) return;
 
-        // TODO: 传回bool并弹出
-        clockApi.clockIn({
-            longitude: position.value.coords.longitude,
-            latitude: position.value.coords.latitude,
-            locationId: recentClock.value?.locationId,
-            time: now.value.toISOString()
-        });
+        clockApi
+            .checkIn({
+                longitude: position.value.coords.longitude,
+                latitude: position.value.coords.latitude,
+                locationId: recentClock.value?.locationId,
+                time: now.value.toISOString()
+            })
+            .then(resp =>
+                resp ? ElMessage.success(t(LOCAL("success", "script"))) : ElMessage.error(t("failed", "script"))
+            )
+            .catch(e => ElMessage.error(e.message));
+    };
+
+    // 处理时间
+    const processTime = (date: Date) => ({
+        year: date.getFullYear(),
+        month: (date.getMonth() + 1).toString().padStart(2, "0"),
+        day: date.getDate().toString().padStart(2, "0"),
+        hours: date.getHours().toString().padStart(2, "0"),
+        minutes: date.getMinutes().toString().padStart(2, "0"),
+        seconds: date.getSeconds().toString().padStart(2, "0")
+    });
+
+    // 格式化打卡时间
+    const formatClockTime = (clockInfo: TodayStatusItem) => {
+        const time = processTime((clockInfo.startTime || clockInfo.endTime)!);
+
+        return `${time.hours}:${time.minutes}`;
     };
 
     /* watch */
 
-    watch(() => recentClock.value?.locationId, execute);
+    watch(
+        () => recentClock.value?.locationId,
+        () => locationExecute()
+    );
+
+    watch(
+        () => position.value?.coords,
+        () => addressExecute()
+    );
 
     /* onMounted */
 
@@ -236,7 +357,6 @@
         &-main
             background: rgba(255, 255, 255, 0.98)
             backdrop-filter: blur(4px)
-            border-radius: 48px
             padding: 32px 28px 40px
             transition: all 0.2s
             max-width: 500px
@@ -246,6 +366,7 @@
             +pc()
                 box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0,0,0,0.02)
                 border: 1px solid rgba(255,255,255,0.6)
+                border-radius: 48px
 
             +mobile()
                 height: 100%
@@ -309,13 +430,25 @@
                     margin-bottom: 12px
                     word-break: break-word
 
-                &-destance
+                &-distance
                     font-size: 0.7rem
                     background: var(--location-dest-bg)
                     display: inline-block
                     padding: 4px 12px
                     border-radius: 40px
                     color: var(--primary-color)
+
+                    &.invaild
+                        background: var(--location-dest-err-bg)
+                        color: var(--location-dest-err-color)
+
+                &-guide
+                    margin-top: 12px
+                    font-size: 0.7rem
+                    color: var(--primary-color)
+
+                    &.invaild
+                        color: var(--location-dest-err-color)
 
             &-btn
                 background: var(--primary-color)
@@ -339,7 +472,37 @@
                     transform: scale(0.98)
 
                 &:disabled
-                    background: var(--disabled-color)
+                    background: var(--clock-btn-disabled-color)
                     cursor: not-allowed
                     box-shadow: none
+
+            &-status
+                background: var(--clock-status-bg)
+                border-radius: 28px
+                padding: 16px
+                font-size: 0.8rem
+                display: flex
+                justify-content: space-between
+                align-items: center
+                flex-wrap: wrap
+                gap: 10px
+                overflow-x: hidden
+
+                &-list
+                    overflow-x: auto
+
+                &-item
+                    &-dot
+                        width: 10px
+                        height: 10px
+                        border-radius: 10px
+                        display: inline-block
+                        margin-right: 6px
+
+                        &.sucess
+                            background: var(--primary-color)
+                        &.wait
+                            background: var(--clock-status-wait)
+                        &.miss
+                            background: var(--clock-status-miss)
 </style>

@@ -79,8 +79,8 @@ export namespace attendanceApi {
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace clockApi {
 
-    export async function clockIn(data: ClockData) {
-        return await http.post("/clock/record", { data });
+    export async function checkIn(data: ClockData) {
+        return await http.post<boolean>("/clock/record", { data });
     }
 
 }

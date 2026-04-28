@@ -78,7 +78,7 @@
             </div>
 
             <!-- 错过打卡 -->
-            <i18n-t class="dhr-empty" v-else-if="checkInStat.miss" :keypath="LOCAL('miss-task')" tag="div">
+            <i18n-t class="dhr-empty" v-else-if="checkInStat?.miss" :keypath="LOCAL('miss-task')" tag="div">
 
                 <template #count>
 
@@ -90,7 +90,7 @@
 
             <!-- 无打卡信息 -->
             <div class="dhr-empty" v-else>
-                {{ $t(LOCAL(checkInStat.total ? "finish" : "no-task")) }}
+                {{ $t(LOCAL(checkInStat?.total ? "finish" : "no-task")) }}
             </div>
         </template>
     </dg-panel>

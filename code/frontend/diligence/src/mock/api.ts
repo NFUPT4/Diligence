@@ -23,16 +23,17 @@ import { MockServerBase, route as mockRoute } from "@/mock/common";
 import type {
     AttendanceRateResult,
     FetchUserInfoResult,
-    HttpRequest,
-    LocationInfo,
     LocationInfoResult,
-    LoginData,
-    LoginResult,
-    Nullable,
     TodayStatusResult,
+    LocationInfo,
+    HttpRequest,
+    LoginResult,
+    ClockData,
+    LoginData,
+    Nullable,
     UserInfo
 } from "@/types/common";
-import { randomBoolean, randomChoice, genRandomDatePairs } from "@/utils";
+import { genRandomDatePairs } from "@/utils";
 
 type AxiosRequest<T = unknown> = HttpRequest<{
     data: T;
@@ -193,6 +194,13 @@ class MockServer extends MockServerBase {
         const location = this.locations[request.body.data - 1];
 
         return location || { code: 404, msg: "位置不存在", data: null };
+    }
+
+    @route("/clock/record", "POST")
+    checkIn(request: AxiosRequest<ClockData>): HttpRequest<null> | HttpRequest<boolean> {
+        const info = MockServer.parseToken(request);
+
+        return info ? true : { code: 401, msg: "请先登录", data: null };
     }
 
     /**
