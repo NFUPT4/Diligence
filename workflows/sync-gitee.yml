@@ -1,0 +1,21 @@
+name: Sync from Gitee (mirror)
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # 每6小时同步一次
+  workflow_dispatch:         # 支持手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout temporary repo
+        run: |
+          git clone --mirror https://gitee.com/nfupt4/Diligence.git temp-repo
+          cd temp-repo
+
+      - name: Push to GitHub
+        run: |
+          cd temp-repo
+          git remote set-url origin https://${{ secrets.GITHUB_TOKEN }}@github.com/nfupt4/Diligence.git
+          git push --mirror --force origin
